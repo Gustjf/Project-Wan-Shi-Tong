@@ -1588,11 +1588,16 @@
       ctx.fillText(`${Math.round(wv)} ${unit}`, chartLeft - 16, yy + 7);
     });
 
-    // minimal x-axis: first / mid / last date, no year
+    // minimal x-axis: first / mid / last date. Year is omitted when it
+    // matches the current year, but added back for any date that falls in
+    // a different year so the goal window stays unambiguous.
     ctx.textAlign = "center";
+    const nowYear = new Date().getFullYear();
     [0, 0.5, 1].forEach(f => {
       let d = addDays(minDate, Math.round(totalDays * f));
-      ctx.fillText(fmtDateShort(d), cx(d), chartBottom + 36);
+      let dt = new Date(d + "T00:00:00");
+      let label = dt.getFullYear() === nowYear ? fmtDateShort(d) : fmtDate(d);
+      ctx.fillText(label, cx(d), chartBottom + 36);
     });
 
     let pts = wEntries.map(p => ({ x: cx(p.date), y: cy(p.weight) }));
