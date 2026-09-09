@@ -619,8 +619,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.502";
+  const APP_VERSION = "1.512";
   const CHANGELOG = [
+    { version: "1.512", date: "2026-09-09", changes: [
+      "The exported progress image's title is now 'Weight report', and its chart sits in its own light-grey, white-bordered card instead of floating directly on the page."
+    ] },
     { version: "1.502", date: "2026-09-09", changes: [
       "Importing a backup that contains Tirzepatide dose entries now skips the start-up 'Do you take Tirzepatide?' question and turns the dose UI on automatically."
     ] },
@@ -1535,10 +1538,14 @@
 
     // --- Layout: fixed blocks + goal rows, clamped to a 1350-1920 tall canvas ---
     const topPad = 96, titleH = 66;
-    const chartGapTop = 76, chartH = 540, chartGapBottom = 96;
+    // The chart sits inside its own card (see "Chart card" below); cardPadTop/
+    // Bottom are the padding *inside* that card around the plot area, while
+    // chartGapTop/Bottom are the breathing room *outside* it, between the card
+    // and the title/table.
+    const chartGapTop = 56, cardPadTop = 44, chartH = 540, cardPadBottom = 68, chartGapBottom = 56;
     const tableHeaderH = 56, bottomPad = 80;
     const n = Math.max(goalList.length, 1);
-    const fixedH = topPad + titleH + chartGapTop + chartH + chartGapBottom + tableHeaderH + bottomPad;
+    const fixedH = topPad + titleH + chartGapTop + cardPadTop + chartH + cardPadBottom + chartGapBottom + tableHeaderH + bottomPad;
     let rowH = Math.min(112, Math.max(58, Math.round((1650 - fixedH) / n)));
     let H = Math.min(1920, Math.max(1350, Math.round(fixedH + rowH * n)));
     rowH = Math.max(50, Math.floor((H - fixedH) / n));
@@ -1557,14 +1564,29 @@
     ctx.textAlign = "center";
     ctx.fillStyle = "#1f2430"; // --text
     ctx.font = `700 56px ${FONT}`;
-    let titleText = profile.name ? `${profile.name}'s weight loss progress` : "Weight loss progress";
+    let titleText = profile.name ? `${profile.name}'s weight report` : "Weight report";
     ctx.fillText(titleText, W / 2, topPad + 50);
 
-    // --- Chart: minimal gradient trend line, no goal lines ---
-    let chartTop = topPad + titleH + chartGapTop;
-    let chartLeft = PAD_X + 44;
-    let chartRight = W - PAD_X;
+    // --- Chart card: a light-grey framed panel (mirrors the app's own
+    // section/card styling — see --bg and the white .section panels) so the
+    // chart reads as a contained block instead of spilling into the rest of
+    // the report. Light grey fill + a clean white inset border, minimal and
+    // consistent with the rest of the export.
+    let cardTop = topPad + titleH + chartGapTop;
+    let cardLeft = PAD_X;
+    let cardRight = W - PAD_X;
+    let chartTop = cardTop + cardPadTop;
+    let chartLeft = cardLeft + 116;
+    let chartRight = cardRight - 40;
     let chartBottom = chartTop + chartH;
+    let cardBottom = chartBottom + cardPadBottom;
+
+    roundRectPath(ctx, cardLeft, cardTop, cardRight - cardLeft, cardBottom - cardTop, 20);
+    ctx.fillStyle = "#f4f5f7"; // --bg, subtle light grey
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ffffff";
+    ctx.stroke();
 
     let minDate = wEntries[0].date, maxDate = wEntries[wEntries.length - 1].date;
     let weightsArr = wEntries.map(p => p.weight);
@@ -1638,7 +1660,7 @@
     ctx.stroke();
 
     // --- Goal table ---
-    let tableTop = chartBottom + chartGapBottom;
+    let tableTop = cardBottom + chartGapBottom;
     ctx.font = `600 20px ${FONT}`;
     ctx.fillStyle = "#6b7280"; // --muted
     ctx.textAlign = "left";
