@@ -1,0 +1,6616 @@
+{
+  "schemaVersion": 2,
+  "appVersion": "1.502",
+  "unit": "lb",
+  "name": "Alex",
+  "entries": [
+    {
+      "date": "2023-09-09",
+      "weight": 219.9,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-10",
+      "weight": 219.9,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-11",
+      "weight": 219.8,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-12",
+      "weight": 220.1,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-13",
+      "weight": 219.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-14",
+      "weight": 219.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-15",
+      "weight": 219.6,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-16",
+      "weight": 219.6,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-17",
+      "weight": 219.5,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-18",
+      "weight": 219.6,
+      "calories": 2700,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-19",
+      "weight": 219.7,
+      "calories": 2660,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-20",
+      "weight": 220.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-21",
+      "weight": 220.1,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-22",
+      "weight": 219.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-23",
+      "weight": 219.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-24",
+      "weight": 219.1,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-25",
+      "weight": 219.3,
+      "calories": 2800,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-26",
+      "weight": 219.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-27",
+      "weight": 219.7,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-28",
+      "weight": 219.5,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-29",
+      "weight": 219.6,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2023-09-30",
+      "weight": 219.0,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-01",
+      "weight": 219.0,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-02",
+      "weight": 219.2,
+      "calories": 2480,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-03",
+      "weight": 219.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-04",
+      "weight": 219.3,
+      "calories": 2480,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-05",
+      "weight": 219.3,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-06",
+      "weight": 219.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-07",
+      "weight": 219.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-08",
+      "weight": 218.9,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-09",
+      "weight": 219.1,
+      "calories": 2570,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-10",
+      "weight": 218.4,
+      "calories": 2520,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-11",
+      "weight": 217.5,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-12",
+      "weight": 217.5,
+      "calories": 2690,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-13",
+      "weight": 217.3,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-14",
+      "weight": 217.8,
+      "calories": 2720,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-15",
+      "weight": 217.9,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-16",
+      "weight": 217.3,
+      "calories": 2690,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-17",
+      "weight": 217.6,
+      "calories": 2630,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-18",
+      "weight": 217.0,
+      "calories": 2540,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-19",
+      "weight": 216.9,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-20",
+      "weight": 216.7,
+      "calories": 2580,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-21",
+      "weight": 216.6,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-22",
+      "weight": 216.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-23",
+      "weight": 216.7,
+      "calories": 2510,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-24",
+      "weight": 216.5,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-25",
+      "weight": 216.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-26",
+      "weight": 216.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-27",
+      "weight": 215.6,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-28",
+      "weight": 215.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-29",
+      "weight": 214.9,
+      "calories": 2790,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-30",
+      "weight": 215.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-10-31",
+      "weight": 214.7,
+      "calories": 2530,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-01",
+      "weight": 215.3,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-02",
+      "weight": 214.6,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-03",
+      "weight": 213.9,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-04",
+      "weight": 214.1,
+      "calories": 2710,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-05",
+      "weight": 214.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-06",
+      "weight": 214.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-07",
+      "weight": 214.0,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-08",
+      "weight": 214.1,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-09",
+      "weight": 213.6,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-10",
+      "weight": 212.6,
+      "calories": 2570,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-11",
+      "weight": 212.3,
+      "calories": 2580,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-12",
+      "weight": 212.5,
+      "calories": 2640,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-13",
+      "weight": 211.7,
+      "calories": 2600,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-14",
+      "weight": 211.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-15",
+      "weight": 211.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-16",
+      "weight": 211.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-17",
+      "weight": 211.3,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-18",
+      "weight": 211.2,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-19",
+      "weight": 211.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-20",
+      "weight": 211.3,
+      "calories": 2670,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-21",
+      "weight": 210.6,
+      "calories": 2520,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-22",
+      "weight": 210.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-23",
+      "weight": 209.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-24",
+      "weight": 209.7,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-25",
+      "weight": 209.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-26",
+      "weight": 209.0,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-27",
+      "weight": 209.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-28",
+      "weight": 208.5,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-29",
+      "weight": 208.2,
+      "calories": 2630,
+      "doseMg": null
+    },
+    {
+      "date": "2023-11-30",
+      "weight": 207.4,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-01",
+      "weight": 207.1,
+      "calories": 2650,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-02",
+      "weight": 207.0,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-03",
+      "weight": 207.1,
+      "calories": 2730,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-04",
+      "weight": 207.5,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-05",
+      "weight": 207.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-06",
+      "weight": 207.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-07",
+      "weight": 206.7,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-08",
+      "weight": 206.8,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-09",
+      "weight": 206.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-10",
+      "weight": 206.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-11",
+      "weight": 206.3,
+      "calories": 2570,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-12",
+      "weight": 206.8,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-13",
+      "weight": 207.1,
+      "calories": 2530,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-14",
+      "weight": 207.6,
+      "calories": 2540,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-15",
+      "weight": 207.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-16",
+      "weight": 208.3,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-17",
+      "weight": 208.1,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-18",
+      "weight": 208.7,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-19",
+      "weight": 208.6,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-20",
+      "weight": 208.5,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-21",
+      "weight": 208.2,
+      "calories": 2580,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-22",
+      "weight": 208.4,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-23",
+      "weight": 209.2,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-24",
+      "weight": 209.6,
+      "calories": 2660,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-25",
+      "weight": 209.9,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-26",
+      "weight": 209.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-27",
+      "weight": 209.7,
+      "calories": 2720,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-28",
+      "weight": 210.1,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-29",
+      "weight": 210.1,
+      "calories": 2580,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-30",
+      "weight": 210.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2023-12-31",
+      "weight": 210.4,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-01",
+      "weight": 211.3,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-02",
+      "weight": 211.0,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-03",
+      "weight": 211.0,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-04",
+      "weight": 211.8,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-05",
+      "weight": 211.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-06",
+      "weight": 211.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-07",
+      "weight": 212.1,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-08",
+      "weight": 211.8,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-09",
+      "weight": 212.3,
+      "calories": 2450,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-10",
+      "weight": 212.2,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-11",
+      "weight": 212.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-12",
+      "weight": 213.1,
+      "calories": 2510,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-13",
+      "weight": 214.1,
+      "calories": 2570,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-14",
+      "weight": 214.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-15",
+      "weight": 214.6,
+      "calories": 2530,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-16",
+      "weight": 214.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-17",
+      "weight": 214.2,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-18",
+      "weight": 214.5,
+      "calories": 2510,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-19",
+      "weight": 215.3,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-20",
+      "weight": 214.7,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-21",
+      "weight": 215.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-22",
+      "weight": 215.6,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-23",
+      "weight": 216.3,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-24",
+      "weight": 216.5,
+      "calories": 2600,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-25",
+      "weight": 216.4,
+      "calories": 2450,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-26",
+      "weight": 216.3,
+      "calories": 2710,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-27",
+      "weight": 216.0,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-28",
+      "weight": 216.4,
+      "calories": 2720,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-29",
+      "weight": 216.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-30",
+      "weight": 217.6,
+      "calories": 2850,
+      "doseMg": null
+    },
+    {
+      "date": "2024-01-31",
+      "weight": 217.4,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-01",
+      "weight": 217.6,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-02",
+      "weight": 217.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-03",
+      "weight": 217.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-04",
+      "weight": 217.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-05",
+      "weight": 218.4,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-06",
+      "weight": 219.1,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-07",
+      "weight": 219.1,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-08",
+      "weight": 218.8,
+      "calories": 2640,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-09",
+      "weight": 219.1,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-10",
+      "weight": 219.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-11",
+      "weight": 219.5,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-12",
+      "weight": 219.2,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-13",
+      "weight": 219.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-14",
+      "weight": 219.6,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-15",
+      "weight": 219.8,
+      "calories": 2540,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-16",
+      "weight": 220.2,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-17",
+      "weight": 220.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-18",
+      "weight": 220.2,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-19",
+      "weight": 220.8,
+      "calories": 2730,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-20",
+      "weight": 220.6,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-21",
+      "weight": 220.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-22",
+      "weight": 220.2,
+      "calories": 2440,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-23",
+      "weight": 220.7,
+      "calories": 2740,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-24",
+      "weight": 220.5,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-25",
+      "weight": 220.6,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-26",
+      "weight": 220.9,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-27",
+      "weight": 220.5,
+      "calories": 2750,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-28",
+      "weight": 219.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-02-29",
+      "weight": 220.2,
+      "calories": 2580,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-01",
+      "weight": 220.4,
+      "calories": 2570,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-02",
+      "weight": 220.2,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-03",
+      "weight": 220.7,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-04",
+      "weight": 220.9,
+      "calories": 2640,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-05",
+      "weight": 220.5,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-06",
+      "weight": 220.8,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-07",
+      "weight": 220.8,
+      "calories": 2570,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-08",
+      "weight": 220.3,
+      "calories": 2510,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-09",
+      "weight": 220.8,
+      "calories": 2630,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-10",
+      "weight": 220.9,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-11",
+      "weight": 220.9,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-12",
+      "weight": 221.5,
+      "calories": 2660,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-13",
+      "weight": 222.0,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-14",
+      "weight": 222.1,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-15",
+      "weight": 222.5,
+      "calories": 2220,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-16",
+      "weight": 223.2,
+      "calories": 2530,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-17",
+      "weight": 223.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-18",
+      "weight": 223.5,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-19",
+      "weight": 223.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-20",
+      "weight": 224.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-21",
+      "weight": 224.1,
+      "calories": 2660,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-22",
+      "weight": 224.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-23",
+      "weight": 224.8,
+      "calories": 2540,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-24",
+      "weight": 225.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-25",
+      "weight": 226.1,
+      "calories": 2440,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-26",
+      "weight": 226.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-27",
+      "weight": 227.1,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-28",
+      "weight": 226.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-29",
+      "weight": 227.1,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-30",
+      "weight": 227.0,
+      "calories": 2540,
+      "doseMg": null
+    },
+    {
+      "date": "2024-03-31",
+      "weight": 227.0,
+      "calories": 2640,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-01",
+      "weight": 227.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-02",
+      "weight": 227.6,
+      "calories": 2440,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-03",
+      "weight": 228.1,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-04",
+      "weight": 227.6,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-05",
+      "weight": 228.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-06",
+      "weight": 229.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-07",
+      "weight": 229.9,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-08",
+      "weight": 229.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-09",
+      "weight": 230.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-10",
+      "weight": 231.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-11",
+      "weight": 230.4,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-12",
+      "weight": 229.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-13",
+      "weight": 229.6,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-14",
+      "weight": 229.8,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-15",
+      "weight": 230.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-16",
+      "weight": 230.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-17",
+      "weight": 230.0,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-18",
+      "weight": 229.4,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-19",
+      "weight": 229.3,
+      "calories": 2670,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-20",
+      "weight": 229.8,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-21",
+      "weight": 229.9,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-22",
+      "weight": 229.1,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-23",
+      "weight": 229.2,
+      "calories": 2580,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-24",
+      "weight": 229.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-25",
+      "weight": 230.4,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-26",
+      "weight": 230.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-27",
+      "weight": 230.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-28",
+      "weight": 229.4,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-29",
+      "weight": 229.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-04-30",
+      "weight": 229.1,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-01",
+      "weight": 229.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-02",
+      "weight": 229.5,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-03",
+      "weight": 229.2,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-04",
+      "weight": 228.8,
+      "calories": 2520,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-05",
+      "weight": 228.6,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-06",
+      "weight": 228.4,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-07",
+      "weight": 228.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-08",
+      "weight": 228.1,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-09",
+      "weight": 228.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-10",
+      "weight": 228.7,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-11",
+      "weight": 229.1,
+      "calories": 2480,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-12",
+      "weight": 228.7,
+      "calories": 2660,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-13",
+      "weight": 228.7,
+      "calories": 2640,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-14",
+      "weight": 228.1,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-15",
+      "weight": 227.5,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-16",
+      "weight": 227.1,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-17",
+      "weight": 227.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-18",
+      "weight": 227.5,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-19",
+      "weight": 227.2,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-20",
+      "weight": 227.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-21",
+      "weight": 227.1,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-22",
+      "weight": 226.7,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-23",
+      "weight": 226.2,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-24",
+      "weight": 225.7,
+      "calories": 2650,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-25",
+      "weight": 226.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-26",
+      "weight": 226.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-27",
+      "weight": 224.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-28",
+      "weight": 224.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-29",
+      "weight": 224.2,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-30",
+      "weight": 224.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-05-31",
+      "weight": 223.3,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-01",
+      "weight": 222.3,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-02",
+      "weight": 221.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-03",
+      "weight": 221.9,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-04",
+      "weight": 221.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-05",
+      "weight": 221.9,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-06",
+      "weight": 221.5,
+      "calories": 2600,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-07",
+      "weight": 220.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-08",
+      "weight": 220.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-09",
+      "weight": 220.5,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-10",
+      "weight": 220.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-11",
+      "weight": 220.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-12",
+      "weight": 220.9,
+      "calories": 2680,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-13",
+      "weight": 220.5,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-14",
+      "weight": 220.7,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-15",
+      "weight": 220.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-16",
+      "weight": 219.7,
+      "calories": 2720,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-17",
+      "weight": 219.3,
+      "calories": 2640,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-18",
+      "weight": 219.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-19",
+      "weight": 218.2,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-20",
+      "weight": 218.4,
+      "calories": 2540,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-21",
+      "weight": 218.5,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-22",
+      "weight": 218.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-23",
+      "weight": 217.9,
+      "calories": 2760,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-24",
+      "weight": 218.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-25",
+      "weight": 218.4,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-26",
+      "weight": 218.1,
+      "calories": 2440,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-27",
+      "weight": 217.6,
+      "calories": 2480,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-28",
+      "weight": 217.2,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-29",
+      "weight": 217.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-06-30",
+      "weight": 216.4,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-01",
+      "weight": 216.4,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-02",
+      "weight": 216.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-03",
+      "weight": 216.9,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-04",
+      "weight": 216.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-05",
+      "weight": 216.8,
+      "calories": 2680,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-06",
+      "weight": 216.0,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-07",
+      "weight": 216.0,
+      "calories": 2510,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-08",
+      "weight": 215.3,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-09",
+      "weight": 215.2,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-10",
+      "weight": 215.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-11",
+      "weight": 214.6,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-12",
+      "weight": 215.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-13",
+      "weight": 214.8,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-14",
+      "weight": 213.7,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-15",
+      "weight": 213.7,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-16",
+      "weight": 213.3,
+      "calories": 2510,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-17",
+      "weight": 213.1,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-18",
+      "weight": 213.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-19",
+      "weight": 212.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-20",
+      "weight": 211.8,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-21",
+      "weight": 211.3,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-22",
+      "weight": 211.6,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-23",
+      "weight": 211.9,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-24",
+      "weight": 212.2,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-25",
+      "weight": 212.3,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-26",
+      "weight": 210.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-27",
+      "weight": 210.8,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-28",
+      "weight": 209.8,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-29",
+      "weight": 210.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-30",
+      "weight": 210.0,
+      "calories": 2450,
+      "doseMg": null
+    },
+    {
+      "date": "2024-07-31",
+      "weight": 209.3,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-01",
+      "weight": 209.8,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-02",
+      "weight": 209.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-03",
+      "weight": 208.4,
+      "calories": 2590,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-04",
+      "weight": 208.4,
+      "calories": 2480,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-05",
+      "weight": 207.9,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-06",
+      "weight": 207.8,
+      "calories": 2510,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-07",
+      "weight": 207.4,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-08",
+      "weight": 207.7,
+      "calories": 2440,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-09",
+      "weight": 206.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-10",
+      "weight": 207.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-11",
+      "weight": 208.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-12",
+      "weight": 208.2,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-13",
+      "weight": 208.6,
+      "calories": 2600,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-14",
+      "weight": 209.1,
+      "calories": 2640,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-15",
+      "weight": 209.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-16",
+      "weight": 209.9,
+      "calories": 2570,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-17",
+      "weight": 210.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-18",
+      "weight": 210.4,
+      "calories": 2760,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-19",
+      "weight": 211.5,
+      "calories": 2740,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-20",
+      "weight": 212.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-21",
+      "weight": 212.2,
+      "calories": 2700,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-22",
+      "weight": 212.3,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-23",
+      "weight": 212.5,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-24",
+      "weight": 213.4,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-25",
+      "weight": 213.7,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-26",
+      "weight": 214.3,
+      "calories": 2520,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-27",
+      "weight": 214.5,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-28",
+      "weight": 215.2,
+      "calories": 2660,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-29",
+      "weight": 215.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-30",
+      "weight": 216.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-08-31",
+      "weight": 216.3,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-01",
+      "weight": 217.0,
+      "calories": 2710,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-02",
+      "weight": 217.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-03",
+      "weight": 217.7,
+      "calories": 2550,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-04",
+      "weight": 217.8,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-05",
+      "weight": 217.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-06",
+      "weight": 218.2,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-07",
+      "weight": 218.5,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-08",
+      "weight": 219.4,
+      "calories": 2160,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-09",
+      "weight": 219.9,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2024-09-10",
+      "weight": 219.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-11",
+      "weight": 219.4,
+      "calories": 1650,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-12",
+      "weight": 218.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-13",
+      "weight": 217.0,
+      "calories": 1690,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-14",
+      "weight": 216.1,
+      "calories": 1760,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-15",
+      "weight": 215.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-16",
+      "weight": 214.3,
+      "calories": 1590,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2024-09-17",
+      "weight": 213.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-18",
+      "weight": 213.2,
+      "calories": 1570,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-19",
+      "weight": 212.4,
+      "calories": 1570,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-20",
+      "weight": 211.5,
+      "calories": 1670,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-21",
+      "weight": 210.7,
+      "calories": 1650,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-22",
+      "weight": 210.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-23",
+      "weight": 209.9,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2024-09-24",
+      "weight": 208.9,
+      "calories": 1310,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-25",
+      "weight": 208.1,
+      "calories": 1630,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-26",
+      "weight": 207.8,
+      "calories": 1710,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-27",
+      "weight": 206.8,
+      "calories": 1570,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-28",
+      "weight": 206.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-29",
+      "weight": 205.8,
+      "calories": 1670,
+      "doseMg": null
+    },
+    {
+      "date": "2024-09-30",
+      "weight": 205.2,
+      "calories": 1630,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2024-10-01",
+      "weight": 204.8,
+      "calories": 1390,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-02",
+      "weight": 203.7,
+      "calories": 1530,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-03",
+      "weight": 203.2,
+      "calories": 1550,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-04",
+      "weight": 202.1,
+      "calories": 1650,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-05",
+      "weight": 201.3,
+      "calories": 1940,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-06",
+      "weight": 201.0,
+      "calories": 1650,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-07",
+      "weight": 200.4,
+      "calories": 1800,
+      "doseMg": 5.0
+    },
+    {
+      "date": "2024-10-08",
+      "weight": 200.0,
+      "calories": 2010,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-09",
+      "weight": 199.3,
+      "calories": 1710,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-10",
+      "weight": 199.2,
+      "calories": 1740,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-11",
+      "weight": 198.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-12",
+      "weight": 198.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-13",
+      "weight": 197.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-14",
+      "weight": 197.8,
+      "calories": null,
+      "doseMg": 5.0
+    },
+    {
+      "date": "2024-10-15",
+      "weight": 197.0,
+      "calories": 1690,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-16",
+      "weight": 197.1,
+      "calories": 1770,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-17",
+      "weight": 197.0,
+      "calories": 1680,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-18",
+      "weight": 196.6,
+      "calories": 1710,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-19",
+      "weight": 196.7,
+      "calories": 1810,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-20",
+      "weight": 196.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-21",
+      "weight": 196.0,
+      "calories": 1920,
+      "doseMg": 5.0
+    },
+    {
+      "date": "2024-10-22",
+      "weight": 195.5,
+      "calories": 1940,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-23",
+      "weight": 195.5,
+      "calories": 1720,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-24",
+      "weight": 194.8,
+      "calories": 1660,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-25",
+      "weight": 194.6,
+      "calories": 1620,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-26",
+      "weight": 194.2,
+      "calories": 1910,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-27",
+      "weight": 194.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-28",
+      "weight": 194.0,
+      "calories": 1520,
+      "doseMg": 5.0
+    },
+    {
+      "date": "2024-10-29",
+      "weight": 193.7,
+      "calories": 1710,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-30",
+      "weight": 193.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-10-31",
+      "weight": 193.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-01",
+      "weight": 193.0,
+      "calories": 1900,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-02",
+      "weight": 192.4,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-03",
+      "weight": 192.4,
+      "calories": 1850,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-04",
+      "weight": 192.3,
+      "calories": 1770,
+      "doseMg": 7.5
+    },
+    {
+      "date": "2024-11-05",
+      "weight": 192.4,
+      "calories": 1750,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-06",
+      "weight": 191.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-07",
+      "weight": 191.4,
+      "calories": 1500,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-08",
+      "weight": 191.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-09",
+      "weight": 190.7,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-10",
+      "weight": 190.5,
+      "calories": 1580,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-11",
+      "weight": 189.7,
+      "calories": 2110,
+      "doseMg": 7.5
+    },
+    {
+      "date": "2024-11-12",
+      "weight": 189.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-13",
+      "weight": 189.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-14",
+      "weight": 189.8,
+      "calories": 1670,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-15",
+      "weight": 190.0,
+      "calories": 2090,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-16",
+      "weight": 189.3,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-17",
+      "weight": 188.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-18",
+      "weight": 188.5,
+      "calories": 1490,
+      "doseMg": 7.5
+    },
+    {
+      "date": "2024-11-19",
+      "weight": 188.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-20",
+      "weight": 187.7,
+      "calories": 1810,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-21",
+      "weight": 187.6,
+      "calories": 1860,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-22",
+      "weight": 186.9,
+      "calories": 1850,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-23",
+      "weight": 186.0,
+      "calories": 1880,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-24",
+      "weight": 185.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-25",
+      "weight": 185.3,
+      "calories": 2000,
+      "doseMg": 7.5
+    },
+    {
+      "date": "2024-11-26",
+      "weight": 185.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-27",
+      "weight": 185.3,
+      "calories": 1970,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-28",
+      "weight": 185.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-29",
+      "weight": 184.8,
+      "calories": 1580,
+      "doseMg": null
+    },
+    {
+      "date": "2024-11-30",
+      "weight": 184.9,
+      "calories": 1760,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-01",
+      "weight": 184.4,
+      "calories": 1730,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-02",
+      "weight": 184.6,
+      "calories": 1800,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2024-12-03",
+      "weight": 184.1,
+      "calories": 1900,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-04",
+      "weight": 183.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-05",
+      "weight": 183.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-06",
+      "weight": 183.4,
+      "calories": 1800,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-07",
+      "weight": 183.5,
+      "calories": 1780,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-08",
+      "weight": 183.2,
+      "calories": 1860,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-09",
+      "weight": 182.5,
+      "calories": 1820,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2024-12-10",
+      "weight": 182.2,
+      "calories": 1520,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-11",
+      "weight": 181.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-12",
+      "weight": 181.9,
+      "calories": 1800,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-13",
+      "weight": 181.8,
+      "calories": 1890,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-14",
+      "weight": 181.4,
+      "calories": 1750,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-15",
+      "weight": 181.4,
+      "calories": 1850,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-16",
+      "weight": 180.9,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2024-12-17",
+      "weight": 180.6,
+      "calories": 1860,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-18",
+      "weight": 180.4,
+      "calories": 1660,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-19",
+      "weight": 180.5,
+      "calories": 1760,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-20",
+      "weight": 180.1,
+      "calories": 1820,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-21",
+      "weight": 179.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-22",
+      "weight": 179.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-23",
+      "weight": 179.1,
+      "calories": 1900,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2024-12-24",
+      "weight": 178.7,
+      "calories": 1780,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-25",
+      "weight": 178.6,
+      "calories": 1750,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-26",
+      "weight": 177.8,
+      "calories": 1650,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-27",
+      "weight": 178.0,
+      "calories": 1750,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-28",
+      "weight": 177.4,
+      "calories": 1730,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-29",
+      "weight": 177.0,
+      "calories": 1940,
+      "doseMg": null
+    },
+    {
+      "date": "2024-12-30",
+      "weight": 177.3,
+      "calories": 1750,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2024-12-31",
+      "weight": 176.6,
+      "calories": 1770,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-01",
+      "weight": 176.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-02",
+      "weight": 176.4,
+      "calories": 1660,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-03",
+      "weight": 175.9,
+      "calories": 1790,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-04",
+      "weight": 176.1,
+      "calories": 1870,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-05",
+      "weight": 176.3,
+      "calories": 1600,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-06",
+      "weight": 175.3,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-01-07",
+      "weight": 174.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-08",
+      "weight": 174.9,
+      "calories": 1910,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-09",
+      "weight": 174.3,
+      "calories": 1830,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-10",
+      "weight": 174.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-11",
+      "weight": 174.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-12",
+      "weight": 174.0,
+      "calories": 1830,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-13",
+      "weight": 173.7,
+      "calories": 1790,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-01-14",
+      "weight": 173.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-15",
+      "weight": 173.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-16",
+      "weight": 173.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-17",
+      "weight": 172.8,
+      "calories": 1440,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-18",
+      "weight": 172.6,
+      "calories": 2000,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-19",
+      "weight": 172.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-20",
+      "weight": 172.0,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-01-21",
+      "weight": 171.7,
+      "calories": 1720,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-22",
+      "weight": 171.4,
+      "calories": 1630,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-23",
+      "weight": 170.9,
+      "calories": 1750,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-24",
+      "weight": 171.0,
+      "calories": 1870,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-25",
+      "weight": 171.2,
+      "calories": 1790,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-26",
+      "weight": 170.9,
+      "calories": 1710,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-27",
+      "weight": 170.7,
+      "calories": 1740,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-01-28",
+      "weight": 170.6,
+      "calories": 1990,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-29",
+      "weight": 170.4,
+      "calories": 1840,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-30",
+      "weight": 170.0,
+      "calories": 1710,
+      "doseMg": null
+    },
+    {
+      "date": "2025-01-31",
+      "weight": 169.7,
+      "calories": 1990,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-01",
+      "weight": 169.6,
+      "calories": 1720,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-02",
+      "weight": 169.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-03",
+      "weight": 168.5,
+      "calories": 1830,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-02-04",
+      "weight": 168.3,
+      "calories": 1530,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-05",
+      "weight": 167.6,
+      "calories": 1830,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-06",
+      "weight": 167.5,
+      "calories": 1820,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-07",
+      "weight": 167.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-08",
+      "weight": 167.7,
+      "calories": 1790,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-09",
+      "weight": 167.4,
+      "calories": 1670,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-10",
+      "weight": 167.3,
+      "calories": 1830,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-02-11",
+      "weight": 166.9,
+      "calories": 1770,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-12",
+      "weight": 166.3,
+      "calories": 1880,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-13",
+      "weight": 165.7,
+      "calories": 1610,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-14",
+      "weight": 165.4,
+      "calories": 1750,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-15",
+      "weight": 165.0,
+      "calories": 1700,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-16",
+      "weight": 165.2,
+      "calories": 1750,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-17",
+      "weight": 165.0,
+      "calories": 1720,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-02-18",
+      "weight": 165.0,
+      "calories": 2050,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-19",
+      "weight": 164.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-20",
+      "weight": 164.8,
+      "calories": 1710,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-21",
+      "weight": 164.8,
+      "calories": 1450,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-22",
+      "weight": 164.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-23",
+      "weight": 163.8,
+      "calories": 1810,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-24",
+      "weight": 163.4,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-02-25",
+      "weight": 162.8,
+      "calories": 1740,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-26",
+      "weight": 162.9,
+      "calories": 1840,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-27",
+      "weight": 163.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-02-28",
+      "weight": 162.8,
+      "calories": 1860,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-01",
+      "weight": 162.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-02",
+      "weight": 162.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-03",
+      "weight": 161.5,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-03-04",
+      "weight": 161.6,
+      "calories": 1860,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-05",
+      "weight": 161.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-06",
+      "weight": 161.4,
+      "calories": 2010,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-07",
+      "weight": 161.7,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-08",
+      "weight": 161.8,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-09",
+      "weight": 161.5,
+      "calories": 1830,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-10",
+      "weight": 161.2,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-03-11",
+      "weight": 161.0,
+      "calories": 1930,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-12",
+      "weight": 160.7,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-13",
+      "weight": 160.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-14",
+      "weight": 160.8,
+      "calories": 1970,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-15",
+      "weight": 160.9,
+      "calories": 1740,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-16",
+      "weight": 160.9,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-17",
+      "weight": 160.3,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-03-18",
+      "weight": 160.8,
+      "calories": 1860,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-19",
+      "weight": 161.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-20",
+      "weight": 160.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-21",
+      "weight": 160.0,
+      "calories": 2100,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-22",
+      "weight": 159.6,
+      "calories": 1950,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-23",
+      "weight": 159.7,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-24",
+      "weight": 159.3,
+      "calories": 2230,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-03-25",
+      "weight": 159.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-26",
+      "weight": 159.5,
+      "calories": 1830,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-27",
+      "weight": 158.9,
+      "calories": 1920,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-28",
+      "weight": 159.4,
+      "calories": 1890,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-29",
+      "weight": 159.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-30",
+      "weight": 158.9,
+      "calories": 1950,
+      "doseMg": null
+    },
+    {
+      "date": "2025-03-31",
+      "weight": 158.4,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-04-01",
+      "weight": 158.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-02",
+      "weight": 158.0,
+      "calories": 1810,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-03",
+      "weight": 158.0,
+      "calories": 2040,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-04",
+      "weight": 157.3,
+      "calories": 1930,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-05",
+      "weight": 157.5,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-06",
+      "weight": 158.1,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-07",
+      "weight": 157.7,
+      "calories": 2050,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-04-08",
+      "weight": 157.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-09",
+      "weight": 157.1,
+      "calories": 1840,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-10",
+      "weight": 157.4,
+      "calories": 1790,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-11",
+      "weight": 157.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-12",
+      "weight": 157.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-13",
+      "weight": 157.6,
+      "calories": 1870,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-14",
+      "weight": 157.3,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-04-15",
+      "weight": 157.3,
+      "calories": 1950,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-16",
+      "weight": 156.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-17",
+      "weight": 156.4,
+      "calories": 2090,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-18",
+      "weight": 156.5,
+      "calories": 1870,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-19",
+      "weight": 156.4,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-20",
+      "weight": 156.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-21",
+      "weight": 156.4,
+      "calories": 2000,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-04-22",
+      "weight": 156.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-23",
+      "weight": 156.2,
+      "calories": 2000,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-24",
+      "weight": 156.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-25",
+      "weight": 155.9,
+      "calories": 1870,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-26",
+      "weight": 156.3,
+      "calories": 1820,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-27",
+      "weight": 156.0,
+      "calories": 2080,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-28",
+      "weight": 155.5,
+      "calories": 1800,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-04-29",
+      "weight": 156.1,
+      "calories": 1970,
+      "doseMg": null
+    },
+    {
+      "date": "2025-04-30",
+      "weight": 155.8,
+      "calories": 2110,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-01",
+      "weight": 155.9,
+      "calories": 1960,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-02",
+      "weight": 155.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-03",
+      "weight": 155.0,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-04",
+      "weight": 154.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-05",
+      "weight": 154.7,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-05-06",
+      "weight": 154.2,
+      "calories": 1770,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-07",
+      "weight": 153.8,
+      "calories": 2000,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-08",
+      "weight": 154.0,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-09",
+      "weight": 154.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-10",
+      "weight": 154.3,
+      "calories": 1850,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-11",
+      "weight": 154.1,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-12",
+      "weight": 153.8,
+      "calories": 2040,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-05-13",
+      "weight": 153.5,
+      "calories": 1940,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-14",
+      "weight": 153.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-15",
+      "weight": 153.1,
+      "calories": 2090,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-16",
+      "weight": 153.2,
+      "calories": 1780,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-17",
+      "weight": 153.2,
+      "calories": 1910,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-18",
+      "weight": 152.9,
+      "calories": 1940,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-19",
+      "weight": 152.9,
+      "calories": 1810,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-05-20",
+      "weight": 152.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-21",
+      "weight": 152.8,
+      "calories": 1950,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-22",
+      "weight": 152.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-23",
+      "weight": 152.8,
+      "calories": 1910,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-24",
+      "weight": 152.9,
+      "calories": 1940,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-25",
+      "weight": 152.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-26",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-05-27",
+      "weight": 152.2,
+      "calories": 2000,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-28",
+      "weight": 152.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-29",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-30",
+      "weight": 151.8,
+      "calories": 1960,
+      "doseMg": null
+    },
+    {
+      "date": "2025-05-31",
+      "weight": 152.1,
+      "calories": 2050,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-01",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-02",
+      "weight": 151.8,
+      "calories": 1900,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-06-03",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-04",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-05",
+      "weight": 152.0,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-06",
+      "weight": 151.9,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-07",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-08",
+      "weight": 151.6,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-09",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-06-10",
+      "weight": 152.0,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-11",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-12",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-13",
+      "weight": 151.6,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-14",
+      "weight": 151.9,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-15",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-16",
+      "weight": 151.9,
+      "calories": 2240,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-06-17",
+      "weight": 151.6,
+      "calories": 1880,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-18",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-19",
+      "weight": 151.5,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-20",
+      "weight": 151.6,
+      "calories": 2600,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-21",
+      "weight": 151.8,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-22",
+      "weight": 152.0,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-23",
+      "weight": 151.8,
+      "calories": 2350,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-06-24",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-25",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-26",
+      "weight": 152.0,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-27",
+      "weight": 152.1,
+      "calories": 2160,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-28",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-29",
+      "weight": 152.0,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2025-06-30",
+      "weight": 151.7,
+      "calories": 2310,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-07-01",
+      "weight": 151.6,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-02",
+      "weight": 151.8,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-03",
+      "weight": 151.8,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-04",
+      "weight": 151.8,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-05",
+      "weight": 151.4,
+      "calories": 2220,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-06",
+      "weight": 151.6,
+      "calories": 2110,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-07",
+      "weight": 151.4,
+      "calories": 2130,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-07-08",
+      "weight": 151.2,
+      "calories": 2160,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-09",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-10",
+      "weight": 151.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-11",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-12",
+      "weight": 151.8,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-13",
+      "weight": 151.7,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-14",
+      "weight": 151.5,
+      "calories": 2250,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-07-15",
+      "weight": 151.3,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-16",
+      "weight": 151.4,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-17",
+      "weight": 150.8,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-18",
+      "weight": 151.2,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-19",
+      "weight": 151.6,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-20",
+      "weight": 151.5,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-21",
+      "weight": 151.5,
+      "calories": 2310,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-07-22",
+      "weight": 151.6,
+      "calories": 2160,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-23",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-24",
+      "weight": 152.0,
+      "calories": 2080,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-25",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-26",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-27",
+      "weight": 151.6,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-28",
+      "weight": 151.7,
+      "calories": 2280,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-07-29",
+      "weight": 152.1,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-30",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-07-31",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-01",
+      "weight": 151.4,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-02",
+      "weight": 150.9,
+      "calories": 2060,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-03",
+      "weight": 151.3,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-04",
+      "weight": 151.1,
+      "calories": 2370,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-08-05",
+      "weight": 150.9,
+      "calories": 2040,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-06",
+      "weight": 150.7,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-07",
+      "weight": 150.7,
+      "calories": 1890,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-08",
+      "weight": 151.2,
+      "calories": 2100,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-09",
+      "weight": 151.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-10",
+      "weight": 150.8,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-11",
+      "weight": 151.2,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-08-12",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-13",
+      "weight": 151.6,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-14",
+      "weight": 151.8,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-15",
+      "weight": 151.8,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-16",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-17",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-18",
+      "weight": 151.7,
+      "calories": 2350,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-08-19",
+      "weight": 151.6,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-20",
+      "weight": 151.2,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-21",
+      "weight": 151.7,
+      "calories": 2100,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-22",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-23",
+      "weight": 151.5,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-24",
+      "weight": 151.6,
+      "calories": 2100,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-25",
+      "weight": 151.9,
+      "calories": 2220,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-08-26",
+      "weight": 151.9,
+      "calories": 2010,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-27",
+      "weight": 151.8,
+      "calories": 2560,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-28",
+      "weight": 151.9,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-29",
+      "weight": 152.5,
+      "calories": 2210,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-30",
+      "weight": 152.6,
+      "calories": 1860,
+      "doseMg": null
+    },
+    {
+      "date": "2025-08-31",
+      "weight": 152.5,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-01",
+      "weight": 151.9,
+      "calories": 2360,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-09-02",
+      "weight": 152.9,
+      "calories": 2070,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-03",
+      "weight": 152.2,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-04",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-05",
+      "weight": 151.6,
+      "calories": 2080,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-06",
+      "weight": 152.1,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-07",
+      "weight": 152.1,
+      "calories": 1910,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-08",
+      "weight": 151.6,
+      "calories": 2370,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-09-09",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-10",
+      "weight": 151.9,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-11",
+      "weight": 151.7,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-12",
+      "weight": 151.4,
+      "calories": 2060,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-13",
+      "weight": 151.3,
+      "calories": 2220,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-14",
+      "weight": 151.3,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-15",
+      "weight": 151.5,
+      "calories": 2430,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-09-16",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-17",
+      "weight": 151.7,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-18",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-19",
+      "weight": 151.1,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-20",
+      "weight": 151.1,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-21",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-22",
+      "weight": 151.5,
+      "calories": 2340,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-09-23",
+      "weight": 152.3,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-24",
+      "weight": 152.2,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-25",
+      "weight": 151.7,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-26",
+      "weight": 151.5,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-27",
+      "weight": 151.6,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-28",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-09-29",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-09-30",
+      "weight": 151.7,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-01",
+      "weight": 151.9,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-02",
+      "weight": 152.3,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-03",
+      "weight": 152.0,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-04",
+      "weight": 151.7,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-05",
+      "weight": 151.6,
+      "calories": 2050,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-06",
+      "weight": 151.7,
+      "calories": 2100,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-10-07",
+      "weight": 152.0,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-08",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-09",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-10",
+      "weight": 151.6,
+      "calories": 2050,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-11",
+      "weight": 151.4,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-12",
+      "weight": 150.9,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-13",
+      "weight": 151.0,
+      "calories": 2280,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-10-14",
+      "weight": 150.9,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-15",
+      "weight": 151.3,
+      "calories": 2280,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-16",
+      "weight": 152.0,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-17",
+      "weight": 152.4,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-18",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-19",
+      "weight": 151.8,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-20",
+      "weight": 152.0,
+      "calories": 2270,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-10-21",
+      "weight": 152.2,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-22",
+      "weight": 151.9,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-23",
+      "weight": 151.8,
+      "calories": 2210,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-24",
+      "weight": 152.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-25",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-26",
+      "weight": 151.9,
+      "calories": 2000,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-27",
+      "weight": 151.8,
+      "calories": 2210,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-10-28",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-29",
+      "weight": 151.6,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-30",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-10-31",
+      "weight": 151.3,
+      "calories": 2220,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-01",
+      "weight": 151.4,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-02",
+      "weight": 152.0,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-03",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-11-04",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-05",
+      "weight": 151.6,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-06",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-07",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-08",
+      "weight": 151.7,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-09",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-10",
+      "weight": 151.6,
+      "calories": 2170,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-11-11",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-12",
+      "weight": 152.1,
+      "calories": 2040,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-13",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-14",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-15",
+      "weight": 151.3,
+      "calories": 2340,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-16",
+      "weight": 151.4,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-17",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-11-18",
+      "weight": 151.8,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-19",
+      "weight": 150.9,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-20",
+      "weight": 150.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-21",
+      "weight": 150.9,
+      "calories": 2080,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-22",
+      "weight": 151.2,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-23",
+      "weight": 151.1,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-24",
+      "weight": 151.3,
+      "calories": 2270,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-11-25",
+      "weight": 151.1,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-26",
+      "weight": 151.2,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-27",
+      "weight": 151.2,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-28",
+      "weight": 151.4,
+      "calories": 2100,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-29",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-11-30",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-01",
+      "weight": 151.8,
+      "calories": 2480,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-12-02",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-03",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-04",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-05",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-06",
+      "weight": 151.2,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-07",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-08",
+      "weight": 151.3,
+      "calories": 2140,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-12-09",
+      "weight": 151.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-10",
+      "weight": 150.9,
+      "calories": 1960,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-11",
+      "weight": 151.5,
+      "calories": 2110,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-12",
+      "weight": 151.6,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-13",
+      "weight": 151.9,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-14",
+      "weight": 151.9,
+      "calories": 2000,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-15",
+      "weight": 151.4,
+      "calories": 2150,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-12-16",
+      "weight": 151.2,
+      "calories": 2500,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-17",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-18",
+      "weight": 151.4,
+      "calories": 2420,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-19",
+      "weight": 151.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-20",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-21",
+      "weight": 151.4,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-22",
+      "weight": 151.3,
+      "calories": 2170,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-12-23",
+      "weight": 151.3,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-24",
+      "weight": 151.3,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-25",
+      "weight": 150.7,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-26",
+      "weight": 151.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-27",
+      "weight": 151.2,
+      "calories": 2050,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-28",
+      "weight": 151.7,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-29",
+      "weight": 151.4,
+      "calories": 2180,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2025-12-30",
+      "weight": 151.1,
+      "calories": 2160,
+      "doseMg": null
+    },
+    {
+      "date": "2025-12-31",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-01",
+      "weight": 151.2,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-02",
+      "weight": 151.2,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-03",
+      "weight": 151.6,
+      "calories": 2280,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-04",
+      "weight": 151.5,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-05",
+      "weight": 151.1,
+      "calories": 2160,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-01-06",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-07",
+      "weight": 151.5,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-08",
+      "weight": 151.9,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-09",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-10",
+      "weight": 152.8,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-11",
+      "weight": 151.9,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-12",
+      "weight": 151.9,
+      "calories": 2390,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-01-13",
+      "weight": 151.5,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-14",
+      "weight": 151.9,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-15",
+      "weight": 152.1,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-16",
+      "weight": 152.2,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-17",
+      "weight": 151.8,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-18",
+      "weight": 151.6,
+      "calories": 1850,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-19",
+      "weight": 151.1,
+      "calories": 2320,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-01-20",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-21",
+      "weight": 151.9,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-22",
+      "weight": 151.8,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-23",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-24",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-25",
+      "weight": 152.3,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-26",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-01-27",
+      "weight": 151.5,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-28",
+      "weight": 151.6,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-29",
+      "weight": 151.7,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-30",
+      "weight": 152.0,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2026-01-31",
+      "weight": 151.6,
+      "calories": 2100,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-01",
+      "weight": 151.7,
+      "calories": 1960,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-02",
+      "weight": 152.3,
+      "calories": 2200,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-02-03",
+      "weight": 152.3,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-04",
+      "weight": 152.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-05",
+      "weight": 152.1,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-06",
+      "weight": 152.2,
+      "calories": 2280,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-07",
+      "weight": 152.5,
+      "calories": 2060,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-08",
+      "weight": 152.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-09",
+      "weight": 152.4,
+      "calories": 2100,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-02-10",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-11",
+      "weight": 152.0,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-12",
+      "weight": 152.2,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-13",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-14",
+      "weight": 152.1,
+      "calories": 2460,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-15",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-16",
+      "weight": 151.5,
+      "calories": 2290,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-02-17",
+      "weight": 151.6,
+      "calories": 2030,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-18",
+      "weight": 152.2,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-19",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-20",
+      "weight": 152.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-21",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-22",
+      "weight": 151.8,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-23",
+      "weight": 151.5,
+      "calories": 2070,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-02-24",
+      "weight": 151.4,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-25",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-26",
+      "weight": 151.7,
+      "calories": 1880,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-27",
+      "weight": 152.1,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-02-28",
+      "weight": 151.9,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-01",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-02",
+      "weight": 152.1,
+      "calories": 2090,
+      "doseMg": 10.0
+    },
+    {
+      "date": "2026-03-03",
+      "weight": 151.8,
+      "calories": 2090,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-04",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-05",
+      "weight": 151.9,
+      "calories": 2020,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-06",
+      "weight": 151.9,
+      "calories": 2160,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-07",
+      "weight": 151.3,
+      "calories": 2110,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-08",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-09",
+      "weight": 151.4,
+      "calories": 2240,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-03-10",
+      "weight": 152.0,
+      "calories": 2090,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-11",
+      "weight": 151.7,
+      "calories": 2070,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-12",
+      "weight": 151.6,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-13",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-14",
+      "weight": 151.2,
+      "calories": 2050,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-15",
+      "weight": 151.2,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-16",
+      "weight": 151.0,
+      "calories": 2310,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-03-17",
+      "weight": 150.9,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-18",
+      "weight": 150.8,
+      "calories": 2040,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-19",
+      "weight": 150.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-20",
+      "weight": 150.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-21",
+      "weight": 150.9,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-22",
+      "weight": 151.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-23",
+      "weight": 150.9,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-03-24",
+      "weight": 151.3,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-25",
+      "weight": 151.4,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-26",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-27",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-28",
+      "weight": 152.0,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-29",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-03-30",
+      "weight": 152.0,
+      "calories": 2440,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-03-31",
+      "weight": 151.2,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-01",
+      "weight": 151.2,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-02",
+      "weight": 150.8,
+      "calories": 2280,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-03",
+      "weight": 151.0,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-04",
+      "weight": 151.4,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-05",
+      "weight": 151.3,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-06",
+      "weight": 151.6,
+      "calories": 2160,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-04-07",
+      "weight": 151.4,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-08",
+      "weight": 151.6,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-09",
+      "weight": 151.2,
+      "calories": 2430,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-10",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-11",
+      "weight": 151.6,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-12",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-13",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-04-14",
+      "weight": 152.3,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-15",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-16",
+      "weight": 151.8,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-17",
+      "weight": 151.0,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-18",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-19",
+      "weight": 151.6,
+      "calories": 2360,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-20",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-04-21",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-22",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-23",
+      "weight": 152.0,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-24",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-25",
+      "weight": 151.7,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-26",
+      "weight": 151.5,
+      "calories": 2340,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-27",
+      "weight": 151.3,
+      "calories": 2250,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-04-28",
+      "weight": 151.7,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-29",
+      "weight": 151.1,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2026-04-30",
+      "weight": 151.5,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-01",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-02",
+      "weight": 152.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-03",
+      "weight": 152.2,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-04",
+      "weight": 151.4,
+      "calories": 2170,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-05-05",
+      "weight": 151.3,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-06",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-07",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-08",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-09",
+      "weight": 151.3,
+      "calories": 2110,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-10",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-11",
+      "weight": 151.8,
+      "calories": 2040,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-05-12",
+      "weight": 152.2,
+      "calories": 2260,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-13",
+      "weight": 152.5,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-14",
+      "weight": 152.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-15",
+      "weight": 152.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-16",
+      "weight": 152.6,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-17",
+      "weight": 152.6,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-18",
+      "weight": 152.5,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-05-19",
+      "weight": 152.5,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-20",
+      "weight": 152.0,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-21",
+      "weight": 151.5,
+      "calories": 2270,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-22",
+      "weight": 151.9,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-23",
+      "weight": 151.7,
+      "calories": 2340,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-24",
+      "weight": 151.7,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-25",
+      "weight": 151.6,
+      "calories": 2310,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-05-26",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-27",
+      "weight": 151.6,
+      "calories": 2060,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-28",
+      "weight": 151.4,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-29",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-30",
+      "weight": 151.7,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2026-05-31",
+      "weight": 151.7,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-01",
+      "weight": 151.5,
+      "calories": 2380,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-06-02",
+      "weight": 151.8,
+      "calories": 2340,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-03",
+      "weight": 152.3,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-04",
+      "weight": 151.9,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-05",
+      "weight": 152.2,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-06",
+      "weight": 152.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-07",
+      "weight": 151.3,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-08",
+      "weight": 151.3,
+      "calories": 2310,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-06-09",
+      "weight": 151.3,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-10",
+      "weight": 151.6,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-11",
+      "weight": 151.7,
+      "calories": 2220,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-12",
+      "weight": 151.9,
+      "calories": 2650,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-13",
+      "weight": 152.0,
+      "calories": 2040,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-14",
+      "weight": 151.6,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-15",
+      "weight": 151.5,
+      "calories": 2270,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-06-16",
+      "weight": 151.2,
+      "calories": 2180,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-17",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-18",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-19",
+      "weight": 151.6,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-20",
+      "weight": 151.4,
+      "calories": 2140,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-21",
+      "weight": 151.8,
+      "calories": 2160,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-22",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-06-23",
+      "weight": 152.4,
+      "calories": 2200,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-24",
+      "weight": 152.3,
+      "calories": 2370,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-25",
+      "weight": 152.2,
+      "calories": 2170,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-26",
+      "weight": 152.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-27",
+      "weight": 152.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-28",
+      "weight": 151.9,
+      "calories": 2390,
+      "doseMg": null
+    },
+    {
+      "date": "2026-06-29",
+      "weight": 152.2,
+      "calories": 2290,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-06-30",
+      "weight": 152.5,
+      "calories": 2310,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-01",
+      "weight": 152.8,
+      "calories": 2130,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-02",
+      "weight": 152.4,
+      "calories": 2290,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-03",
+      "weight": 152.3,
+      "calories": 2330,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-04",
+      "weight": 152.2,
+      "calories": 2280,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-05",
+      "weight": 152.0,
+      "calories": 2230,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-06",
+      "weight": 152.1,
+      "calories": 2210,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-07-07",
+      "weight": 151.9,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-08",
+      "weight": 151.8,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-09",
+      "weight": 152.3,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-10",
+      "weight": 152.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-11",
+      "weight": 152.0,
+      "calories": 2090,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-12",
+      "weight": 152.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-13",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-07-14",
+      "weight": 152.0,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-15",
+      "weight": 151.9,
+      "calories": 2080,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-16",
+      "weight": 151.5,
+      "calories": 1960,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-17",
+      "weight": 151.6,
+      "calories": 2280,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-18",
+      "weight": 151.3,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-19",
+      "weight": 151.5,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-20",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-07-21",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-22",
+      "weight": 151.9,
+      "calories": 2410,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-23",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-24",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-25",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-26",
+      "weight": 151.3,
+      "calories": 2240,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-27",
+      "weight": 151.1,
+      "calories": 2230,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-07-28",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-29",
+      "weight": 151.6,
+      "calories": 2490,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-30",
+      "weight": 151.6,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-07-31",
+      "weight": 151.4,
+      "calories": 2380,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-01",
+      "weight": 151.5,
+      "calories": 2060,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-02",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-03",
+      "weight": 151.3,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-08-04",
+      "weight": 151.5,
+      "calories": 2050,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-05",
+      "weight": 151.5,
+      "calories": 2120,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-06",
+      "weight": 151.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-07",
+      "weight": 152.1,
+      "calories": 2150,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-08",
+      "weight": 152.1,
+      "calories": 1950,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-09",
+      "weight": 152.1,
+      "calories": 2400,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-10",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-08-11",
+      "weight": 151.5,
+      "calories": 2610,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-12",
+      "weight": 151.1,
+      "calories": 2190,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-13",
+      "weight": 152.2,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-14",
+      "weight": 151.7,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-15",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-16",
+      "weight": 151.6,
+      "calories": 2250,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-17",
+      "weight": 151.6,
+      "calories": 2190,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-08-18",
+      "weight": 151.5,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-19",
+      "weight": 151.0,
+      "calories": 1960,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-20",
+      "weight": 151.0,
+      "calories": 2000,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-21",
+      "weight": 150.9,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-22",
+      "weight": 151.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-23",
+      "weight": 151.1,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-24",
+      "weight": 151.2,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-08-25",
+      "weight": 151.4,
+      "calories": 2100,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-26",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-27",
+      "weight": 151.8,
+      "calories": 2340,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-28",
+      "weight": 151.6,
+      "calories": 2320,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-29",
+      "weight": 151.7,
+      "calories": 2470,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-30",
+      "weight": 151.4,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-08-31",
+      "weight": 151.7,
+      "calories": 2180,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-09-01",
+      "weight": 151.6,
+      "calories": 2450,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-02",
+      "weight": 151.7,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-03",
+      "weight": 151.8,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-04",
+      "weight": 151.7,
+      "calories": 2210,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-05",
+      "weight": 151.8,
+      "calories": 2300,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-06",
+      "weight": 151.7,
+      "calories": 2350,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-07",
+      "weight": 152.1,
+      "calories": 2210,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-09-08",
+      "weight": 152.2,
+      "calories": null,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-09",
+      "weight": 152.2,
+      "calories": 1940,
+      "doseMg": null
+    },
+    {
+      "date": "2026-09-14",
+      "weight": null,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-09-21",
+      "weight": null,
+      "calories": null,
+      "doseMg": 2.5
+    },
+    {
+      "date": "2026-09-28",
+      "weight": null,
+      "calories": null,
+      "doseMg": 2.5
+    }
+  ],
+  "goals": [
+    200,
+    175,
+    160,
+    150
+  ],
+  "avgCalories": 2216,
+  "cumulativeTirzepatideDoseMg": 787.5
+}
