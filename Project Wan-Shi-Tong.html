@@ -394,7 +394,7 @@
         <label for="caloriesInput">Calories</label>
         <input type="number" id="caloriesInput" step="1" min="0" placeholder="e.g. 2100">
       </div>
-      <div>
+      <div id="doseFieldWrap">
         <label for="doseInput">Tirzepatide, mg</label>
         <input type="number" id="doseInput" step="0.25" min="0" placeholder="e.g. 5">
       </div>
@@ -447,7 +447,7 @@
     <div id="historyEmpty" class="empty-msg">No entries yet. Add your first weigh-in above.</div>
     <div id="historyWrap" style="display:none;">
       <table>
-        <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th>Calories</th><th>Dose</th><th></th></tr></thead>
+        <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th>Calories</th><th id="doseColHeader">Dose</th><th></th></tr></thead>
         <tbody id="historyBody"></tbody>
       </table>
       <div class="pagination" id="paginationWrap">
@@ -561,7 +561,7 @@
   // left blank still counts as "answered" so it doesn't keep reappearing).
   const ONE_TIME_FIELDS = [
     { key: "name", label: "Your name", placeholder: "e.g. Jordan", type: "text" },
-    { key: "tirzepatideDose", label: "Starting Tirzepatide dose, mg (optional)", placeholder: "e.g. 2.5", type: "number", optional: true }
+    { key: "usesTirzepatide", label: "Do you take Tirzepatide?", type: "boolean", optional: true, default: true }
   ];
   let profile = {};
   let unsavedChanges = false;
@@ -592,8 +592,11 @@
   // digits track incremental changes, sized to the effort of the change:
   //   +0.001-0.009 = small tweak, +0.010-0.090 = moderate feature/fix,
   //   +0.100-0.900 = significant feature or rework. Whole numbers = major releases.
-  const APP_VERSION = "1.400";
+  const APP_VERSION = "1.410";
   const CHANGELOG = [
+    { version: "1.410", date: "2026-09-09", changes: [
+      "The start-up Tirzepatide question now actually hides all dose UI (Add Entry field, History column, Upcoming Doses) when answered 'No', the exported image's cumulative dosage line was fixed to actually appear, and its title is now centered."
+    ] },
     { version: "1.400", date: "2026-09-09", changes: [
       "Upcoming Doses now falls back to your last dose taken when none shows up in the last 7 history entries, JSON exports gained a separate cumulative-dose total, the exported image dropped its redundant 'Generated' date, the start-up Tirzepatide question is now optional and re-openable from Developer Mode (replacing the removed header pencil icon), number-input spinner arrows are gone, the changelog is now one line per version, and a curve-smoothing bug that pinched the exported chart on small datasets is fixed."
     ] },
@@ -1032,12 +1035,38 @@
     section.style.display = "block";
     document.getElementById("oneTimeInfoCancelBtn").style.display = forceAll ? "inline-block" : "none";
     let wrap = document.getElementById("oneTimeInfoFields");
-    wrap.innerHTML = fieldsToShow.map(f => `
-      <div>
-        <label for="oneTimeInput_${f.key}">${f.label}</label>
-        <input type="${f.type || 'text'}" id="oneTimeInput_${f.key}" placeholder="${f.placeholder}" value="${String(profile[f.key] || "").replace(/"/g, "&quot;")}">
-      </div>
-    `).join('');
+    wrap.innerHTML = fieldsToShow.map(f => {
+      if (f.type === "boolean") {
+        let current = typeof profile[f.key] === "boolean" ? profile[f.key] : !!f.default;
+        return `
+          <div>
+            <label>${f.label}</label>
+            <div class="mode-toggle" id="oneTimeInput_${f.key}" data-value="${current}">
+              <button type="button" class="mode-btn${current ? ' active' : ''}" data-bool="true">Yes</button>
+              <button type="button" class="mode-btn${!current ? ' active' : ''}" data-bool="false">No</button>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div>
+          <label for="oneTimeInput_${f.key}">${f.label}</label>
+          <input type="${f.type || 'text'}" id="oneTimeInput_${f.key}" placeholder="${f.placeholder}" value="${String(profile[f.key] || "").replace(/"/g, "&quot;")}">
+        </div>
+      `;
+    }).join('');
+
+    // Boolean fields render as a Yes/No mode-toggle rather than an <input>,
+    // so their current selection is tracked in a data-value attribute instead.
+    wrap.querySelectorAll('.mode-toggle[id^="oneTimeInput_"]').forEach(toggle => {
+      toggle.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener("click", () => {
+          toggle.querySelectorAll('button').forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          toggle.dataset.value = btn.getAttribute("data-bool");
+        });
+      });
+    });
   }
 
   // Applies the current profile name to the on-screen header, e.g.
@@ -1046,6 +1075,22 @@
   function updateHeaderTitle() {
     let titleEl = document.getElementById("appTitleText");
     titleEl.textContent = profile.name ? `${profile.name}'s Weight Tracker & Projections` : "Weight Tracker & Projections";
+  }
+
+  // Whether to show any Tirzepatide-related UI at all — the Add Entry dose
+  // field, the History Dose column, and Upcoming Doses. Defaults to shown
+  // (true) until the person explicitly answers "No" at start-up; existing
+  // dose data already logged is never deleted by this, only hidden.
+  function tirzepatideEnabled() {
+    return profile.usesTirzepatide !== false;
+  }
+
+  // Shows/hides the Tirzepatide-related chrome that isn't already gated by
+  // its own render function (Upcoming Doses and the History Dose column
+  // handle themselves). Called after start-up info changes.
+  function applyTirzepatideVisibility() {
+    let enabled = tirzepatideEnabled();
+    document.getElementById("doseFieldWrap").style.display = enabled ? "" : "none";
   }
 
   // ============================================================================
@@ -1072,6 +1117,9 @@
     let wrap = document.getElementById("historyWrap");
     let empty = document.getElementById("historyEmpty");
     body.innerHTML = "";
+
+    let showDose = tirzepatideEnabled();
+    document.getElementById("doseColHeader").style.display = showDose ? "" : "none";
 
     // History only ever shows today-or-past entries — future-dated entries (e.g.
     // scheduled doses) live in Upcoming Tirzepatide Doses instead, not here.
@@ -1117,7 +1165,7 @@
         <td>${weightStr}</td>
         <td class="${changeClass}">${changeStr}</td>
         <td>${calStr}</td>
-        <td>${doseStr}</td>
+        <td${showDose ? '' : ' style="display:none;"'}>${doseStr}</td>
         <td><button class="danger" data-idx="${i}">Delete</button></td>
       `;
       body.appendChild(tr);
@@ -1141,6 +1189,12 @@
   function renderUpcomingDoses() {
     let section = document.getElementById("upcomingDosesSection");
     let grid = document.getElementById("upcomingDosesGrid");
+
+    if (!tirzepatideEnabled()) {
+      section.style.display = "none";
+      return;
+    }
+
     let upcoming = getUpcomingDoses();
     let lastKnown = getLastKnownDose();
 
@@ -1436,11 +1490,11 @@
 
     // --- Title (colors pulled straight from the app's light CSS vars) ---
     ctx.textBaseline = "alphabetic";
-    ctx.textAlign = "left";
+    ctx.textAlign = "center";
     ctx.fillStyle = "#1f2430"; // --text
     ctx.font = `700 56px ${FONT}`;
     let titleText = profile.name ? `${profile.name}'s weight loss progress` : "Weight loss progress";
-    ctx.fillText(titleText, PAD_X, topPad + 50);
+    ctx.fillText(titleText, W / 2, topPad + 50);
 
     // --- Chart: minimal gradient trend line, no goal lines ---
     let chartTop = topPad + titleH + chartGapTop;
@@ -1589,11 +1643,17 @@
       });
     }
 
-    // --- Footer: current weight (its date already covers "as of when") ---
+    // --- Footer: current weight (its date already covers "as of when"),
+    // plus cumulative dosage when Tirzepatide tracking is in use ---
     ctx.font = `500 22px ${FONT}`;
     ctx.fillStyle = "#94a3b8"; // Matches the app's --muted variable
     ctx.textAlign = "center";
-    ctx.fillText(`Current weight: ${current.toFixed(1)} ${unit} as of ${fmtDateShort(lastDate)}`, W / 2, H - 35);
+    let footerText = `Current weight: ${current.toFixed(1)} ${unit} as of ${fmtDateShort(lastDate)}`;
+    let cumulativeDose = getCumulativeDoseMg();
+    if (tirzepatideEnabled() && cumulativeDose > 0) {
+      footerText += ` | Tirzepatide cumulative dosage: ${cumulativeDose} mg`;
+    }
+    ctx.fillText(footerText, W / 2, H - 35);
 
     canvas.toBlob(async blob => {
       if (fileHandle) {
@@ -1943,13 +2003,16 @@
     ONE_TIME_FIELDS.forEach(f => {
       let el = document.getElementById(`oneTimeInput_${f.key}`);
       if (el) {
-        profile[f.key] = el.value.trim();
+        profile[f.key] = (f.type === "boolean") ? (el.dataset.value === "true") : el.value.trim();
         if (f.optional) profile[`${f.key}Asked`] = true;
       }
     });
     saveProfile();
     updateHeaderTitle();
     renderOneTimeInfo();
+    applyTirzepatideVisibility();
+    currentPage = 1;
+    renderAll();
   });
 
   document.getElementById("oneTimeInfoCancelBtn").addEventListener("click", () => {
@@ -1973,6 +2036,7 @@
   loadProfile();
   updateHeaderTitle();
   renderOneTimeInfo();
+  applyTirzepatideVisibility();
   document.getElementById("appVersionTag").textContent = `v${APP_VERSION}`;
   document.getElementById("dateInput").value = new Date().toISOString().slice(0, 10);
   renderAll();
