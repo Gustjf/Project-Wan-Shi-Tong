@@ -868,6 +868,14 @@
     return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
 
+  // Same as fmtDateShort, but falls back to the full year-bearing format for
+  // any date outside the current year — used on the exported progress image
+  // so dates from a past/future year aren't shown ambiguously.
+  function fmtDateExport(d) {
+    let dt = new Date(d + "T00:00:00");
+    return dt.getFullYear() === new Date().getFullYear() ? fmtDateShort(d) : fmtDate(d);
+  }
+
   // Returns exact integer days elapsed between two "YYYY-MM-DD" strings
   function daysBetween(d1, d2) {
     return (new Date(d2 + "T00:00:00") - new Date(d1 + "T00:00:00")) / (1000 * 60 * 60 * 24);
@@ -1588,11 +1596,12 @@
       ctx.fillText(`${Math.round(wv)} ${unit}`, chartLeft - 16, yy + 7);
     });
 
-    // minimal x-axis: first / mid / last date, no year
+    // minimal x-axis: first / mid / last date, year added back only when it
+    // isn't the current year
     ctx.textAlign = "center";
     [0, 0.5, 1].forEach(f => {
       let d = addDays(minDate, Math.round(totalDays * f));
-      ctx.fillText(fmtDateShort(d), cx(d), chartBottom + 36);
+      ctx.fillText(fmtDateExport(d), cx(d), chartBottom + 36);
     });
 
     let pts = wEntries.map(p => ({ x: cx(p.date), y: cy(p.weight) }));
@@ -1662,7 +1671,7 @@
         if (res.status === "reached") {
           pillText = "Reached"; pillColor = "#dcfce7"; pillTextColor = "#16a34a";
           let rd = getGoalReachedDate(g);
-          etaText = rd ? fmtDateShort(rd) : "\u2014";
+          etaText = rd ? fmtDateExport(rd) : "\u2014";
         } else if (res.status === "flat") {
           pillText = "Flat rate"; pillColor = "#dcdfe4"; pillTextColor = "#6b7280";
           etaText = "\u2014";
@@ -1671,7 +1680,7 @@
           etaText = "\u2014";
         } else {
           pillText = "In progress"; pillColor = "#fef3c7"; pillTextColor = "#92400e";
-          etaText = fmtDateShort(res.date);
+          etaText = fmtDateExport(res.date);
         }
 
         let midY = rowY + rowH / 2;
@@ -1704,7 +1713,7 @@
     ctx.font = `500 22px ${FONT}`;
     ctx.fillStyle = "#94a3b8"; // Matches the app's --muted variable
     ctx.textAlign = "center";
-    let footerText = `Current weight: ${current.toFixed(1)} ${unit} as of ${fmtDateShort(lastDate)}`;
+    let footerText = `Current weight: ${current.toFixed(1)} ${unit} as of ${fmtDateExport(lastDate)}`;
     let cumulativeDose = getCumulativeDoseMg();
     if (tirzepatideEnabled() && cumulativeDose > 0) {
       footerText += ` | Tirzepatide cumulative dosage: ${cumulativeDose} mg`;
