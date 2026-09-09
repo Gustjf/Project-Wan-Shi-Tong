@@ -17,6 +17,14 @@
 - I trust you with the smaller things.
   Ensure to update the changelog in the dev console. Keep entries very brief and high level, a sentence per change. 
 
+## Changelog & Versioning
+- Every change gets a CHANGELOG entry and an APP_VERSION bump. No exceptions.
+- Version format is X.YYY — each digit is a size tier, bump exactly one per change:
+  - `+0.001` bug fix
+  - `+0.010` tiny tweak
+  - `+0.100` small feature
+  - `+1` large feature
+
 ## Git Workflow
 - I don't use git/PRs manually. After pushing your branch, open a pull request and merge it into the main branch yourself — don't ask me to do it or wait for my confirmation.
 - Only skip the auto-merge and ask me first if something seems risky or destructive (e.g. it could break the app, lose data, or you're unsure about a decision).
