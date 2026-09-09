@@ -204,6 +204,33 @@
   .preset.active, [data-theme="dark"] .preset.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
   .preset.active:hover, [data-theme="dark"] .preset.active:hover { background: var(--accent-dark); color: #ffffff; border-color: var(--accent-dark); }
 
+  /* Small inline lose/gain-direction toggle, sized to sit next to .preset buttons */
+  .dir-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 2px 2px 2px 0;
+  }
+  .dir-toggle button {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 0.9em;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  [data-theme="dark"] .dir-toggle button { background: var(--panel); }
+  .dir-toggle button:first-child { border-right: 1px solid var(--border); }
+  .dir-toggle button:hover:not(.active) { background: var(--border); }
+  .dir-toggle button.active { background: var(--accent); color: #ffffff; }
+  .dir-toggle button.active:hover { background: var(--accent-dark); }
+
   table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
   th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: 600; font-size: 0.85em; }
@@ -486,10 +513,6 @@
 
     <div class="proj-box">
       <div class="subhead">Projection settings &mdash; drives the ETAs below</div>
-      <div class="mode-toggle" id="goalDirectionToggle">
-        <button type="button" class="mode-btn" data-goal-direction="lose">Lose weight</button>
-        <button type="button" class="mode-btn" data-goal-direction="gain">Gain weight</button>
-      </div>
       <div class="mode-toggle" id="rateModeToggle">
         <button type="button" class="mode-btn active" data-rate-mode="trend">Current trend</button>
         <button type="button" class="mode-btn" data-rate-mode="custom">Custom weekly %</button>
@@ -501,7 +524,11 @@
             <input type="number" id="customRate" step="0.1" min="0" max="10" value="1.0">
           </div>
         </div>
-        <div style="margin-top:6px;">
+        <div style="margin-top:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <div class="dir-toggle" id="goalDirectionToggle">
+            <button type="button" data-goal-direction="lose" title="Lose weight" aria-label="Lose weight">&minus;</button>
+            <button type="button" data-goal-direction="gain" title="Gain weight" aria-label="Gain weight">&plus;</button>
+          </div>
           <button class="preset" data-rate="0.5">0.5%/wk</button>
           <button class="preset" data-rate="1">1%/wk</button>
           <button class="preset" data-rate="1.5">1.5%/wk</button>
@@ -628,8 +655,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.613";
+  const APP_VERSION = "1.614";
   const CHANGELOG = [
+    { version: "1.614", date: "2026-09-09", changes: [
+      "The Lose/Gain weight toggle is now a small inline -/+ control next to the custom rate presets, shown only when Custom weekly % is selected, instead of a full-width button pair always on screen."
+    ] },
     { version: "1.613", date: "2026-09-09", changes: [
       "Projection settings gained a Lose weight / Gain weight toggle, defaulting to whichever direction your last 90 days of weigh-ins actually show. It flips the sign of the custom weekly rate, the direction goals are sorted in, and which way stat/history coloring reads as good vs. bad."
     ] },
