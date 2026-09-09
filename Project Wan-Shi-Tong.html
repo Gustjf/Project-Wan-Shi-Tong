@@ -253,8 +253,8 @@
   .icon-btn:hover { background: var(--border); color: var(--text); border-color: var(--accent); }
   .icon-btn:active { transform: scale(0.94); }
   
-  .loss { color: var(--good); }
-  .gain { color: var(--bad); }
+  .good { color: var(--good); }
+  .bad { color: var(--bad); }
 
   .tdee-box {
     margin-top: 10px;
@@ -486,6 +486,10 @@
 
     <div class="proj-box">
       <div class="subhead">Projection settings &mdash; drives the ETAs below</div>
+      <div class="mode-toggle" id="goalDirectionToggle">
+        <button type="button" class="mode-btn" data-goal-direction="lose">Lose weight</button>
+        <button type="button" class="mode-btn" data-goal-direction="gain">Gain weight</button>
+      </div>
       <div class="mode-toggle" id="rateModeToggle">
         <button type="button" class="mode-btn active" data-rate-mode="trend">Current trend</button>
         <button type="button" class="mode-btn" data-rate-mode="custom">Custom weekly %</button>
@@ -493,8 +497,8 @@
       <div id="customRateWrap">
         <div class="row">
           <div>
-            <label for="customRate">Custom weekly rate (%)</label>
-            <input type="number" id="customRate" step="0.1" min="-10" max="10" value="1.0">
+            <label for="customRate">Custom weekly rate toward goal (%)</label>
+            <input type="number" id="customRate" step="0.1" min="0" max="10" value="1.0">
           </div>
         </div>
         <div style="margin-top:6px;">
@@ -552,6 +556,7 @@
   const CALORIES_KEY = "weightTrackerCalories_v1";
   const THEME_KEY = "weightTrackerTheme_v1";
   const PROFILE_KEY = "weightTrackerProfile_v1";
+  const GOAL_DIRECTION_KEY = "weightTrackerGoalDirection_v1";
   const DEFAULT_GOALS = [200, 175, 160, 150];
 
   // One-time info: things we only ever need to ask for once. Defined as a list
@@ -609,6 +614,10 @@
   }
   let rateMode = "trend"; // "trend" or "custom"
   let trendWindow = "all"; // Controls which data points feed the regression AND the calorie/TDEE window
+  // "lose" or "gain". Once the user has explicitly picked one it's remembered
+  // (GOAL_DIRECTION_KEY); until then it auto-follows the last-90-days trend on
+  // every load — see getDefaultGoalDirection().
+  let goalDirection = "lose";
   let avgCalories = 0; // Fallback moving average if recent inputs are sparse
 
   const PAGE_SIZE = 7;
@@ -619,8 +628,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.513";
+  const APP_VERSION = "1.613";
   const CHANGELOG = [
+    { version: "1.613", date: "2026-09-09", changes: [
+      "Projection settings gained a Lose weight / Gain weight toggle, defaulting to whichever direction your last 90 days of weigh-ins actually show. It flips the sign of the custom weekly rate, the direction goals are sorted in, and which way stat/history coloring reads as good vs. bad."
+    ] },
     { version: "1.513", date: "2026-09-09", changes: [
       "Fixed the dev console changelog showing oldest entries first — it now lists newest at the top."
     ] },
@@ -736,8 +748,24 @@
     }
     // Ensure chronological order for math calculations
     entries.sort((a, b) => a.date.localeCompare(b.date));
-    // Goals are sorted descending so the nearest reachable goal is handled logically
-    goals.sort((a, b) => b - a);
+
+    let storedDirection = localStorage.getItem(GOAL_DIRECTION_KEY);
+    goalDirection = (storedDirection === "gain" || storedDirection === "lose")
+      ? storedDirection
+      : getDefaultGoalDirection();
+
+    sortGoals();
+  }
+
+  // Descending when the goal is to lose (nearest/highest goal first) and
+  // ascending when the goal is to gain (nearest/lowest goal first), so the
+  // table always lists the soonest-reachable goal first.
+  function sortGoalsArray(arr) {
+    arr.sort((a, b) => goalDirection === "gain" ? a - b : b - a);
+    return arr;
+  }
+  function sortGoals() {
+    sortGoalsArray(goals);
   }
 
   function saveData() {
@@ -839,7 +867,7 @@
           .map(g => convertWeightValue(g, sourceUnit, targetUnit))
       // DEFAULT_GOALS is defined in lb regardless of what unit is active.
       : DEFAULT_GOALS.map(g => convertWeightValue(g, "lb", targetUnit));
-    cleanGoals.sort((a, b) => b - a);
+    sortGoalsArray(cleanGoals);
 
     let cleanAvgCal = (typeof raw.avgCalories === "number" && !isNaN(raw.avgCalories) && raw.avgCalories > 0)
       ? raw.avgCalories : 0;
@@ -999,27 +1027,50 @@
    * Computes the trend line using logarithmic (exponential) regression to find the
    * constant percentage rate of change per week.
    * Model: y = A * (1 - rate)^t => ln(y) = ln(A) + t * ln(1 - rate)
-   * This provides a smoother, more realistic curve for human bodyweight changes 
+   * This provides a smoother, more realistic curve for human bodyweight changes
    * than a standard linear regression (which assumes constant absolute lb/kg loss).
+   * Returns the signed fractional weekly rate: positive means net loss over the
+   * subset, negative means net gain.
    */
-  function computeTrend() {
-    let subset = getTrendEntries();
+  function computeTrendForEntries(subset) {
     if (subset.length < 2) return null;
     let t0 = subset[0].date;
     let n = subset.length;
     let sumT = 0, sumY = 0, sumTT = 0, sumTY = 0;
-    
+
     for (let i = 0; i < n; i++) {
       let t = daysBetween(t0, subset[i].date) / 7; // Convert days to weeks for standard rate formatting
       let y = Math.log(subset[i].weight);
       sumT += t; sumY += y; sumTT += t * t; sumTY += t * y;
     }
-    
+
     let denom = (n * sumTT - sumT * sumT);
     if (Math.abs(denom) < 1e-9) return null;
-    
+
     let m = (n * sumTY - sumT * sumY) / denom; // Slope in log space
-    return 1 - Math.exp(m); // Convert back to fractional loss rate
+    return 1 - Math.exp(m); // Convert back to fractional weekly rate of change
+  }
+
+  function computeTrend() {
+    return computeTrendForEntries(getTrendEntries());
+  }
+
+  // Always the last 90 days regardless of the Current Trend window selector —
+  // used only to pick a starting gain/lose default for the Projection
+  // settings toggle before the user has chosen one explicitly.
+  function computeTrend90() {
+    let wEntries = weightEntries();
+    if (!wEntries.length) return null;
+    let lastDate = wEntries[wEntries.length - 1].date;
+    return computeTrendForEntries(wEntries.filter(e => daysBetween(e.date, lastDate) <= 90));
+  }
+
+  // Defaults to "gain" only when the last 90 days show a clear net gain;
+  // no data, too little data, or a net loss/flat trend all default to "lose",
+  // matching the app's original loss-oriented defaults (DEFAULT_GOALS, etc.).
+  function getDefaultGoalDirection() {
+    let rate = computeTrend90();
+    return (rate !== null && rate < 0) ? "gain" : "lose";
   }
 
   function compute7DayAvg() {
@@ -1054,11 +1105,15 @@
     return startWeight * Math.pow(1 - weeklyRateFraction, weeks);
   }
 
-  // Extracts the specific rate being used based on UI toggle (Fitted Trend vs Custom Rate)
+  // Extracts the specific rate being used based on UI toggle (Fitted Trend vs Custom Rate).
+  // In custom mode the input is always a magnitude — its sign comes from the
+  // Lose/Gain weight toggle, not from what's typed in the field.
   function getEffectiveRate(trendRate) {
     if (rateMode === "trend") return trendRate !== null ? trendRate : 0;
     let custom = parseFloat(document.getElementById("customRate").value);
-    return isNaN(custom) ? 0 : (custom / 100);
+    if (isNaN(custom)) return 0;
+    let magnitude = Math.abs(custom) / 100;
+    return goalDirection === "gain" ? -magnitude : magnitude;
   }
 
   // ============================================================================
@@ -1222,7 +1277,11 @@
 
       let change = (hasWeight && prevHasWeight) ? (e.weight - prev.weight) : 0;
       let changeStr = (hasWeight && prevHasWeight) ? (change <= 0 ? "" : "+") + change.toFixed(1) + " " + unit : "&mdash;";
-      let changeClass = change < 0 ? "loss" : (change > 0 ? "gain" : "");
+      let isNetLoss = change < 0;
+      let isNetGain = change > 0;
+      let changeClass = (isNetLoss || isNetGain)
+        ? ((goalDirection === "gain") === isNetGain ? "good" : "bad")
+        : "";
       let weightStr = hasWeight ? `${e.weight.toFixed(1)} ${unit}` : "&mdash;";
       let calStr = (e.calories !== undefined && e.calories !== null) ? e.calories : "&mdash;";
       let doseStr = (typeof e.doseMg === "number" && !isNaN(e.doseMg)) ? `${e.doseMg} mg` : "&mdash;";
@@ -1320,8 +1379,9 @@
       rateEl.className = "val";
     } else {
       let pct = trendRate * 100;
-      rateEl.textContent = (pct >= 0 ? "-" : "+") + Math.abs(pct).toFixed(2) + "%/wk";
-      rateEl.className = "val " + (pct >= 0 ? "loss" : "gain");
+      let isNetLoss = pct >= 0;
+      rateEl.textContent = (isNetLoss ? "-" : "+") + Math.abs(pct).toFixed(2) + "%/wk";
+      rateEl.className = "val " + ((goalDirection === "gain") === !isNetLoss ? "good" : "bad");
     }
 
     // 2. Render 7-day rolling avg (always based on the most recent week, regardless of window)
@@ -1373,10 +1433,11 @@
     let effectiveRate = getEffectiveRate(trendRate);
 
     let windowLabel = trendWindow === "all" ? "all-time" : `${trendWindow}d`;
+    let directionLabel = goalDirection === "gain" ? "gain weight" : "lose weight";
     document.getElementById("goalsRateNote").textContent =
       rateMode === "trend"
         ? `Using the fitted trend from the ${windowLabel} window (set above in Current Trend).`
-        : "Using the custom weekly rate set above.";
+        : `Using the custom weekly rate above, applied toward your goal to ${directionLabel}.`;
 
     renderFutureWeightGrid(current, effectiveRate, lastDate);
 
@@ -1862,8 +1923,16 @@
     svg.innerHTML = parts.join('');
   }
 
+  // Reflects `goalDirection` on the Lose/Gain weight toggle buttons.
+  function applyGoalDirectionUI() {
+    document.querySelectorAll('#goalDirectionToggle button').forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-goal-direction") === goalDirection);
+    });
+  }
+
   // Master render trigger function to update all UI modules sequentially
   function renderAll() {
+    applyGoalDirectionUI();
     renderHistory();
     renderUpcomingDoses();
     let trendRate = computeTrend();
@@ -1983,6 +2052,15 @@
     if (currentPage < Math.ceil(entries.length / PAGE_SIZE)) { currentPage++; renderHistory(); }
   });
 
+  document.querySelectorAll('#goalDirectionToggle button').forEach(btn => {
+    btn.addEventListener("click", () => {
+      goalDirection = btn.getAttribute("data-goal-direction");
+      localStorage.setItem(GOAL_DIRECTION_KEY, goalDirection);
+      sortGoals();
+      renderAll();
+    });
+  });
+
   document.querySelectorAll('#rateModeToggle button').forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll('#rateModeToggle button').forEach(b => b.classList.remove("active"));
@@ -1997,7 +2075,7 @@
     let val = parseFloat(document.getElementById("goalInput").value);
     if (!isNaN(val) && val > 0 && !goals.includes(val)) {
       goals.push(val);
-      goals.sort((a, b) => b - a);
+      sortGoals();
       saveData();
       document.getElementById("goalInput").value = "";
       renderAll();
