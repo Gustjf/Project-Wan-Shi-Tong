@@ -55,19 +55,6 @@
   h1 { font-size: 1.4em; margin: 0 0 4px 0; }
   .subtitle { color: var(--muted); font-size: 0.85em; }
 
-  .edit-name-btn {
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    opacity: 0.45;
-    cursor: pointer;
-    padding: 0 0 0 8px;
-    font-size: 0.55em;
-    vertical-align: middle;
-    transition: opacity 0.2s ease, color 0.2s ease;
-  }
-  .edit-name-btn:hover { opacity: 1; color: var(--accent); }
-
   .app-version-tag {
     position: fixed;
     bottom: 6px;
@@ -128,7 +115,19 @@
   [data-theme="dark"] input[type=date]:focus, [data-theme="dark"] input[type=number]:focus, [data-theme="dark"] select:focus {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
   }
-  
+
+  /* Numbers are entered via keyboard/on-screen keyboard, so the spinner
+     arrows just get in the way — hidden across browsers. */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
   .row { display: flex; gap: 10px; flex-wrap: wrap; }
   .row > div { flex: 1; min-width: 100px; }
   
@@ -365,7 +364,7 @@
 <div class="app">
   <div class="header">
     <div>
-      <h1><span id="appTitleText">Weight Tracker &amp; Projections</span><button class="edit-name-btn" id="editNameBtn" title="Edit your name" aria-label="Edit your name">✎</button></h1>
+      <h1><span id="appTitleText">Weight Tracker &amp; Projections</span></h1>
       <div class="subtitle">Runs 100% locally in your browser. Private &amp; offline.</div>
     </div>
     <button class="theme-toggle" id="themeToggle">🌓 Theme</button>
@@ -536,6 +535,7 @@
   <button class="dev-close" id="devPanelClose" aria-label="Close">&times;</button>
   <h3>Developer Mode</h3>
   <div class="dev-version">Version <span id="devVersionNum"></span></div>
+  <button class="secondary" id="reopenOneTimeInfoBtn" style="margin-bottom:10px; font-size:0.85em; padding:5px 10px;">Edit start-up info</button>
   <div id="devChangelog"></div>
 </div>
 
@@ -555,11 +555,13 @@
   const DEFAULT_GOALS = [200, 175, 160, 150];
 
   // One-time info: things we only ever need to ask for once. Defined as a list
-  // so more fields can be added later without changing the surrounding logic —
-  // for now it's just the person's name. The "Get Started" section only shows
-  // fields that are still unset; once saved, the section hides itself.
+  // so more fields can be added later without changing the surrounding logic.
+  // The "Get Started" section shows required fields until they're filled, and
+  // optional fields until they've been asked at least once (an optional field
+  // left blank still counts as "answered" so it doesn't keep reappearing).
   const ONE_TIME_FIELDS = [
-    { key: "name", label: "Your name", placeholder: "e.g. Jordan" }
+    { key: "name", label: "Your name", placeholder: "e.g. Jordan", type: "text" },
+    { key: "tirzepatideDose", label: "Starting Tirzepatide dose, mg (optional)", placeholder: "e.g. 2.5", type: "number", optional: true }
   ];
   let profile = {};
   let unsavedChanges = false;
@@ -590,41 +592,26 @@
   // digits track incremental changes, sized to the effort of the change:
   //   +0.001-0.009 = small tweak, +0.010-0.090 = moderate feature/fix,
   //   +0.100-0.900 = significant feature or rework. Whole numbers = major releases.
-  const APP_VERSION = "1.300";
+  const APP_VERSION = "1.400";
   const CHANGELOG = [
+    { version: "1.400", date: "2026-09-09", changes: [
+      "Upcoming Doses now falls back to your last dose taken when none shows up in the last 7 history entries, JSON exports gained a separate cumulative-dose total, the exported image dropped its redundant 'Generated' date, the start-up Tirzepatide question is now optional and re-openable from Developer Mode (replacing the removed header pencil icon), number-input spinner arrows are gone, the changelog is now one line per version, and a curve-smoothing bug that pinched the exported chart on small datasets is fixed."
+    ] },
     { version: "1.300", date: "2026-09-09", changes: [
-      "Added a one-time 'Get Started' name prompt — shown only until it's filled in, with a small \u270e icon by the title to edit it later.",
-      "The on-screen header now reads \"{Name}'s Weight Tracker & Projections\" once a name is set.",
-      "JSON backups now include your name, and importing a backup restores it.",
-      "The exported progress image now reads \"{Name}'s weight loss progress\" and no longer shows the 'App export' subtitle line.",
-      "Renamed the 'ETA' column to 'Date' in the exported progress image.",
-      "Added a subtle app version number in the bottom-right corner of the app."
+      "Added a one-time 'Get Started' name prompt, included the name in JSON backups and the exported progress image, and added a subtle version tag in the corner."
     ] },
     { version: "1.200", date: "2026-09-08", changes: [
-      "Merged the Projection controls into Goal Weights so it's clear the trend/custom-rate choice drives the goal ETAs — replaced with a compact 'Projection settings' block inside that card.",
-      "Replaced the 'months to project' number input with a single row previewing projected weight at 1/3/6/12 months out.",
-      "Avg Daily Intake and Est. TDEE now respect the Current Trend window (All/30d/60d/90d) instead of always averaging all-time data.",
-      "Removed the latest-weight and tracked-span stats from Current Trend; tracked span now lives as a small footnote under History.",
-      "Removed the chart's time-range zoom control — the chart always shows the full logged history now.",
-      "Removed the projected (dashed) line from the chart; it now plots actual weigh-ins only, plus any active goal lines."
+      "Merged projection controls into Goal Weights with a 1/3/6/12-month preview row, scoped Avg Intake/TDEE to the Current Trend window, and simplified the chart to actual weigh-ins plus active goal lines only."
     ] },
     { version: "1.100", date: "2026-09-08", changes: [
-      "Added optional tirzepatide dose tracking: log a dose (mg) on any entry date, alongside or instead of weight/calories.",
-      "New 'Upcoming Doses' panel shows the next 3 scheduled doses — add a future-dated entry with just a dose to schedule it.",
-      "History table now shows a Dose column.",
-      "Removed kg support; the app is lb-only now. Existing kg data (local or imported backups) is automatically converted to lb."
+      "Added optional Tirzepatide dose tracking with an Upcoming Doses panel and History column, and dropped kg support in favor of lb-only."
     ] },
     { version: "1.000", date: "2026-09-08", changes: ["Initial versioned release."] },
     { version: "1.010", date: "2026-09-08", changes: [
-      "Bug fix: weight and calories can now each be logged independently — add calories in the evening without a weight, and fill in the weigh-in later (or vice versa).",
-      "History table shows &mdash; for whichever value wasn't logged that day.",
-      "Trend, stats, goals, and chart calculations now only use days with a recorded weight."
+      "Weight and calories can now be logged independently of each other, with trend/stats/goals/chart calculations using only days with a recorded weight."
     ] },
     { version: "1.030", date: "2026-09-08", changes: [
-      "Added backup file versioning: exports now include a schemaVersion/appVersion tag.",
-      "Import now validates and normalizes backup files instead of trusting them blindly — malformed rows are dropped rather than crashing the import.",
-      "Old backups exported before this change (no schemaVersion) still import correctly.",
-      "Importing a backup from a newer app version now shows a warning instead of failing silently."
+      "Added versioned, validated JSON backups — malformed rows are dropped on import instead of crashing, and newer-version backups show a warning."
     ] }
   ];
   let devModeOn = false;
@@ -880,6 +867,30 @@
     return entries.filter(e => typeof e.doseMg === "number" && !isNaN(e.doseMg) && e.date >= todayStr).length;
   }
 
+  // History (page 1) only ever shows this many of the most recent past-or-today
+  // entries, so a dose logged further back than this can silently scroll out of
+  // view if doses aren't taken every entry. When none of those recent entries
+  // carry a dose, this surfaces the most recent one actually taken so it's
+  // never more than a glance away.
+  function getLastKnownDose() {
+    let todayStr = new Date().toISOString().slice(0, 10);
+    let past = entries.filter(e => e.date <= todayStr).sort((a, b) => b.date.localeCompare(a.date));
+    let recentWindow = past.slice(0, PAGE_SIZE);
+    let doseVisibleInWindow = recentWindow.some(e => typeof e.doseMg === "number" && !isNaN(e.doseMg));
+    if (doseVisibleInWindow) return null;
+    return past.find(e => typeof e.doseMg === "number" && !isNaN(e.doseMg)) || null;
+  }
+
+  // Sums every dose actually taken (today-or-past — scheduled future doses
+  // haven't happened yet and don't count), for the cumulative total in exports.
+  function getCumulativeDoseMg() {
+    let todayStr = new Date().toISOString().slice(0, 10);
+    let total = entries
+      .filter(e => e.date <= todayStr && typeof e.doseMg === "number" && !isNaN(e.doseMg))
+      .reduce((sum, e) => sum + e.doseMg, 0);
+    return Math.round(total * 100) / 100;
+  }
+
   // Averages the non-null, strictly positive calories in the given list (defaults
   // to every entry). Pass a windowed subset (see getWindowedEntries) to scope
   // the average to the same all/30d/60d/90d window as the trend calculation.
@@ -1002,12 +1013,16 @@
   // ONE-TIME PROFILE INFO (name, and any future one-time fields)
   // ============================================================================
 
-  // Shows the "Get Started" section only for fields that are still unset.
-  // Pass forceAll=true to show every field pre-filled with its current value,
-  // for editing later via the ✎ icon (rather than only the still-unknown ones).
+  // Shows the "Get Started" section only for fields not yet answered — a
+  // required field counts as answered once it has a value; an optional field
+  // counts as answered once it's been asked, even if left blank. Pass
+  // forceAll=true to show every field pre-filled with its current value, for
+  // editing later via Developer Mode's "Edit start-up info" button.
   function renderOneTimeInfo(forceAll) {
     let section = document.getElementById("oneTimeInfoSection");
-    let fieldsToShow = forceAll ? ONE_TIME_FIELDS : ONE_TIME_FIELDS.filter(f => !String(profile[f.key] || "").trim());
+    let fieldsToShow = forceAll ? ONE_TIME_FIELDS : ONE_TIME_FIELDS.filter(f =>
+      f.optional ? !profile[`${f.key}Asked`] : !String(profile[f.key] || "").trim()
+    );
 
     if (!fieldsToShow.length) {
       section.style.display = "none";
@@ -1020,7 +1035,7 @@
     wrap.innerHTML = fieldsToShow.map(f => `
       <div>
         <label for="oneTimeInput_${f.key}">${f.label}</label>
-        <input type="text" id="oneTimeInput_${f.key}" placeholder="${f.placeholder}" value="${(profile[f.key] || "").replace(/"/g, "&quot;")}">
+        <input type="${f.type || 'text'}" id="oneTimeInput_${f.key}" placeholder="${f.placeholder}" value="${String(profile[f.key] || "").replace(/"/g, "&quot;")}">
       </div>
     `).join('');
   }
@@ -1127,13 +1142,22 @@
     let section = document.getElementById("upcomingDosesSection");
     let grid = document.getElementById("upcomingDosesGrid");
     let upcoming = getUpcomingDoses();
+    let lastKnown = getLastKnownDose();
 
-    if (!upcoming.length) {
+    if (!upcoming.length && !lastKnown) {
       section.style.display = "none";
       return;
     }
     section.style.display = "block";
-    grid.innerHTML = upcoming.map(e => `
+
+    let lastKnownHtml = lastKnown ? `
+      <div class="stat upcoming-dose">
+        <div class="val">${lastKnown.doseMg} mg</div>
+        <div class="lbl">Last dose taken &middot; ${fmtDate(lastKnown.date)}</div>
+      </div>
+    ` : "";
+
+    grid.innerHTML = lastKnownHtml + upcoming.map(e => `
       <div class="stat upcoming-dose">
         <button class="subtle-remove" data-dose-date="${e.date}" title="Remove this dose" aria-label="Remove upcoming dose">&times;</button>
         <div class="val">${e.doseMg} mg</div>
@@ -1326,7 +1350,11 @@
   // avoids sharp joints without needing a charting library.
   function tracePath(ctx, pts) {
     ctx.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < pts.length - 1; i++) {
+    // Loop stops one point earlier than the last midpoint segment so the
+    // closing curve below isn't drawn twice through the same control point —
+    // that double-draw was what made the curve look pinched/discontinuous
+    // near the end, especially with only a few points.
+    for (let i = 1; i < pts.length - 2; i++) {
       let mx = (pts[i].x + pts[i + 1].x) / 2;
       let my = (pts[i].y + pts[i + 1].y) / 2;
       ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
@@ -1561,12 +1589,11 @@
       });
     }
 
-    // --- Footer: Current weight and generated date ---
+    // --- Footer: current weight (its date already covers "as of when") ---
     ctx.font = `500 22px ${FONT}`;
     ctx.fillStyle = "#94a3b8"; // Matches the app's --muted variable
     ctx.textAlign = "center";
-    let todayStr = new Date().toISOString().slice(0, 10);
-    ctx.fillText(`Current weight: ${current.toFixed(1)} ${unit} as of ${fmtDateShort(lastDate)}  |  Generated: ${fmtDateShort(todayStr)}`, W / 2, H - 35);
+    ctx.fillText(`Current weight: ${current.toFixed(1)} ${unit} as of ${fmtDateShort(lastDate)}`, W / 2, H - 35);
 
     canvas.toBlob(async blob => {
       if (fileHandle) {
@@ -1846,7 +1873,10 @@
       name: profile.name || "",
       entries: entries,
       goals: goals,
-      avgCalories: computedAvgCal
+      avgCalories: computedAvgCal,
+      // Kept separate from `entries` since it's a derived total, not a logged
+      // data point — the cumulative mg of Tirzepatide actually taken to date.
+      cumulativeTirzepatideDoseMg: getCumulativeDoseMg()
     };
     let blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     let url = URL.createObjectURL(blob);
@@ -1912,7 +1942,10 @@
   document.getElementById("oneTimeInfoSaveBtn").addEventListener("click", () => {
     ONE_TIME_FIELDS.forEach(f => {
       let el = document.getElementById(`oneTimeInput_${f.key}`);
-      if (el) profile[f.key] = el.value.trim();
+      if (el) {
+        profile[f.key] = el.value.trim();
+        if (f.optional) profile[`${f.key}Asked`] = true;
+      }
     });
     saveProfile();
     updateHeaderTitle();
@@ -1923,7 +1956,8 @@
     renderOneTimeInfo();
   });
 
-  document.getElementById("editNameBtn").addEventListener("click", () => {
+  document.getElementById("reopenOneTimeInfoBtn").addEventListener("click", () => {
+    toggleDevMode();
     renderOneTimeInfo(true);
     document.getElementById("oneTimeInfoSection").scrollIntoView({ behavior: "smooth", block: "center" });
   });
