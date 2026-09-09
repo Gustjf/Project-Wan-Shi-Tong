@@ -414,6 +414,7 @@
       <h2>Current Trend</h2>
       <div id="trendWindowWrap">
         <button class="pill active" data-window="all">All</button>
+        <button class="pill" data-window="7">7d</button>
         <button class="pill" data-window="30">30d</button>
         <button class="pill" data-window="60">60d</button>
         <button class="pill" data-window="90">90d</button>
@@ -620,8 +621,11 @@
   // digits track incremental changes, sized to the effort of the change:
   //   +0.001-0.009 = small tweak, +0.010-0.090 = moderate feature/fix,
   //   +0.100-0.900 = significant feature or rework. Whole numbers = major releases.
-  const APP_VERSION = "1.500";
+  const APP_VERSION = "1.501";
   const CHANGELOG = [
+    { version: "1.501", date: "2026-09-09", changes: [
+      "Added a 7d option to the Current Trend window slicer, alongside All/30d/60d/90d."
+    ] },
     { version: "1.500", date: "2026-09-09", changes: [
       "kg support is back: a new start-up 'Units' question (lb or kg) picks the unit for the whole app — nothing is ever mixed. Changing it later means re-answering start-up info from Developer Mode, which converts every existing weight, goal, and imported backup into the new unit; the Est. TDEE calorie math now scales correctly for kg too."
     ] },
@@ -926,7 +930,7 @@
 
   // Averages the non-null, strictly positive calories in the given list (defaults
   // to every entry). Pass a windowed subset (see getWindowedEntries) to scope
-  // the average to the same all/30d/60d/90d window as the trend calculation.
+  // the average to the same all/7d/30d/60d/90d window as the trend calculation.
   function getAvgCalories(list) {
     let src = list || entries;
     let entriesWithCal = src.filter(e => typeof e.calories === "number" && !isNaN(e.calories) && e.calories > 0);
@@ -937,7 +941,7 @@
     return avgCalories || 0;
   }
 
-  // Returns entries falling within the selected Current Trend window (all/30d/60d/90d),
+  // Returns entries falling within the selected Current Trend window (all/7d/30d/60d/90d),
   // anchored to the most recent weigh-in date — the same anchor the trend regression
   // uses. This is what lets "30d" on Current Trend also scope the calorie average and
   // TDEE, not just the fitted rate.
@@ -967,7 +971,7 @@
   // CORE STATISTICS & REGRESSION
   // ============================================================================
   
-  // Filters entries based on the user's selected trend window (All, 30d, 60d, etc.)
+  // Filters entries based on the user's selected trend window (All, 7d, 30d, 60d, etc.)
   function getTrendEntries() {
     let wEntries = weightEntries();
     if (!wEntries.length || trendWindow === "all") return wEntries;
@@ -1312,7 +1316,7 @@
     // 3. Render Estimated TDEE
     // Calculation: TDEE = Avg Intake + Daily Caloric Deficit
     // (A 1 lb weekly deficit implies ~500 cal/day burn; ~1102 cal/day per kg)
-    // Both the avg intake and TDEE are scoped to the same all/30d/60d/90d window
+    // Both the avg intake and TDEE are scoped to the same all/7d/30d/60d/90d window
     // selected above, so switching windows updates these numbers too.
     let windowed = getWindowedEntries();
     let computedAvgCal = getAvgCalories(windowed);
