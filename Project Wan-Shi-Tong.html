@@ -387,7 +387,7 @@
         <input type="date" id="dateInput">
       </div>
       <div>
-        <label for="weightInput">Weight, lb</label>
+        <label for="weightInput" id="weightInputLabel">Weight, lb</label>
         <input type="number" id="weightInput" step="0.1" min="0" placeholder="e.g. 185.4">
       </div>
       <div>
@@ -547,7 +547,6 @@
   // APP STATE & CONSTANTS
   // ============================================================================
   const STORAGE_KEY = "weightTrackerEntries_v1";
-  const UNIT_KEY = "weightTrackerUnit_v1";
   const GOALS_KEY = "weightTrackerGoals_v1";
   const CALORIES_KEY = "weightTrackerCalories_v1";
   const THEME_KEY = "weightTrackerTheme_v1";
@@ -561,6 +560,10 @@
   // left blank still counts as "answered" so it doesn't keep reappearing).
   const ONE_TIME_FIELDS = [
     { key: "name", label: "Your name", placeholder: "e.g. Jordan", type: "text" },
+    { key: "unit", label: "Units", type: "select", default: "lb", options: [
+      { value: "lb", label: "lb" },
+      { value: "kg", label: "kg" }
+    ] },
     { key: "usesTirzepatide", label: "Do you take Tirzepatide?", type: "boolean", optional: true, default: true }
   ];
   let profile = {};
@@ -569,15 +572,40 @@
   // Data schema version for exported/imported JSON backups. Bump this only
   // when the backup file's *shape* changes in a way that needs migration
   // logic below — independent of APP_VERSION, which tracks the UI/app itself.
-  // v2: kg support removed (weight is always lb now, old kg backups get
-  // converted on import) and entries gained an optional doseMg field.
+  // v2: entries gained an optional doseMg field.
   const DATA_SCHEMA_VERSION = 2;
 
   // Core state objects
   // `entries` format matches JSON schema: { date: string, weight: number | null, calories: number | null, doseMg: number | null }
   let entries = [];
   let goals = [];
-  const unit = "lb"; // kg support removed; kept as a constant so display strings ("${unit}") don't need to change everywhere
+  // The whole app — entries, goals, every display string — lives in exactly one
+  // unit at a time; nothing here ever mixes kg and lb. This mirrors profile.unit
+  // (a one-time start-up field, re-answerable only via Developer Mode's "Edit
+  // start-up info"), and is kept in sync with it via getActiveUnit() below.
+  let unit = "lb";
+  const LB_PER_KG = 2.20462;
+
+  // Converts a single weight value between units, rounded to the same 1-decimal
+  // precision entries/goals are always stored at. Used both when the unit is
+  // changed via start-up info and when importing a backup saved in a different
+  // unit than the one currently active — either way, nothing is ever left mixed.
+  function convertWeightValue(value, fromUnit, toUnit) {
+    if (typeof value !== "number" || isNaN(value) || fromUnit === toUnit) return value;
+    if (fromUnit === "kg" && toUnit === "lb") return Math.round(value * LB_PER_KG * 10) / 10;
+    if (fromUnit === "lb" && toUnit === "kg") return Math.round(value / LB_PER_KG * 10) / 10;
+    return value;
+  }
+
+  // Converts every stored weight (entries + goals) from one unit to the other
+  // in place, e.g. when the start-up unit choice is changed via Developer Mode.
+  function convertAllWeightsToUnit(fromUnit, toUnit) {
+    if (fromUnit === toUnit) return;
+    entries.forEach(e => {
+      if (typeof e.weight === "number" && !isNaN(e.weight)) e.weight = convertWeightValue(e.weight, fromUnit, toUnit);
+    });
+    goals = goals.map(g => convertWeightValue(g, fromUnit, toUnit));
+  }
   let rateMode = "trend"; // "trend" or "custom"
   let trendWindow = "all"; // Controls which data points feed the regression AND the calorie/TDEE window
   let avgCalories = 0; // Fallback moving average if recent inputs are sparse
@@ -592,8 +620,11 @@
   // digits track incremental changes, sized to the effort of the change:
   //   +0.001-0.009 = small tweak, +0.010-0.090 = moderate feature/fix,
   //   +0.100-0.900 = significant feature or rework. Whole numbers = major releases.
-  const APP_VERSION = "1.410";
+  const APP_VERSION = "1.500";
   const CHANGELOG = [
+    { version: "1.500", date: "2026-09-09", changes: [
+      "kg support is back: a new start-up 'Units' question (lb or kg) picks the unit for the whole app — nothing is ever mixed. Changing it later means re-answering start-up info from Developer Mode, which converts every existing weight, goal, and imported backup into the new unit; the Est. TDEE calorie math now scales correctly for kg too."
+    ] },
     { version: "1.410", date: "2026-09-09", changes: [
       "The start-up Tirzepatide question now actually hides all dose UI (Add Entry field, History column, Upcoming Doses) when answered 'No', the exported image's cumulative dosage line was fixed to actually appear, and its title is now centered."
     ] },
@@ -685,20 +716,8 @@
   function loadData() {
     try {
       entries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      let storedUnit = localStorage.getItem(UNIT_KEY) || "lb";
       goals = JSON.parse(localStorage.getItem(GOALS_KEY)) || DEFAULT_GOALS.slice();
       avgCalories = parseFloat(localStorage.getItem(CALORIES_KEY)) || 0;
-
-      // One-time migration: kg support has been removed. Any locally stored
-      // data that was previously tracked in kg gets converted to lb here so
-      // the numbers stay accurate instead of silently being relabeled.
-      if (storedUnit === "kg") {
-        entries.forEach(e => {
-          if (typeof e.weight === "number" && !isNaN(e.weight)) e.weight = Math.round(e.weight * 2.20462 * 10) / 10;
-        });
-        goals = goals.map(g => Math.round(g * 2.20462 * 10) / 10);
-        localStorage.setItem(UNIT_KEY, "lb");
-      }
     } catch (e) {
       console.warn("Failed to load existing data, starting fresh.", e);
       entries = [];
@@ -713,7 +732,6 @@
   function saveData() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-      localStorage.setItem(UNIT_KEY, unit);
       localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
       localStorage.setItem(CALORIES_KEY, avgCalories);
       unsavedChanges = true;
@@ -730,6 +748,15 @@
       profile = {};
     }
     if (typeof profile.name !== "string") profile.name = "";
+    // Left unset ("") until the start-up "Units" question is actually answered,
+    // same as name — see getActiveUnit() for what the app uses in the meantime.
+    if (profile.unit !== "kg" && profile.unit !== "lb") profile.unit = "";
+  }
+
+  // The unit actually in effect: whatever was chosen at start-up, or "lb" as
+  // the working default before that question has been answered.
+  function getActiveUnit() {
+    return (profile.unit === "kg" || profile.unit === "lb") ? profile.unit : "lb";
   }
 
   function saveProfile() {
@@ -757,24 +784,26 @@
    * - Forward compatibility: a backup with a schemaVersion newer than this
    *   app understands is still imported best-effort (unknown extra fields
    *   are simply ignored), with a warning surfaced to the user.
-   * - kg support has been removed (schema v2+). A backup tagged "unit": "kg"
-   *   has its weights and goals converted to lb on import so old data stays
-   *   accurate instead of being silently relabeled.
+   * - Everything in the app lives in one unit at a time — never mixed. A
+   *   backup's own "unit" field (missing/invalid means "lb", the only unit
+   *   before this feature existed) is converted into whichever unit is
+   *   currently active here, so imported weights/goals stay accurate instead
+   *   of being silently relabeled or left mismatched with existing data.
    *
    * Malformed rows (missing/invalid date, or a weight/calories/dose value
    * that isn't a usable number) are dropped rather than crashing the import.
    */
   function normalizeBackupData(raw) {
     let schemaVersion = typeof raw.schemaVersion === "number" ? raw.schemaVersion : 0;
-    let convertKg = raw.unit === "kg";
-    const KG_TO_LB = 2.20462;
+    let sourceUnit = (raw.unit === "kg" || raw.unit === "lb") ? raw.unit : "lb";
+    let targetUnit = unit;
 
     let cleanEntries = Array.isArray(raw.entries) ? raw.entries.map(e => {
       if (!e || typeof e.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return null;
 
       let w = e.weight;
       let weight = (typeof w === "number" && !isNaN(w) && w > 0) ? w : null;
-      if (weight !== null && convertKg) weight = Math.round(weight * KG_TO_LB * 10) / 10;
+      if (weight !== null) weight = convertWeightValue(weight, sourceUnit, targetUnit);
 
       let c = e.calories;
       let calories = (typeof c === "number" && !isNaN(c) && c > 0) ? c : null;
@@ -796,8 +825,9 @@
 
     let cleanGoals = Array.isArray(raw.goals)
       ? raw.goals.filter(g => typeof g === "number" && !isNaN(g) && g > 0)
-          .map(g => convertKg ? Math.round(g * KG_TO_LB * 10) / 10 : g)
-      : DEFAULT_GOALS.slice();
+          .map(g => convertWeightValue(g, sourceUnit, targetUnit))
+      // DEFAULT_GOALS is defined in lb regardless of what unit is active.
+      : DEFAULT_GOALS.map(g => convertWeightValue(g, "lb", targetUnit));
     cleanGoals.sort((a, b) => b - a);
 
     let cleanAvgCal = (typeof raw.avgCalories === "number" && !isNaN(raw.avgCalories) && raw.avgCalories > 0)
@@ -1048,6 +1078,17 @@
           </div>
         `;
       }
+      if (f.type === "select") {
+        let current = f.options.some(o => o.value === profile[f.key]) ? profile[f.key] : f.default;
+        return `
+          <div>
+            <label>${f.label}</label>
+            <div class="mode-toggle" id="oneTimeInput_${f.key}" data-value="${current}">
+              ${f.options.map(o => `<button type="button" class="mode-btn${current === o.value ? ' active' : ''}" data-select="${o.value}">${o.label}</button>`).join('')}
+            </div>
+          </div>
+        `;
+      }
       return `
         <div>
           <label for="oneTimeInput_${f.key}">${f.label}</label>
@@ -1056,17 +1097,25 @@
       `;
     }).join('');
 
-    // Boolean fields render as a Yes/No mode-toggle rather than an <input>,
+    // Boolean and select fields render as a mode-toggle rather than an <input>,
     // so their current selection is tracked in a data-value attribute instead.
     wrap.querySelectorAll('.mode-toggle[id^="oneTimeInput_"]').forEach(toggle => {
       toggle.querySelectorAll('button').forEach(btn => {
         btn.addEventListener("click", () => {
           toggle.querySelectorAll('button').forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
-          toggle.dataset.value = btn.getAttribute("data-bool");
+          toggle.dataset.value = btn.getAttribute("data-bool") || btn.getAttribute("data-select");
         });
       });
     });
+  }
+
+  // Updates the unit-dependent labels/placeholders outside the Get Started
+  // section (History, Add Entry, etc. read `unit` directly at render time).
+  function updateUnitLabels() {
+    document.getElementById("weightInputLabel").textContent = `Weight, ${unit}`;
+    document.getElementById("weightInput").placeholder = unit === "kg" ? "e.g. 84.1" : "e.g. 185.4";
+    document.getElementById("goalInput").placeholder = unit === "kg" ? "e.g. 68" : "e.g. 150";
   }
 
   // Applies the current profile name to the on-screen header, e.g.
@@ -1262,7 +1311,7 @@
 
     // 3. Render Estimated TDEE
     // Calculation: TDEE = Avg Intake + Daily Caloric Deficit
-    // (A 1lb weekly deficit implies ~500 cal/day burn, scaling appropriately for kg)
+    // (A 1 lb weekly deficit implies ~500 cal/day burn; ~1102 cal/day per kg)
     // Both the avg intake and TDEE are scoped to the same all/30d/60d/90d window
     // selected above, so switching windows updates these numbers too.
     let windowed = getWindowedEntries();
@@ -1278,8 +1327,10 @@
 
     if (computedAvgCal > 0 && trendRate !== null) {
       let curW = wEntries[wEntries.length - 1].weight;
-      let weeklyChangeLbs = curW * trendRate;
-      let dailyDeficit = weeklyChangeLbs * 500; // 3500 weekly calories per 1 lb
+      let weeklyChange = curW * trendRate;
+      // 3500 kcal per lb of body weight, scaled to 3500 * LB_PER_KG kcal/kg when in kg.
+      let kcalPerUnitPerWeek = unit === "kg" ? 3500 * LB_PER_KG : 3500;
+      let dailyDeficit = weeklyChange * (kcalPerUnitPerWeek / 7);
       let tdee = Math.round(computedAvgCal + dailyDeficit);
       tdeeEl.textContent = `${tdee} kcal/day`;
     } else {
@@ -1929,7 +1980,7 @@
     let data = {
       schemaVersion: DATA_SCHEMA_VERSION,
       appVersion: APP_VERSION,
-      unit: unit, // always "lb" — kept in the file for readability/back-compat
+      unit: unit,
       name: profile.name || "",
       entries: entries,
       goals: goals,
@@ -2000,15 +2051,31 @@
   });
 
   document.getElementById("oneTimeInfoSaveBtn").addEventListener("click", () => {
+    let previousUnit = getActiveUnit();
     ONE_TIME_FIELDS.forEach(f => {
       let el = document.getElementById(`oneTimeInput_${f.key}`);
       if (el) {
-        profile[f.key] = (f.type === "boolean") ? (el.dataset.value === "true") : el.value.trim();
+        if (f.type === "boolean") profile[f.key] = (el.dataset.value === "true");
+        else if (f.type === "select") profile[f.key] = el.dataset.value;
+        else profile[f.key] = el.value.trim();
         if (f.optional) profile[`${f.key}Asked`] = true;
       }
     });
+
+    // Changing units (only reachable by re-answering start-up info via Developer
+    // Mode) converts every existing weight — the app only ever holds one unit
+    // at a time, never a mix, so the numbers move with the label instead of
+    // being silently relabeled.
+    let newUnit = getActiveUnit();
+    if (newUnit !== previousUnit) {
+      convertAllWeightsToUnit(previousUnit, newUnit);
+      unit = newUnit;
+      saveData();
+    }
+
     saveProfile();
     updateHeaderTitle();
+    updateUnitLabels();
     renderOneTimeInfo();
     applyTirzepatideVisibility();
     currentPage = 1;
@@ -2032,11 +2099,13 @@
   // APP INITIALIZATION
   // ============================================================================
   initTheme();
-  loadData();
   loadProfile();
+  unit = getActiveUnit();
+  loadData();
   updateHeaderTitle();
   renderOneTimeInfo();
   applyTirzepatideVisibility();
+  updateUnitLabels();
   document.getElementById("appVersionTag").textContent = `v${APP_VERSION}`;
   document.getElementById("dateInput").value = new Date().toISOString().slice(0, 10);
   renderAll();
