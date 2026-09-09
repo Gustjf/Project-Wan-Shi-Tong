@@ -619,8 +619,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.512";
+  const APP_VERSION = "1.513";
   const CHANGELOG = [
+    { version: "1.513", date: "2026-09-09", changes: [
+      "Fixed the dev console changelog showing oldest entries first — it now lists newest at the top."
+    ] },
     { version: "1.512", date: "2026-09-09", changes: [
       "The exported progress image's title is now 'Weight report', and its chart and goal table now share one centered, light-grey, white-bordered card instead of floating directly on the page."
     ] },
@@ -661,7 +664,7 @@
   function renderDevPanel() {
     document.getElementById("devVersionNum").textContent = APP_VERSION;
     let log = document.getElementById("devChangelog");
-    log.innerHTML = CHANGELOG.slice().reverse().map(entry => `
+    log.innerHTML = CHANGELOG.map(entry => `
       <div class="changelog-entry">
         <span class="changelog-version">v${entry.version}</span><span class="changelog-date">${entry.date}</span>
         <ul>${entry.changes.map(c => `<li>${c}</li>`).join('')}</ul>
