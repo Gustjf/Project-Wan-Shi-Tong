@@ -188,48 +188,42 @@
   [data-theme="dark"] button.danger { background: var(--panel); color: var(--bad); }
   button.danger:hover { background: var(--bad); color: #ffffff; border-color: var(--bad); }
 
-  .preset {
-    background: var(--card-bg);
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    font-size: 0.85em;
-    font-weight: 600;
-    border-radius: 5px;
-    margin: 2px 4px 2px 0;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+  input[type=range]#customRate {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    outline: none;
+    margin: 8px 0 2px;
   }
-  [data-theme="dark"] .preset { background: var(--panel); color: var(--text); }
-  .preset:hover:not(.active) { background: var(--border); color: var(--text); }
-  .preset.active, [data-theme="dark"] .preset.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
-  .preset.active:hover, [data-theme="dark"] .preset.active:hover { background: var(--accent-dark); color: #ffffff; border-color: var(--accent-dark); }
-
-  /* Small inline lose/gain-direction toggle, sized to sit next to .preset buttons */
-  .dir-toggle {
-    display: inline-flex;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    overflow: hidden;
-    margin: 2px 2px 2px 0;
-  }
-  .dir-toggle button {
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    border: none;
-    background: var(--card-bg);
-    color: var(--text);
-    font-size: 0.9em;
-    font-weight: 700;
-    line-height: 1;
+  input[type=range]#customRate::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--panel);
+    box-shadow: 0 0 0 1px var(--border);
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
   }
-  [data-theme="dark"] .dir-toggle button { background: var(--panel); }
-  .dir-toggle button:first-child { border-right: 1px solid var(--border); }
-  .dir-toggle button:hover:not(.active) { background: var(--border); }
-  .dir-toggle button.active { background: var(--accent); color: #ffffff; }
-  .dir-toggle button.active:hover { background: var(--accent-dark); }
+  input[type=range]#customRate::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+  }
+  input[type=range]#customRate::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--panel);
+    box-shadow: 0 0 0 1px var(--border);
+    cursor: pointer;
+  }
+  .rate-scale { display: flex; justify-content: space-between; font-size: 0.72em; color: var(--muted); }
 
   table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
   th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
@@ -518,22 +512,9 @@
         <button type="button" class="mode-btn" data-rate-mode="custom">Custom weekly %</button>
       </div>
       <div id="customRateWrap">
-        <div class="row">
-          <div>
-            <label for="customRate">Custom weekly rate toward goal (%)</label>
-            <input type="number" id="customRate" step="0.1" min="0" max="10" value="1.0">
-          </div>
-        </div>
-        <div style="margin-top:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-          <div class="dir-toggle" id="goalDirectionToggle">
-            <button type="button" data-goal-direction="lose" title="Lose weight" aria-label="Lose weight">&minus;</button>
-            <button type="button" data-goal-direction="gain" title="Gain weight" aria-label="Gain weight">&plus;</button>
-          </div>
-          <button class="preset" data-rate="0.5">0.5%/wk</button>
-          <button class="preset" data-rate="1">1%/wk</button>
-          <button class="preset" data-rate="1.5">1.5%/wk</button>
-          <button class="preset" data-rate="2">2%/wk</button>
-        </div>
+        <label for="customRate">Custom weekly rate toward goal &mdash; <span id="customRateValue">0%</span>/wk</label>
+        <input type="range" id="customRate" step="0.25" min="-2" max="1" value="0">
+        <div class="rate-scale"><span>&minus;2%</span><span>0%</span><span>+1%</span></div>
       </div>
       <div id="goalsRateNote" style="font-size:0.8em; color: var(--muted); margin-top:8px;"></div>
       <div class="stat-grid" id="futureWeightGrid" style="margin-top:10px;"></div>
@@ -583,7 +564,6 @@
   const CALORIES_KEY = "weightTrackerCalories_v1";
   const THEME_KEY = "weightTrackerTheme_v1";
   const PROFILE_KEY = "weightTrackerProfile_v1";
-  const GOAL_DIRECTION_KEY = "weightTrackerGoalDirection_v1";
   const DEFAULT_GOALS = [200, 175, 160, 150];
 
   // One-time info: things we only ever need to ask for once. Defined as a list
@@ -641,10 +621,6 @@
   }
   let rateMode = "trend"; // "trend" or "custom"
   let trendWindow = "all"; // Controls which data points feed the regression AND the calorie/TDEE window
-  // "lose" or "gain". Once the user has explicitly picked one it's remembered
-  // (GOAL_DIRECTION_KEY); until then it auto-follows the last-90-days trend on
-  // every load — see getDefaultGoalDirection().
-  let goalDirection = "lose";
   let avgCalories = 0; // Fallback moving average if recent inputs are sparse
 
   const PAGE_SIZE = 7;
@@ -655,8 +631,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.614";
+  const APP_VERSION = "1.714";
   const CHANGELOG = [
+    { version: "1.714", date: "2026-09-10", changes: [
+      "Custom weekly % is now a single slider from -2% to +1% in 0.25% steps (0 = no change, negative = lose, positive = gain), replacing the rate input box, presets, and the separate Lose/Gain toggle."
+    ] },
     { version: "1.614", date: "2026-09-09", changes: [
       "The Lose/Gain weight toggle is now a small inline -/+ control next to the custom rate presets, shown only when Custom weekly % is selected, instead of a full-width button pair always on screen."
     ] },
@@ -779,19 +758,26 @@
     // Ensure chronological order for math calculations
     entries.sort((a, b) => a.date.localeCompare(b.date));
 
-    let storedDirection = localStorage.getItem(GOAL_DIRECTION_KEY);
-    goalDirection = (storedDirection === "gain" || storedDirection === "lose")
-      ? storedDirection
-      : getDefaultGoalDirection();
-
     sortGoals();
+  }
+
+  // Lose/gain direction is no longer a manual toggle — in custom mode it
+  // follows the sign of the rate slider (negative = lose, positive = gain),
+  // and otherwise (trend mode, or the slider parked at 0) it falls back to
+  // whichever direction the last 90 days of weigh-ins actually show.
+  function currentGoalDirection() {
+    if (rateMode === "custom") {
+      let v = parseFloat(document.getElementById("customRate").value);
+      if (!isNaN(v) && v !== 0) return v > 0 ? "gain" : "lose";
+    }
+    return getDefaultGoalDirection();
   }
 
   // Descending when the goal is to lose (nearest/highest goal first) and
   // ascending when the goal is to gain (nearest/lowest goal first), so the
   // table always lists the soonest-reachable goal first.
   function sortGoalsArray(arr) {
-    arr.sort((a, b) => goalDirection === "gain" ? a - b : b - a);
+    arr.sort((a, b) => currentGoalDirection() === "gain" ? a - b : b - a);
     return arr;
   }
   function sortGoals() {
@@ -1136,14 +1122,14 @@
   }
 
   // Extracts the specific rate being used based on UI toggle (Fitted Trend vs Custom Rate).
-  // In custom mode the input is always a magnitude — its sign comes from the
-  // Lose/Gain weight toggle, not from what's typed in the field.
+  // The slider itself is signed (negative = lose, positive = gain), which is
+  // the opposite of the internal fractional-rate convention (positive = lose),
+  // so its value is negated here.
   function getEffectiveRate(trendRate) {
     if (rateMode === "trend") return trendRate !== null ? trendRate : 0;
     let custom = parseFloat(document.getElementById("customRate").value);
     if (isNaN(custom)) return 0;
-    let magnitude = Math.abs(custom) / 100;
-    return goalDirection === "gain" ? -magnitude : magnitude;
+    return -custom / 100;
   }
 
   // ============================================================================
@@ -1310,7 +1296,7 @@
       let isNetLoss = change < 0;
       let isNetGain = change > 0;
       let changeClass = (isNetLoss || isNetGain)
-        ? ((goalDirection === "gain") === isNetGain ? "good" : "bad")
+        ? ((currentGoalDirection() === "gain") === isNetGain ? "good" : "bad")
         : "";
       let weightStr = hasWeight ? `${e.weight.toFixed(1)} ${unit}` : "&mdash;";
       let calStr = (e.calories !== undefined && e.calories !== null) ? e.calories : "&mdash;";
@@ -1411,7 +1397,7 @@
       let pct = trendRate * 100;
       let isNetLoss = pct >= 0;
       rateEl.textContent = (isNetLoss ? "-" : "+") + Math.abs(pct).toFixed(2) + "%/wk";
-      rateEl.className = "val " + ((goalDirection === "gain") === !isNetLoss ? "good" : "bad");
+      rateEl.className = "val " + ((currentGoalDirection() === "gain") === !isNetLoss ? "good" : "bad");
     }
 
     // 2. Render 7-day rolling avg (always based on the most recent week, regardless of window)
@@ -1463,7 +1449,7 @@
     let effectiveRate = getEffectiveRate(trendRate);
 
     let windowLabel = trendWindow === "all" ? "all-time" : `${trendWindow}d`;
-    let directionLabel = goalDirection === "gain" ? "gain weight" : "lose weight";
+    let directionLabel = currentGoalDirection() === "gain" ? "gain weight" : "lose weight";
     document.getElementById("goalsRateNote").textContent =
       rateMode === "trend"
         ? `Using the fitted trend from the ${windowLabel} window (set above in Current Trend).`
@@ -1953,16 +1939,16 @@
     svg.innerHTML = parts.join('');
   }
 
-  // Reflects `goalDirection` on the Lose/Gain weight toggle buttons.
-  function applyGoalDirectionUI() {
-    document.querySelectorAll('#goalDirectionToggle button').forEach(b => {
-      b.classList.toggle("active", b.getAttribute("data-goal-direction") === goalDirection);
-    });
+  // Reflects the custom rate slider's current value in its live label.
+  function updateCustomRateLabel() {
+    let v = parseFloat(document.getElementById("customRate").value);
+    let formatted = v.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+    document.getElementById("customRateValue").textContent = (v > 0 ? "+" : "") + formatted + "%";
   }
 
   // Master render trigger function to update all UI modules sequentially
   function renderAll() {
-    applyGoalDirectionUI();
+    updateCustomRateLabel();
     renderHistory();
     renderUpcomingDoses();
     let trendRate = computeTrend();
@@ -2082,21 +2068,13 @@
     if (currentPage < Math.ceil(entries.length / PAGE_SIZE)) { currentPage++; renderHistory(); }
   });
 
-  document.querySelectorAll('#goalDirectionToggle button').forEach(btn => {
-    btn.addEventListener("click", () => {
-      goalDirection = btn.getAttribute("data-goal-direction");
-      localStorage.setItem(GOAL_DIRECTION_KEY, goalDirection);
-      sortGoals();
-      renderAll();
-    });
-  });
-
   document.querySelectorAll('#rateModeToggle button').forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll('#rateModeToggle button').forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       rateMode = btn.getAttribute("data-rate-mode");
       document.getElementById("customRateWrap").style.display = (rateMode === "custom") ? "block" : "none";
+      sortGoals();
       renderAll();
     });
   });
@@ -2114,16 +2092,9 @@
 
   document.getElementById("exportImageBtn").addEventListener("click", exportGoalsImage);
 
-  document.getElementById("customRate").addEventListener("input", renderAll);
-
-  // Preset custom rates injection
-  document.querySelectorAll("button.preset").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.getElementById("customRate").value = btn.getAttribute("data-rate");
-      document.querySelectorAll("button.preset").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      renderAll();
-    });
+  document.getElementById("customRate").addEventListener("input", () => {
+    sortGoals();
+    renderAll();
   });
 
   // Trigger Local Download adhering directly to JSON standard requirements
