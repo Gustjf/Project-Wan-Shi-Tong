@@ -188,42 +188,88 @@
   [data-theme="dark"] button.danger { background: var(--panel); color: var(--bad); }
   button.danger:hover { background: var(--bad); color: #ffffff; border-color: var(--bad); }
 
+  /* Custom weekly-rate slider: label row with a high-contrast value badge,
+     the range input itself, then min/zero/max marks positioned by their
+     actual numeric fraction of the track (NOT evenly spaced) since the
+     scale is asymmetric (-2 to +1, zero sits at 2/3 across). */
+  .rate-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .rate-head label { margin-bottom: 0; }
+  .rate-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 0.9em;
+    color: #ffffff;
+    background: var(--accent);
+    padding: 4px 12px;
+    border-radius: 6px;
+    min-width: 56px;
+    text-align: center;
+    flex: 0 0 auto;
+  }
   input[type=range]#customRate {
     -webkit-appearance: none;
     appearance: none;
+    display: block;
     width: 100%;
-    height: 6px;
+    height: 5px;
     border-radius: 3px;
     background: var(--border);
     outline: none;
-    margin: 8px 0 2px;
   }
   input[type=range]#customRate::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: var(--accent);
     border: 2px solid var(--panel);
-    box-shadow: 0 0 0 1px var(--border);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
     cursor: pointer;
   }
   input[type=range]#customRate::-moz-range-track {
-    height: 6px;
+    height: 5px;
     border-radius: 3px;
     background: var(--border);
   }
   input[type=range]#customRate::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: var(--accent);
     border: 2px solid var(--panel);
-    box-shadow: 0 0 0 1px var(--border);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
     cursor: pointer;
   }
-  .rate-scale { display: flex; justify-content: space-between; font-size: 0.72em; color: var(--muted); }
+  input[type=range]#customRate:focus-visible::-webkit-slider-thumb,
+  input[type=range]#customRate:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+  }
+  /* One tick per 0.25 step (13 total, evenly spaced since the step size is
+     uniform). Drawn as plain positioned marks rather than relying on
+     <datalist> ticks, which browsers only render on the native slider look
+     and disappear once the track/thumb are custom-styled. Kept clear of the
+     thumb (which overflows well past the 5px track) by a 10px gap. */
+  .rate-ticks { position: relative; height: 6px; margin-top: 10px; }
+  .rate-ticks span { position: absolute; top: 0; width: 1px; height: 6px; background: var(--border); }
+  .rate-ticks span:nth-child(1) { left: 0%; }
+  .rate-ticks span:nth-child(2) { left: 8.333%; }
+  .rate-ticks span:nth-child(3) { left: 16.667%; }
+  .rate-ticks span:nth-child(4) { left: 25%; }
+  .rate-ticks span:nth-child(5) { left: 33.333%; }
+  .rate-ticks span:nth-child(6) { left: 41.667%; }
+  .rate-ticks span:nth-child(7) { left: 50%; }
+  .rate-ticks span:nth-child(8) { left: 58.333%; }
+  .rate-ticks span:nth-child(9) { left: 66.667%; height: 9px; top: -1.5px; background: var(--muted); }
+  .rate-ticks span:nth-child(10) { left: 75%; }
+  .rate-ticks span:nth-child(11) { left: 83.333%; }
+  .rate-ticks span:nth-child(12) { left: 91.667%; }
+  .rate-ticks span:nth-child(13) { left: 100%; }
+  .rate-labels { position: relative; height: 14px; margin-top: 4px; font-size: 0.72em; color: var(--muted); }
+  .rate-labels span { position: absolute; top: 0; white-space: nowrap; }
+  .rate-labels .rl-min { left: 0; }
+  .rate-labels .rl-zero { left: 66.667%; transform: translateX(-50%); }
+  .rate-labels .rl-max { left: 100%; transform: translateX(-100%); }
 
   table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
   th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
@@ -512,9 +558,20 @@
         <button type="button" class="mode-btn" data-rate-mode="custom">Custom weekly %</button>
       </div>
       <div id="customRateWrap">
-        <label for="customRate">Custom weekly rate toward goal &mdash; <span id="customRateValue">0%</span>/wk</label>
-        <input type="range" id="customRate" step="0.25" min="-2" max="1" value="0">
-        <div class="rate-scale"><span>&minus;2%</span><span>0%</span><span>+1%</span></div>
+        <div class="rate-head">
+          <label for="customRate">Custom weekly rate toward goal</label>
+          <span class="rate-value" id="customRateValue">0%</span>
+        </div>
+        <input type="range" id="customRate" step="0.25" min="-2" max="1" value="0" autocomplete="off">
+        <div class="rate-ticks" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="rate-labels">
+          <span class="rl-min">&minus;2%</span>
+          <span class="rl-zero">0%</span>
+          <span class="rl-max">+1%</span>
+        </div>
       </div>
       <div id="goalsRateNote" style="font-size:0.8em; color: var(--muted); margin-top:8px;"></div>
       <div class="stat-grid" id="futureWeightGrid" style="margin-top:10px;"></div>
@@ -631,8 +688,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.714";
+  const APP_VERSION = "1.724";
   const CHANGELOG = [
+    { version: "1.724", date: "2026-09-10", changes: [
+      "Fixed the custom weekly % slider: it now reliably resets to 0 on load, shows tick marks at every 0.25% step, and displays its current value in a high-contrast badge instead of blending into the label text."
+    ] },
     { version: "1.714", date: "2026-09-10", changes: [
       "Custom weekly % is now a single slider from -2% to +1% in 0.25% steps (0 = no change, negative = lose, positive = gain), replacing the rate input box, presets, and the separate Lose/Gain toggle."
     ] },
@@ -757,6 +817,10 @@
     }
     // Ensure chronological order for math calculations
     entries.sort((a, b) => a.date.localeCompare(b.date));
+
+    // Force the rate slider back to 0 on every load — some browsers restore
+    // a form control's last value on refresh regardless of its HTML default.
+    document.getElementById("customRate").value = "0";
 
     sortGoals();
   }
