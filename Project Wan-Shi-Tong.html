@@ -476,6 +476,10 @@
   .bugreport-status { font-size: 0.82em; margin-top: 8px; min-height: 1.2em; }
   .bugreport-status.good { color: var(--good); }
   .bugreport-status.bad { color: var(--bad); }
+
+  .dev-bugreports { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 8px 0; margin-bottom: 10px; }
+  .dev-bugreports-head { font-size: 0.85em; color: var(--muted); margin-bottom: 6px; }
+  .dev-bugreports-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -657,7 +661,16 @@
   <h3>Developer Mode</h3>
   <div class="dev-version">Version <span id="devVersionNum"></span></div>
   <button class="secondary" id="reopenOneTimeInfoBtn" style="margin-bottom:10px; font-size:0.85em; padding:5px 10px;">Edit start-up info</button>
-  <button class="secondary" id="devExportBugReportBtn" style="margin-bottom:10px; margin-left:6px; font-size:0.85em; padding:5px 10px;">Export bug report</button>
+  <div class="dev-bugreports">
+    <div class="dev-bugreports-head">
+      <span>Bug reports: <strong id="devBugReportCount">0</strong></span>
+    </div>
+    <div class="dev-bugreports-actions">
+      <button class="secondary" id="devCopyBugReportsBtn" style="font-size:0.8em; padding:4px 8px;">Copy all</button>
+      <button class="secondary" id="devDownloadBugReportsBtn" style="font-size:0.8em; padding:4px 8px;">Download .md</button>
+      <button class="danger" id="devClearBugReportsBtn" style="font-size:0.8em; padding:3px 8px;">Clear</button>
+    </div>
+  </div>
   <div id="devChangelog"></div>
 </div>
 
@@ -665,11 +678,10 @@
   <div class="bugreport-modal">
     <button class="dev-close" id="bugReportClose" aria-label="Close">&times;</button>
     <h3>Report a Bug</h3>
-    <p class="bugreport-hint">Describe what happened and what you expected. Your environment, app state, and recent console activity are included automatically &mdash; no personal data (weights, dates, calories) is included.</p>
+    <p class="bugreport-hint">Describe what happened and what you expected, then Submit. That saves the report locally (with environment, app state, and recent console activity &mdash; no personal data) and copies it to your clipboard. Saved reports are managed from Developer Mode.</p>
     <textarea id="bugReportText" rows="5" placeholder="What went wrong? What did you expect to happen?"></textarea>
     <div class="bugreport-actions">
-      <button id="bugReportCopyBtn">Copy Report</button>
-      <button class="secondary" id="bugReportDownloadBtn" style="display:none;">Download .md</button>
+      <button id="bugReportSubmitBtn">Submit Report</button>
     </div>
     <div class="bugreport-status" id="bugReportStatus"></div>
   </div>
@@ -685,6 +697,8 @@
   const STORAGE_KEY = "weightTrackerEntries_v1";
   const GOALS_KEY = "weightTrackerGoals_v1";
   const CALORIES_KEY = "weightTrackerCalories_v1";
+  const BUG_REPORTS_KEY = "weightTrackerBugReports_v1";
+  const BUG_REPORTS_MAX = 20;
   const THEME_KEY = "weightTrackerTheme_v1";
   const PROFILE_KEY = "weightTrackerProfile_v1";
   const DEFAULT_GOALS = [200, 175, 160, 150];
@@ -715,6 +729,9 @@
   // `entries` format matches JSON schema: { date: string, weight: number | null, calories: number | null, doseMg: number | null }
   let entries = [];
   let goals = [];
+  // Locally-saved bug reports (see BUG REPORTING section below): { id, timestamp,
+  // description, markdown }. Capped at BUG_REPORTS_MAX, oldest dropped first.
+  let bugReports = [];
   // The whole app — entries, goals, every display string — lives in exactly one
   // unit at a time; nothing here ever mixes kg and lb. This mirrors profile.unit
   // (a one-time start-up field, re-answerable only via Developer Mode's "Edit
@@ -754,8 +771,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.824";
+  const APP_VERSION = "1.924";
   const CHANGELOG = [
+    { version: "1.924", date: "2026-09-14", changes: [
+      "Fixed bug reports not actually being submitted: the 'Report a bug' form now saves each report locally (until exported or cleared) instead of only copying it once and forgetting it, and Developer Mode's export now works on that whole saved log — copy all, download as one .md file, or clear it — instead of just re-generating whatever was currently typed."
+    ] },
     { version: "1.824", date: "2026-09-14", changes: [
       "Added bug reporting: a small 'Report a bug' link in the footer opens a form to describe what happened, then copies a Claude-ready Markdown report (environment, app state, recent console activity — no personal data) to the clipboard; Developer Mode adds a matching .md file export."
     ] },
@@ -843,6 +863,7 @@
 
   function renderDevPanel() {
     document.getElementById("devVersionNum").textContent = APP_VERSION;
+    renderDevBugReportCount();
     let log = document.getElementById("devChangelog");
     log.innerHTML = CHANGELOG.map(entry => `
       <div class="changelog-entry">
@@ -982,6 +1003,25 @@
       localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
       unsavedChanges = true;
       updateExportButtonState();
+    } catch (e) {
+      console.error("Local storage quota exceeded or unavailable.", e);
+    }
+  }
+
+  // Bug reports are kept separate from the entries/goals backup — they're
+  // debugging notes for the developer, not tracker data, and never travel
+  // through the JSON export/import flow.
+  function loadBugReports() {
+    try {
+      bugReports = JSON.parse(localStorage.getItem(BUG_REPORTS_KEY)) || [];
+    } catch (e) {
+      bugReports = [];
+    }
+  }
+
+  function saveBugReports() {
+    try {
+      localStorage.setItem(BUG_REPORTS_KEY, JSON.stringify(bugReports));
     } catch (e) {
       console.error("Local storage quota exceeded or unavailable.", e);
     }
@@ -2179,7 +2219,6 @@
     let statusEl = document.getElementById("bugReportStatus");
     statusEl.textContent = "";
     statusEl.className = "bugreport-status";
-    document.getElementById("bugReportDownloadBtn").style.display = devModeOn ? "inline-block" : "none";
     document.getElementById("bugReportOverlay").classList.add("open");
     document.getElementById("bugReportText").focus();
   }
@@ -2188,14 +2227,14 @@
     document.getElementById("bugReportOverlay").classList.remove("open");
   }
 
-  async function copyBugReport() {
-    let text = buildBugReportText(document.getElementById("bugReportText").value);
-    let statusEl = document.getElementById("bugReportStatus");
+  // Copies text to the clipboard, falling back to a hidden-textarea + execCommand
+  // for contexts without the async Clipboard API (older iOS Safari, etc.). Shared
+  // by the submit flow and the Developer Mode "Copy all" action.
+  async function copyTextToClipboard(text) {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
       } else {
-        // Fallback for contexts without the async Clipboard API (older iOS Safari, etc.)
         let ta = document.createElement("textarea");
         ta.value = text;
         ta.style.position = "fixed";
@@ -2206,23 +2245,44 @@
         document.execCommand("copy");
         document.body.removeChild(ta);
       }
-      statusEl.textContent = "Copied to clipboard.";
-      statusEl.className = "bugreport-status good";
+      return true;
     } catch (err) {
-      statusEl.textContent = "Couldn't copy automatically — select the text and copy manually.";
-      statusEl.className = "bugreport-status bad";
+      return false;
     }
   }
 
-  function downloadBugReport() {
-    let text = buildBugReportText(document.getElementById("bugReportText").value);
-    let blob = new Blob([text], { type: "text/markdown" });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = `bug-report-${new Date().toISOString().replace(/[:.]/g, "-")}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
+  // The actual "submit": saves the report to the local bug-report log (so it
+  // survives closing the modal, unlike a clipboard-only copy) and copies it to
+  // the clipboard as a convenience. Saved reports are reviewed, copied as a
+  // batch, or exported to a file from Developer Mode — see below.
+  async function submitBugReport() {
+    let descriptionEl = document.getElementById("bugReportText");
+    let description = descriptionEl.value.trim();
+    let text = buildBugReportText(description);
+    let statusEl = document.getElementById("bugReportStatus");
+
+    bugReports.push({ id: Date.now(), timestamp: new Date().toISOString(), description: description, markdown: text });
+    if (bugReports.length > BUG_REPORTS_MAX) bugReports = bugReports.slice(bugReports.length - BUG_REPORTS_MAX);
+    saveBugReports();
+    renderDevBugReportCount();
+
+    let copied = await copyTextToClipboard(text);
+    statusEl.textContent = copied
+      ? `Saved and copied to clipboard (${bugReports.length} report${bugReports.length === 1 ? "" : "s"} logged — manage them from Developer Mode).`
+      : `Saved (${bugReports.length} report${bugReports.length === 1 ? "" : "s"} logged), but couldn't copy automatically — export it from Developer Mode instead.`;
+    statusEl.className = "bugreport-status " + (copied ? "good" : "bad");
+    descriptionEl.value = "";
+  }
+
+  // Concatenates every saved report into one Markdown document, separated by
+  // horizontal rules, for the Developer Mode "Copy all" / "Download .md" actions.
+  function combinedBugReportsMarkdown() {
+    return bugReports.map(r => r.markdown).join("\n\n---\n\n");
+  }
+
+  function renderDevBugReportCount() {
+    let el = document.getElementById("devBugReportCount");
+    if (el) el.textContent = String(bugReports.length);
   }
 
   // ============================================================================
@@ -2497,16 +2557,40 @@
     e.preventDefault();
     openBugReportModal();
   });
-  document.getElementById("devExportBugReportBtn").addEventListener("click", openBugReportModal);
   document.getElementById("bugReportClose").addEventListener("click", closeBugReportModal);
   document.getElementById("bugReportOverlay").addEventListener("click", (e) => {
     if (e.target.id === "bugReportOverlay") closeBugReportModal();
   });
-  document.getElementById("bugReportCopyBtn").addEventListener("click", copyBugReport);
-  document.getElementById("bugReportDownloadBtn").addEventListener("click", downloadBugReport);
+  document.getElementById("bugReportSubmitBtn").addEventListener("click", submitBugReport);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && document.getElementById("bugReportOverlay").classList.contains("open")) {
       closeBugReportModal();
+    }
+  });
+
+  document.getElementById("devCopyBugReportsBtn").addEventListener("click", async () => {
+    if (!bugReports.length) { alert("No bug reports logged yet."); return; }
+    let ok = await copyTextToClipboard(combinedBugReportsMarkdown());
+    if (!ok) alert("Couldn't copy automatically — try the Download button instead.");
+  });
+
+  document.getElementById("devDownloadBugReportsBtn").addEventListener("click", () => {
+    if (!bugReports.length) { alert("No bug reports logged yet."); return; }
+    let blob = new Blob([combinedBugReportsMarkdown()], { type: "text/markdown" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = `bug-reports-${new Date().toISOString().slice(0, 10)}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("devClearBugReportsBtn").addEventListener("click", () => {
+    if (!bugReports.length) return;
+    if (confirm(`Clear all ${bugReports.length} logged bug report(s)? This can't be undone.`)) {
+      bugReports = [];
+      saveBugReports();
+      renderDevBugReportCount();
     }
   });
 
@@ -2517,6 +2601,7 @@
   loadProfile();
   unit = getActiveUnit();
   loadData();
+  loadBugReports();
   updateHeaderTitle();
   renderOneTimeInfo();
   applyTirzepatideVisibility();
