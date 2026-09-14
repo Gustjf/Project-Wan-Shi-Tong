@@ -425,6 +425,57 @@
   .dev-panel ul { margin: 4px 0 0 0; padding-left: 18px; }
   .dev-panel li { margin-bottom: 2px; }
   .dev-panel .dev-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1em; padding: 0; }
+
+  /* --- Bug Reporting --- */
+  .bugreport-link { color: var(--muted); text-decoration: none; }
+  .bugreport-link:hover { text-decoration: underline; color: var(--text); }
+
+  .bugreport-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .bugreport-overlay.open { display: flex; }
+  .bugreport-modal {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+  .bugreport-modal h3 { margin: 0 0 6px 0; font-size: 1.05em; }
+  .bugreport-hint { font-size: 0.82em; color: var(--muted); margin: 0 0 10px 0; line-height: 1.4; }
+  #bugReportText {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-family: inherit;
+    background: var(--panel);
+    color: var(--text);
+    resize: vertical;
+    min-height: 90px;
+  }
+  #bugReportText:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+  .bugreport-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .bugreport-status { font-size: 0.82em; margin-top: 8px; min-height: 1.2em; }
+  .bugreport-status.good { color: var(--good); }
+  .bugreport-status.bad { color: var(--bad); }
 </style>
 </head>
 <body>
@@ -595,7 +646,7 @@
   </section>
 
   <footer>
-    Weight Tracker &middot; Offline single-file HTML5 app
+    Weight Tracker &middot; Offline single-file HTML5 app &middot; <a href="#" id="reportBugLink" class="bugreport-link">Report a bug</a>
   </footer>
 </div>
 
@@ -606,7 +657,22 @@
   <h3>Developer Mode</h3>
   <div class="dev-version">Version <span id="devVersionNum"></span></div>
   <button class="secondary" id="reopenOneTimeInfoBtn" style="margin-bottom:10px; font-size:0.85em; padding:5px 10px;">Edit start-up info</button>
+  <button class="secondary" id="devExportBugReportBtn" style="margin-bottom:10px; margin-left:6px; font-size:0.85em; padding:5px 10px;">Export bug report</button>
   <div id="devChangelog"></div>
+</div>
+
+<div class="bugreport-overlay" id="bugReportOverlay">
+  <div class="bugreport-modal">
+    <button class="dev-close" id="bugReportClose" aria-label="Close">&times;</button>
+    <h3>Report a Bug</h3>
+    <p class="bugreport-hint">Describe what happened and what you expected. Your environment, app state, and recent console activity are included automatically &mdash; no personal data (weights, dates, calories) is included.</p>
+    <textarea id="bugReportText" rows="5" placeholder="What went wrong? What did you expect to happen?"></textarea>
+    <div class="bugreport-actions">
+      <button id="bugReportCopyBtn">Copy Report</button>
+      <button class="secondary" id="bugReportDownloadBtn" style="display:none;">Download .md</button>
+    </div>
+    <div class="bugreport-status" id="bugReportStatus"></div>
+  </div>
 </div>
 
 <script>
@@ -688,8 +754,11 @@
   // ============================================================================
   // Versioning scheme: X.YYY — each digit is a size-of-change tier:
   //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.724";
+  const APP_VERSION = "1.824";
   const CHANGELOG = [
+    { version: "1.824", date: "2026-09-14", changes: [
+      "Added bug reporting: a small 'Report a bug' link in the footer opens a form to describe what happened, then copies a Claude-ready Markdown report (environment, app state, recent console activity — no personal data) to the clipboard; Developer Mode adds a matching .md file export."
+    ] },
     { version: "1.724", date: "2026-09-10", changes: [
       "Fixed the custom weekly % slider: it now reliably resets to 0 on load, shows tick marks at every 0.25% step, and displays its current value in a high-contrast badge instead of blending into the label text."
     ] },
@@ -741,6 +810,36 @@
     ] }
   ];
   let devModeOn = false;
+
+  // ============================================================================
+  // BUG REPORTING (in-memory console log capture)
+  // ============================================================================
+  // Runs first so it captures console activity from the rest of init, not just
+  // from user interaction afterward.
+  const DEBUG_LOG_MAX = 40;
+  let debugLog = [];
+
+  function logDebug(level, message) {
+    debugLog.push({ time: new Date().toISOString(), level: level, message: String(message) });
+    if (debugLog.length > DEBUG_LOG_MAX) debugLog.shift();
+  }
+
+  const nativeConsoleError = console.error.bind(console);
+  console.error = function (...args) {
+    logDebug("error", args.map(a => (a && a.stack) ? a.stack : a).join(" "));
+    nativeConsoleError(...args);
+  };
+  const nativeConsoleWarn = console.warn.bind(console);
+  console.warn = function (...args) {
+    logDebug("warn", args.join(" "));
+    nativeConsoleWarn(...args);
+  };
+  window.addEventListener("error", (e) => {
+    logDebug("error", `${e.message} (${e.filename}:${e.lineno})`);
+  });
+  window.addEventListener("unhandledrejection", (e) => {
+    logDebug("error", `Unhandled rejection: ${e.reason && e.reason.message ? e.reason.message : e.reason}`);
+  });
 
   function renderDevPanel() {
     document.getElementById("devVersionNum").textContent = APP_VERSION;
@@ -2022,6 +2121,111 @@
   }
 
   // ============================================================================
+  // BUG REPORTING (report builder + modal)
+  // ============================================================================
+
+  // Builds a Markdown bug report meant to be pasted straight into Claude Code:
+  // the person's own description first, then everything needed to reproduce or
+  // diagnose it. Deliberately omits actual entry/goal values (weights, dates,
+  // calories) since this report is meant to leave the device.
+  function buildBugReportText(description) {
+    let lines = [];
+    lines.push("# Bug Report — Weight Tracker & Projections");
+    lines.push("");
+    lines.push(`**Reported:** ${new Date().toISOString()}`);
+    lines.push(`**App Version:** ${APP_VERSION}`);
+    lines.push(`**Data Schema Version:** ${DATA_SCHEMA_VERSION}`);
+    lines.push("");
+    lines.push("## Description");
+    lines.push(description && description.trim() ? description.trim() : "_(no description provided)_");
+    lines.push("");
+    lines.push("## Environment");
+    lines.push(`- Platform: ${navigator.platform || "unknown"}`);
+    lines.push(`- User agent: ${navigator.userAgent}`);
+    lines.push(`- Viewport: ${window.innerWidth}x${window.innerHeight}`);
+    lines.push(`- Theme: ${document.documentElement.getAttribute("data-theme")}`);
+    lines.push(`- Language: ${navigator.language}`);
+    lines.push(`- Online: ${navigator.onLine}`);
+    lines.push("");
+    lines.push("## App State");
+    lines.push(`- Unit: ${unit}`);
+    lines.push(`- Tirzepatide tracking enabled: ${tirzepatideEnabled()}`);
+    lines.push(`- Entry count: ${entries.length}`);
+    lines.push(`- Goal count: ${goals.length}`);
+    lines.push(`- Rate mode: ${rateMode}`);
+    lines.push(`- Trend window: ${trendWindow}`);
+    lines.push(`- History page: ${currentPage}`);
+    lines.push(`- Unsaved changes since last export: ${unsavedChanges}`);
+    lines.push(`- Dev mode: ${devModeOn}`);
+    lines.push("");
+    lines.push("## Recent Console Activity");
+    if (debugLog.length) {
+      lines.push("```");
+      debugLog.forEach(l => lines.push(`[${l.time}] ${l.level.toUpperCase()}: ${l.message}`));
+      lines.push("```");
+    } else {
+      lines.push("_(none captured this session)_");
+    }
+    lines.push("");
+    lines.push("## Recent Changelog");
+    CHANGELOG.slice(0, 3).forEach(entry => {
+      lines.push(`- v${entry.version} (${entry.date}): ${entry.changes.join(" ")}`);
+    });
+    return lines.join("\n");
+  }
+
+  function openBugReportModal() {
+    document.getElementById("bugReportText").value = "";
+    let statusEl = document.getElementById("bugReportStatus");
+    statusEl.textContent = "";
+    statusEl.className = "bugreport-status";
+    document.getElementById("bugReportDownloadBtn").style.display = devModeOn ? "inline-block" : "none";
+    document.getElementById("bugReportOverlay").classList.add("open");
+    document.getElementById("bugReportText").focus();
+  }
+
+  function closeBugReportModal() {
+    document.getElementById("bugReportOverlay").classList.remove("open");
+  }
+
+  async function copyBugReport() {
+    let text = buildBugReportText(document.getElementById("bugReportText").value);
+    let statusEl = document.getElementById("bugReportStatus");
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for contexts without the async Clipboard API (older iOS Safari, etc.)
+        let ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      statusEl.textContent = "Copied to clipboard.";
+      statusEl.className = "bugreport-status good";
+    } catch (err) {
+      statusEl.textContent = "Couldn't copy automatically — select the text and copy manually.";
+      statusEl.className = "bugreport-status bad";
+    }
+  }
+
+  function downloadBugReport() {
+    let text = buildBugReportText(document.getElementById("bugReportText").value);
+    let blob = new Blob([text], { type: "text/markdown" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = `bug-report-${new Date().toISOString().replace(/[:.]/g, "-")}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ============================================================================
   // EVENT BINDINGS & LISTENERS
   // ============================================================================
 
@@ -2288,6 +2492,23 @@
 
   document.getElementById("devBadge").addEventListener("click", toggleDevMode);
   document.getElementById("devPanelClose").addEventListener("click", toggleDevMode);
+
+  document.getElementById("reportBugLink").addEventListener("click", (e) => {
+    e.preventDefault();
+    openBugReportModal();
+  });
+  document.getElementById("devExportBugReportBtn").addEventListener("click", openBugReportModal);
+  document.getElementById("bugReportClose").addEventListener("click", closeBugReportModal);
+  document.getElementById("bugReportOverlay").addEventListener("click", (e) => {
+    if (e.target.id === "bugReportOverlay") closeBugReportModal();
+  });
+  document.getElementById("bugReportCopyBtn").addEventListener("click", copyBugReport);
+  document.getElementById("bugReportDownloadBtn").addEventListener("click", downloadBugReport);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.getElementById("bugReportOverlay").classList.contains("open")) {
+      closeBugReportModal();
+    }
+  });
 
   // ============================================================================
   // APP INITIALIZATION
