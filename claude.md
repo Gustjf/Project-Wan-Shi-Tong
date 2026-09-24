@@ -26,5 +26,4 @@
   - `+1` large feature
 
 ## Git Workflow
-- I don't use git/PRs manually. After pushing your branch, open a pull request and merge it into the main branch yourself — don't ask me to do it or wait for my confirmation.
-- Only skip the auto-merge and ask me first if something seems risky or destructive (e.g. it could break the app, lose data, or you're unsure about a decision).
+- Make a new branch with the feature and then give me instructions on how to test and accept the changes. 
