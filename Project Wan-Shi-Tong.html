@@ -87,6 +87,8 @@
   .stat { position: relative; flex: 1; min-width: 120px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
   .stat .val { font-size: 1.15em; font-weight: 700; }
   .stat .lbl { font-size: .75em; color: var(--muted); margin-top: 2px; }
+  #statsSection .stat { min-width: 230px; } /* room for a full row of window pills */
+  .window-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
   .subtle-remove { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; padding: 0; line-height: 14px; text-align: center; border-radius: 50%; background: transparent; color: var(--muted); font-size: 13px; opacity: .55; transition: opacity .2s, background-color .2s, color .2s; }
   .subtle-remove:hover { opacity: 1; background: var(--border); color: var(--bad); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .78em; font-weight: 600; }
@@ -208,19 +210,28 @@
   </section>
 
   <section id="statsSection" hidden>
-    <div class="section-header">
-      <h2>Current Trend</h2>
-      <div id="trendWindowWrap">
-        <button class="pill active" data-window="all">All</button>
-        <button class="pill" data-window="7">7d</button>
-        <button class="pill" data-window="30">30d</button>
-        <button class="pill" data-window="60">60d</button>
-        <button class="pill" data-window="90">90d</button>
-      </div>
-    </div>
+    <h2>Current Trend</h2>
     <div class="stat-grid">
-      <div class="stat"><div class="val" id="statRate">&mdash;</div><div class="lbl">fitted weekly rate</div></div>
-      <div class="stat"><div class="val" id="stat7DayAvg">&mdash;</div><div class="lbl">7-day rolling avg</div></div>
+      <div class="stat">
+        <div class="val" id="statRate">&mdash;</div><div class="lbl">fitted weekly rate</div>
+        <div class="window-pills" id="trendWindowWrap">
+          <button class="pill active" data-window="all">All</button>
+          <button class="pill" data-window="7">7d</button>
+          <button class="pill" data-window="30">30d</button>
+          <button class="pill" data-window="60">60d</button>
+          <button class="pill" data-window="90">90d</button>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="val" id="statAvg">&mdash;</div><div class="lbl" id="statAvgLabel">7-day rolling avg</div>
+        <div class="window-pills" id="avgWindowWrap">
+          <button class="pill" data-avg-window="all">All</button>
+          <button class="pill active" data-avg-window="7">7d</button>
+          <button class="pill" data-avg-window="30">30d</button>
+          <button class="pill" data-avg-window="60">60d</button>
+          <button class="pill" data-avg-window="90">90d</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -373,6 +384,7 @@
   let bugReports = [];     // { id, timestamp, description, markdown }
   let rateMode = "trend";  // "trend" | "custom"
   let trendWindow = "all"; // "all" | "7" | "30" | "60" | "90"
+  let avgWindow = "7";     // same options, for the rolling average; starts at 7 on every load
   let currentPage = 1;
   let unsavedChanges = false;
   let devModeOn = false;
@@ -380,6 +392,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "3.024", date: "2026-09-24", changes: [
+      "The rolling weight average gained 30d, 60d, 90d, and All windows (still starting on 7d each load), and each Current Trend stat now has its own window pills."
+    ] },
     { version: "2.924", date: "2026-09-24", changes: [
       "Removed calorie tracking and slimmed down the code, fixing dates shifting a day in some timezones, goals marked Reached too early, and flat weigh-ins or damaged data breaking the app."
     ] },
@@ -735,7 +750,10 @@
       rateEl.textContent = `${losing ? "-" : "+"}${Math.abs(trend * 100).toFixed(2)}%/wk`;
       rateEl.className = "val " + ((dir === "gain") !== losing ? "good" : "bad");
     }
-    $("stat7DayAvg").textContent = `${mean(lastDays(w, 6).map(e => e.weight)).toFixed(1)} ${unit}`;
+    // An N-day average covers the latest weigh-in's day and the N-1 days before it.
+    const avgOf = avgWindow === "all" ? w : lastDays(w, +avgWindow - 1);
+    $("statAvg").textContent = `${mean(avgOf.map(e => e.weight)).toFixed(1)} ${unit}`;
+    $("statAvgLabel").textContent = avgWindow === "all" ? "all-time avg" : `${avgWindow}-day rolling avg`;
   }
 
   function renderGoals({ w, rate, dir, goals: sorted }) {
@@ -1043,6 +1061,7 @@
       `- Goal count: ${goals.length}`,
       `- Rate mode: ${rateMode}`,
       `- Trend window: ${trendWindow}`,
+      `- Average window: ${avgWindow}`,
       `- History page: ${currentPage}`,
       `- Unsaved changes since last export: ${unsavedChanges}`,
       `- Dev mode: ${devModeOn}`, "",
@@ -1265,6 +1284,7 @@
   $("customRate").addEventListener("input", renderAll);
 
   onToggle($("trendWindowWrap"), "data-window", value => { trendWindow = value; renderAll(); });
+  onToggle($("avgWindowWrap"), "data-avg-window", value => { avgWindow = value; renderAll(); });
   onToggle($("rateModeToggle"), "data-rate-mode", value => {
     rateMode = value;
     $("customRateWrap").hidden = value !== "custom";
