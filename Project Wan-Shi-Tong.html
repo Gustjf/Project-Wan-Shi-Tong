@@ -5,505 +5,187 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weight Tracker &amp; Projection Calculator</title>
 <style>
-  /* --- CSS Variables & Theming --- */
   :root {
-    --bg: #f4f5f7;
-    --panel: #ffffff;
-    --border: #dcdfe4;
-    --text: #1f2430;
-    --muted: #6b7280;
-    --accent: #2563eb;
-    --accent-dark: #1e40af;
-    --good: #16a34a;
-    --bad: #dc2626;
-    --proj: #f59e0b;
-    --card-bg: #f8fafc;
+    --bg: #f4f5f7; --panel: #ffffff; --border: #dcdfe4; --text: #1f2430; --muted: #6b7280;
+    --accent: #2563eb; --accent-dark: #1e40af; --good: #16a34a; --bad: #dc2626;
+    --card-bg: #f8fafc; --btn-bg: #f8fafc; --ring: rgba(37, 99, 235, 0.15);
+    --unsaved-bg: rgba(245, 158, 11, 0.15); --unsaved-border: rgba(245, 158, 11, 0.45);
   }
-
   [data-theme="dark"] {
-    --bg: #0f172a;
-    --panel: #1e293b;
-    --border: #334155;
-    --text: #f8fafc;
-    --muted: #94a3b8;
-    --accent: #3b82f6;
-    --accent-dark: #2563eb;
-    --good: #22c55e;
-    --bad: #ef4444;
-    --proj: #f59e0b;
-    --card-bg: #0f172a;
+    --bg: #0f172a; --panel: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8;
+    --accent: #3b82f6; --accent-dark: #2563eb; --good: #22c55e; --bad: #ef4444;
+    --card-bg: #0f172a; --btn-bg: #1e293b; --ring: rgba(59, 130, 246, 0.25);
+    --unsaved-bg: rgba(245, 158, 11, 0.2); --unsaved-border: rgba(245, 158, 11, 0.5);
   }
 
-  /* --- Global Resets & Layout --- */
+  /* --- Layout --- */
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 16px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
+  [hidden], .no-tirz .tirz { display: none !important; }
+  body { margin: 0; padding: 16px; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); transition: background-color .2s, color .2s; }
   .app { max-width: 780px; margin: 0 auto; }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 18px;
-  }
-  h1 { font-size: 1.4em; margin: 0 0 4px 0; }
-  .subtitle { color: var(--muted); font-size: 0.85em; }
-
-  .app-version-tag {
-    position: fixed;
-    bottom: 6px;
-    right: 12px;
-    font-size: 0.68em;
-    color: var(--muted);
-    opacity: 0.4;
-    pointer-events: none;
-    user-select: none;
-    z-index: 500;
-  }
-
-  /* --- Components --- */
-  .theme-toggle {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 0.8em;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  .theme-toggle:hover { background: var(--card-bg); color: var(--text); }
-
-  section {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-  }
-  
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  h2 { font-size: 0.95em; margin: 0; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  label { font-size: 0.85em; color: var(--muted); display: block; margin-bottom: 3px; }
-  
-  input[type=date], input[type=number], select {
-    width: 100%;
-    padding: 7px 8px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    font-size: 0.95em;
-    background: var(--panel);
-    color: var(--text);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  input[type=date]:focus, input[type=number]:focus, select:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-  }
-  [data-theme="dark"] input[type=date]:focus, [data-theme="dark"] input[type=number]:focus, [data-theme="dark"] select:focus {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-  }
-
-  /* Numbers are entered via keyboard/on-screen keyboard, so the spinner
-     arrows just get in the way — hidden across browsers. */
-  input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type=number] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+  h1 { font-size: 1.4em; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: .85em; }
+  section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  h2 { font-size: .95em; margin: 0; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  label { display: block; font-size: .85em; color: var(--muted); margin-bottom: 3px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
   .row > div { flex: 1; min-width: 100px; }
-  
-  button {
-    background: var(--accent);
-    color: #ffffff;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 5px;
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  button:hover { background: var(--accent-dark); color: #ffffff; }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  
-  button.secondary {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  button.secondary:hover:not(:disabled) { background: var(--border); color: var(--text); }
-
-  button.secondary#exportBtn.unsaved {
-    background: rgba(245, 158, 11, 0.15);
-    border-color: rgba(245, 158, 11, 0.45);
-    color: var(--text);
-  }
-  [data-theme="dark"] button.secondary#exportBtn.unsaved {
-    background: rgba(245, 158, 11, 0.2);
-    border-color: rgba(245, 158, 11, 0.5);
-    color: var(--text);
-  }
-  button.secondary#exportBtn.unsaved:hover {
-    background: rgba(245, 158, 11, 0.28);
-    border-color: rgba(245, 158, 11, 0.6);
-  }
-  
-  button.pill {
-    padding: 3px 8px;
-    font-size: 0.78em;
-    border-radius: 4px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-  button.pill:hover:not(.active) { background: var(--border); color: var(--muted); }
-  button.pill.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
-  button.pill.active:hover { background: var(--accent-dark); color: #ffffff; }
-
-  button.danger {
-    background: transparent;
-    color: var(--bad);
-    border: 1px solid var(--bad);
-    padding: 3px 8px;
-    font-size: 0.8em;
-  }
-  [data-theme="dark"] button.danger { background: var(--panel); color: var(--bad); }
-  button.danger:hover { background: var(--bad); color: #ffffff; border-color: var(--bad); }
-
-  /* Custom weekly-rate slider: label row with a high-contrast value badge,
-     the range input itself, then min/zero/max marks positioned by their
-     actual numeric fraction of the track (NOT evenly spaced) since the
-     scale is asymmetric (-2 to +1, zero sits at 2/3 across). */
-  .rate-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-  .rate-head label { margin-bottom: 0; }
-  .rate-value {
-    font-variant-numeric: tabular-nums;
-    font-weight: 700;
-    font-size: 0.9em;
-    color: #ffffff;
-    background: var(--accent);
-    padding: 4px 12px;
-    border-radius: 6px;
-    min-width: 56px;
-    text-align: center;
-    flex: 0 0 auto;
-  }
-  input[type=range]#customRate {
-    -webkit-appearance: none;
-    appearance: none;
-    display: block;
-    width: 100%;
-    height: 5px;
-    border-radius: 3px;
-    background: var(--border);
-    outline: none;
-  }
-  input[type=range]#customRate::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 17px;
-    height: 17px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: 2px solid var(--panel);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    cursor: pointer;
-  }
-  input[type=range]#customRate::-moz-range-track {
-    height: 5px;
-    border-radius: 3px;
-    background: var(--border);
-  }
-  input[type=range]#customRate::-moz-range-thumb {
-    width: 17px;
-    height: 17px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: 2px solid var(--panel);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    cursor: pointer;
-  }
-  input[type=range]#customRate:focus-visible::-webkit-slider-thumb,
-  input[type=range]#customRate:focus-visible::-moz-range-thumb {
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
-  }
-  /* One tick per 0.25 step (13 total, evenly spaced since the step size is
-     uniform). Drawn as plain positioned marks rather than relying on
-     <datalist> ticks, which browsers only render on the native slider look
-     and disappear once the track/thumb are custom-styled. Kept clear of the
-     thumb (which overflows well past the 5px track) by a 10px gap. */
-  .rate-ticks { position: relative; height: 6px; margin-top: 10px; }
-  .rate-ticks span { position: absolute; top: 0; width: 1px; height: 6px; background: var(--border); }
-  .rate-ticks span:nth-child(1) { left: 0%; }
-  .rate-ticks span:nth-child(2) { left: 8.333%; }
-  .rate-ticks span:nth-child(3) { left: 16.667%; }
-  .rate-ticks span:nth-child(4) { left: 25%; }
-  .rate-ticks span:nth-child(5) { left: 33.333%; }
-  .rate-ticks span:nth-child(6) { left: 41.667%; }
-  .rate-ticks span:nth-child(7) { left: 50%; }
-  .rate-ticks span:nth-child(8) { left: 58.333%; }
-  .rate-ticks span:nth-child(9) { left: 66.667%; height: 9px; top: -1.5px; background: var(--muted); }
-  .rate-ticks span:nth-child(10) { left: 75%; }
-  .rate-ticks span:nth-child(11) { left: 83.333%; }
-  .rate-ticks span:nth-child(12) { left: 91.667%; }
-  .rate-ticks span:nth-child(13) { left: 100%; }
-  .rate-labels { position: relative; height: 14px; margin-top: 4px; font-size: 0.72em; color: var(--muted); }
-  .rate-labels span { position: absolute; top: 0; white-space: nowrap; }
-  .rate-labels .rl-min { left: 0; }
-  .rate-labels .rl-zero { left: 66.667%; transform: translateX(-50%); }
-  .rate-labels .rl-max { left: 100%; transform: translateX(-100%); }
-
-  table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
-  th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; font-size: 0.85em; }
-
-  .stat-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-  .stat { flex: 1; min-width: 120px; background: var(--card-bg); border-radius: 6px; padding: 10px 12px; border: 1px solid var(--border); }
-  .stat .val { font-size: 1.15em; font-weight: 700; }
-  .stat .lbl { font-size: 0.75em; color: var(--muted); margin-top: 2px; }
-
-  .upcoming-dose { position: relative; }
-  .subtle-remove {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 16px;
-    height: 16px;
-    padding: 0;
-    line-height: 14px;
-    text-align: center;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--muted);
-    font-size: 13px;
-    opacity: 0.55;
-    cursor: pointer;
-    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-  }
-  .subtle-remove:hover { opacity: 1; background: var(--border); color: var(--bad); }
-
-  .icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    color: var(--muted);
-    cursor: pointer;
-    padding: 0;
-    flex: 0 0 auto;
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  }
-  [data-theme="dark"] .icon-btn { background: var(--panel); }
-  .icon-btn:hover { background: var(--border); color: var(--text); border-color: var(--accent); }
-  .icon-btn:active { transform: scale(0.94); }
-  
+  .row > .btn-cell { flex: 0 0 auto; align-self: flex-end; }
+  .actions { margin-top: 10px; }
+  .toolbar { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .empty-msg { color: var(--muted); font-size: .9em; padding: 8px 0; }
+  .note { font-size: .8em; color: var(--muted); margin-top: 8px; }
+  .footnote { font-size: .8em; color: var(--muted); margin-top: 10px; line-height: 1.5; }
   .good { color: var(--good); }
   .bad { color: var(--bad); }
+  footer { text-align: center; color: var(--muted); font-size: .78em; margin-top: 20px; }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); text-decoration: underline; }
+  .app-version-tag { position: fixed; bottom: 6px; right: 12px; font-size: .68em; color: var(--muted); opacity: .4; pointer-events: none; user-select: none; z-index: 500; }
 
-  .tdee-box {
-    margin-top: 10px;
-    padding: 10px 12px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+  /* --- Inputs --- */
+  input[type=date], input[type=number], input[type=text], textarea { width: 100%; padding: 7px 8px; border: 1px solid var(--border); border-radius: 5px; font-size: .95em; background: var(--panel); color: var(--text); transition: border-color .2s, box-shadow .2s; }
+  input[type=date]:focus, input[type=number]:focus, input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+  input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  textarea { padding: 8px; font-family: inherit; font-size: .9em; resize: vertical; min-height: 90px; }
 
+  /* --- Buttons --- */
+  button { background: var(--accent); color: #fff; border: none; padding: 8px 14px; border-radius: 5px; font-size: .9em; cursor: pointer; transition: background-color .2s; }
+  button:hover { background: var(--accent-dark); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  button.secondary:hover:not(:disabled) { background: var(--border); }
+  button.small { padding: 3px 8px; font-size: .8em; }
+  #exportBtn.unsaved { background: var(--unsaved-bg); border-color: var(--unsaved-border); }
+  #exportBtn.unsaved:hover { background: rgba(245, 158, 11, .28); border-color: rgba(245, 158, 11, .6); }
+  button.pill { padding: 3px 8px; font-size: .78em; border-radius: 4px; background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  button.pill:hover:not(.active) { background: var(--border); }
+  button.pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.pill.active:hover { background: var(--accent-dark); }
+  button.danger { background: transparent; color: var(--bad); border: 1px solid var(--bad); padding: 3px 8px; font-size: .8em; }
+  button.danger:hover { background: var(--bad); color: #fff; }
+  .theme-toggle { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 6px; font-size: .8em; }
+  .theme-toggle:hover { background: var(--card-bg); }
+  .icon-btn { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 30px; height: 30px; padding: 0; border-radius: 6px; border: 1px solid var(--border); background: var(--btn-bg); color: var(--muted); transition: background-color .2s, color .2s, border-color .2s; }
+  .icon-btn:hover { background: var(--border); color: var(--text); border-color: var(--accent); }
+  .icon-btn:active { transform: scale(.94); }
   .mode-toggle { display: flex; gap: 8px; margin-bottom: 10px; }
-  .mode-btn {
-    flex: 1;
-    padding: 12px 10px;
-    font-size: 0.9em;
-    font-weight: 600;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    color: var(--text);
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-  }
-  [data-theme="dark"] .mode-btn { background: var(--panel); }
+  .mode-btn { flex: 1; padding: 12px 10px; font-size: .9em; font-weight: 600; border-radius: 6px; border: 1px solid var(--border); background: var(--btn-bg); color: var(--text); transition: background-color .2s, border-color .2s, color .2s; }
   .mode-btn:hover:not(.active) { background: var(--border); }
-  .mode-btn.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+  .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
   .mode-btn.active:hover { background: var(--accent-dark); }
-  #customRateWrap { display: none; margin-top: 8px; }
 
-  svg { width: 100%; height: auto; display: block; background: var(--panel); border-radius: 6px; border: 1px solid var(--border); }
-  .legend { display: flex; gap: 16px; font-size: 0.8em; color: var(--muted); margin-top: 6px; }
-  .legend span { display: inline-flex; align-items: center; gap: 5px; }
-  .swatch { width: 14px; height: 3px; display: inline-block; border-radius: 2px; }
-
-  .toolbar { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-  .empty-msg { color: var(--muted); font-size: 0.9em; padding: 8px 0; }
-  .pagination { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.85em; color: var(--muted); }
-  .footnote { font-size: 0.8em; color: var(--muted); margin-top: 10px; line-height: 1.5; }
-
-  /* --- Projection-within-Goals block --- */
-  .proj-box { border-top: 1px dashed var(--border); margin-top: 12px; padding-top: 10px; }
-  .proj-box .subhead { font-size: 0.75em; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
-  .proj-box .mode-toggle { margin-bottom: 8px; }
-  #futureWeightGrid .stat { text-align: center; }
-  #futureWeightGrid .val { font-size: 1em; }
-
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78em; font-weight: 600; }
+  /* --- Stats, tables, badges --- */
+  table { width: 100%; border-collapse: collapse; font-size: .9em; }
+  th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: .85em; }
+  .pagination { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: .85em; color: var(--muted); }
+  .stat-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .stat { position: relative; flex: 1; min-width: 120px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .stat .val { font-size: 1.15em; font-weight: 700; }
+  .stat .lbl { font-size: .75em; color: var(--muted); margin-top: 2px; }
+  .subtle-remove { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; padding: 0; line-height: 14px; text-align: center; border-radius: 50%; background: transparent; color: var(--muted); font-size: 13px; opacity: .55; transition: opacity .2s, background-color .2s, color .2s; }
+  .subtle-remove:hover { opacity: 1; background: var(--border); color: var(--bad); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .78em; font-weight: 600; }
   .badge.reached { background: #dcfce7; color: var(--good); }
   .badge.projected { background: #fef3c7; color: #92400e; }
   .badge.flat { background: var(--border); color: var(--muted); }
   .badge.unreachable { background: #fee2e2; color: var(--bad); }
 
-  footer { text-align: center; color: var(--muted); font-size: 0.78em; margin-top: 20px; }
-  #fileImport { display: none; }
+  /* --- Goals & projection settings --- */
+  .proj-box { border-top: 1px dashed var(--border); margin-top: 12px; padding-top: 10px; }
+  .proj-box .mode-toggle { margin-bottom: 8px; }
+  .subhead { font-size: .75em; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+  #customRateWrap { margin-top: 8px; }
+  #futureWeightGrid { margin-top: 10px; }
+  #futureWeightGrid .stat { text-align: center; }
+  #futureWeightGrid .val { font-size: 1em; }
+  .goals-table { margin-top: 14px; }
+  /* Custom weekly-rate slider (-2% to +1%, 0.25% steps). Ticks and labels are
+     inset by half the thumb width so they line up with the thumb's center. */
+  .rate-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .rate-head label { margin-bottom: 0; }
+  .rate-value { flex: 0 0 auto; min-width: 56px; padding: 4px 12px; border-radius: 6px; background: var(--accent); color: #fff; font-size: .9em; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; }
+  #customRate { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 5px; margin: 0; border-radius: 3px; background: var(--border); outline: none; }
+  #customRate::-webkit-slider-thumb { -webkit-appearance: none; box-sizing: border-box; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; }
+  #customRate::-moz-range-thumb { box-sizing: border-box; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; }
+  #customRate::-moz-range-track { height: 5px; border-radius: 3px; background: var(--border); }
+  #customRate:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3); }
+  #customRate:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3); }
+  .rate-ticks { position: relative; height: 6px; margin: 10px 8.5px 0; background: linear-gradient(90deg, var(--border) 1px, transparent 1px) 0 0 / calc((100% - 1px) / 12) 100% repeat-x; }
+  .rate-ticks::after { content: ""; position: absolute; left: calc((100% - 1px) * 2 / 3); top: -1.5px; width: 1px; height: 9px; background: var(--muted); }
+  .rate-labels { position: relative; height: 14px; margin: 4px 8.5px 0; font-size: .72em; color: var(--muted); }
+  .rate-labels span { position: absolute; top: 0; white-space: nowrap; }
+  .rate-labels .rl-min { left: 0; }
+  .rate-labels .rl-zero { left: calc((100% - 1px) * 2 / 3); transform: translateX(-50%); }
+  .rate-labels .rl-max { right: 0; }
 
-  /* --- Developer Mode (Ctrl+9) --- */
-  .dev-badge {
-    display: none;
-    position: fixed;
-    bottom: 14px;
-    right: 14px;
-    background: var(--accent);
-    color: #ffffff;
-    font-size: 0.72em;
-    font-weight: 700;
-    padding: 4px 9px;
-    border-radius: 12px;
-    z-index: 9998;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  }
-  body.dev-mode .dev-badge { display: block; }
+  /* --- Chart --- */
+  #chartSvg { display: block; width: 100%; height: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; }
+  #chartSvg text { font-size: 9px; fill: var(--muted); }
+  #chartSvg .grid { stroke: var(--border); stroke-width: .5; stroke-dasharray: 2 2; }
+  #chartSvg .goal { stroke: #e11d48; stroke-width: 2; stroke-dasharray: 4 4; }
+  #chartSvg .goal-tag { fill: #e11d48; }
+  #chartSvg .goal-label { fill: #fff; font-weight: 700; }
+  #chartSvg .line { fill: none; stroke: #2563eb; stroke-width: 2; }
+  #chartSvg circle { fill: #2563eb; }
+  .legend { display: flex; gap: 16px; font-size: .8em; color: var(--muted); margin-top: 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .swatch { width: 14px; height: 3px; border-radius: 2px; background: #2563eb; }
+  .swatch.goal { height: 0; background: none; border-top: 2px dashed #e11d48; }
 
-  .dev-panel {
-    display: none;
-    position: fixed;
-    bottom: 48px;
-    right: 14px;
-    width: 300px;
-    max-height: 70vh;
-    overflow-y: auto;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    z-index: 9999;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    font-size: 0.85em;
-  }
-  body.dev-mode .dev-panel { display: block; }
-
-  .dev-panel h3 { margin: 0 0 2px 0; font-size: 1em; }
-  .dev-panel .dev-version { color: var(--muted); font-size: 0.85em; margin-bottom: 10px; }
-  .dev-panel .changelog-entry { border-top: 1px solid var(--border); padding: 8px 0; }
-  .dev-panel .changelog-entry:first-child { border-top: none; }
-  .dev-panel .changelog-version { font-weight: 700; }
-  .dev-panel .changelog-date { color: var(--muted); font-size: 0.78em; margin-left: 6px; }
-  .dev-panel ul { margin: 4px 0 0 0; padding-left: 18px; }
+  /* --- Developer mode (Ctrl+9) & bug reports --- */
+  .dev-badge, .dev-panel { display: none; position: fixed; right: 14px; }
+  body.dev-mode .dev-badge, body.dev-mode .dev-panel { display: block; }
+  .dev-badge { bottom: 14px; padding: 4px 9px; border-radius: 12px; background: var(--accent); color: #fff; font-size: .72em; font-weight: 700; cursor: pointer; z-index: 9998; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); }
+  .dev-panel { bottom: 48px; width: 300px; max-height: 70vh; overflow-y: auto; padding: 12px 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; font-size: .85em; z-index: 9999; box-shadow: 0 4px 16px rgba(0, 0, 0, .25); }
+  .dev-panel h3 { margin: 0 0 2px; font-size: 1em; }
+  .dev-panel ul { margin: 4px 0 0; padding-left: 18px; }
   .dev-panel li { margin-bottom: 2px; }
-  .dev-panel .dev-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1em; padding: 0; }
-
-  /* --- Bug Reporting --- */
-  .bugreport-link { color: var(--muted); text-decoration: none; }
-  .bugreport-link:hover { text-decoration: underline; color: var(--text); }
-
-  .bugreport-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 10000;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .bugreport-overlay.open { display: flex; }
-  .bugreport-modal {
-    position: relative;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px 18px;
-    width: 100%;
-    max-width: 440px;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  }
-  .bugreport-modal h3 { margin: 0 0 6px 0; font-size: 1.05em; }
-  .bugreport-hint { font-size: 0.82em; color: var(--muted); margin: 0 0 10px 0; line-height: 1.4; }
-  #bugReportText {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    font-size: 0.9em;
-    font-family: inherit;
-    background: var(--panel);
-    color: var(--text);
-    resize: vertical;
-    min-height: 90px;
-  }
-  #bugReportText:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-  }
-  .bugreport-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-  .bugreport-status { font-size: 0.82em; margin-top: 8px; min-height: 1.2em; }
-  .bugreport-status.good { color: var(--good); }
-  .bugreport-status.bad { color: var(--bad); }
-
+  .dev-version { color: var(--muted); font-size: .85em; margin-bottom: 10px; }
+  #reopenOneTimeInfoBtn { margin-bottom: 10px; }
   .dev-bugreports { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 8px 0; margin-bottom: 10px; }
-  .dev-bugreports-head { font-size: 0.85em; color: var(--muted); margin-bottom: 6px; }
+  .dev-bugreports-head { font-size: .85em; color: var(--muted); margin-bottom: 6px; }
   .dev-bugreports-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .changelog-entry { border-top: 1px solid var(--border); padding: 8px 0; }
+  .changelog-entry:first-child { border-top: none; }
+  .changelog-version { font-weight: 700; }
+  .changelog-date { color: var(--muted); font-size: .78em; margin-left: 6px; }
+  .dev-close { position: absolute; top: 8px; right: 10px; padding: 0; background: none; color: var(--muted); font-size: 1em; }
+  .dev-close:hover { background: none; color: var(--text); }
+  .bugreport-overlay { display: none; position: fixed; inset: 0; z-index: 10000; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, .5); }
+  .bugreport-overlay.open { display: flex; }
+  .bugreport-modal { position: relative; width: 100%; max-width: 440px; max-height: 85vh; overflow-y: auto; padding: 16px 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 30px rgba(0, 0, 0, .3); }
+  .bugreport-modal h3 { margin: 0 0 6px; font-size: 1.05em; }
+  .bugreport-hint { font-size: .82em; color: var(--muted); margin: 0 0 10px; line-height: 1.4; }
+  .bugreport-status { font-size: .82em; margin-top: 8px; min-height: 1.2em; }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="header">
     <div>
-      <h1><span id="appTitleText">Weight Tracker &amp; Projections</span></h1>
+      <h1 id="appTitle">Weight Tracker &amp; Projections</h1>
       <div class="subtitle">Runs 100% locally. Private &amp; offline.</div>
     </div>
     <button class="theme-toggle" id="themeToggle">🌓 Theme</button>
   </div>
 
-  <section id="oneTimeInfoSection" style="display:none;">
+  <section id="oneTimeInfoSection" hidden>
     <h2>Get Started</h2>
-    <div class="row" id="oneTimeInfoFields" style="margin-top: 8px;"></div>
-    <div style="margin-top:10px;">
+    <div class="row" id="oneTimeInfoFields"></div>
+    <div class="actions">
       <button id="oneTimeInfoSaveBtn">Save</button>
-      <button class="secondary" id="oneTimeInfoCancelBtn" style="display:none;">Cancel</button>
+      <button class="secondary" id="oneTimeInfoCancelBtn" hidden>Cancel</button>
     </div>
   </section>
 
   <section>
     <h2>Add Entry</h2>
-    <div class="row" style="margin-top: 8px;">
+    <div class="row">
       <div>
         <label for="dateInput">Date</label>
         <input type="date" id="dateInput">
@@ -512,26 +194,20 @@
         <label for="weightInput" id="weightInputLabel">Weight, lb</label>
         <input type="number" id="weightInput" step="0.1" min="0" placeholder="e.g. 185.4">
       </div>
-      <div>
-        <label for="caloriesInput">Calories</label>
-        <input type="number" id="caloriesInput" step="1" min="0" placeholder="e.g. 2100">
-      </div>
-      <div id="doseFieldWrap">
+      <div class="tirz">
         <label for="doseInput">Tirzepatide, mg</label>
         <input type="number" id="doseInput" step="0.25" min="0" placeholder="e.g. 5">
       </div>
-      <div style="flex: 0 0 auto; align-self: flex-end;">
-        <button id="addBtn">Add Entry</button>
-      </div>
+      <div class="btn-cell"><button id="addBtn">Add Entry</button></div>
     </div>
   </section>
 
-  <section id="upcomingDosesSection" style="display:none;">
+  <section id="upcomingDosesSection" class="tirz" hidden>
     <h2>Upcoming Tirzepatide Doses</h2>
     <div class="stat-grid" id="upcomingDosesGrid"></div>
   </section>
 
-  <section id="statsSection" style="display:none;">
+  <section id="statsSection" hidden>
     <div class="section-header">
       <h2>Current Trend</h2>
       <div id="trendWindowWrap">
@@ -543,67 +219,48 @@
       </div>
     </div>
     <div class="stat-grid">
-      <div class="stat">
-        <div class="val" id="statRate">&mdash;</div>
-        <div class="lbl">fitted weekly rate</div>
-      </div>
-      <div class="stat">
-        <div class="val" id="stat7DayAvg">&mdash;</div>
-        <div class="lbl">7-day rolling avg</div>
-      </div>
-    </div>
-
-    <div class="tdee-box">
-      <div style="flex: 1; min-width: 140px;">
-        <div style="font-size: 0.8em; color: var(--muted);">Avg Daily Intake</div>
-        <div id="avgCalorieDisplay" style="font-size: 1.1em; font-weight: 700; margin-top: 2px;">&mdash; kcal/day</div>
-      </div>
-      <div style="flex: 1; min-width: 140px;">
-        <div style="font-size: 0.8em; color: var(--muted);">Est. TDEE</div>
-        <div id="tdeeResult" style="font-size: 1.1em; font-weight: 700; margin-top: 2px;">&mdash; kcal/day</div>
-      </div>
+      <div class="stat"><div class="val" id="statRate">&mdash;</div><div class="lbl">fitted weekly rate</div></div>
+      <div class="stat"><div class="val" id="stat7DayAvg">&mdash;</div><div class="lbl">7-day rolling avg</div></div>
     </div>
   </section>
 
   <section>
     <h2>History</h2>
     <div id="historyEmpty" class="empty-msg">No entries yet. Add your first weigh-in above.</div>
-    <div id="historyWrap" style="display:none;">
+    <div id="historyWrap" hidden>
       <table>
-        <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th>Calories</th><th id="doseColHeader">Tirzepatide Dose</th><th></th></tr></thead>
+        <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th class="tirz">Tirzepatide Dose</th><th></th></tr></thead>
         <tbody id="historyBody"></tbody>
       </table>
-      <div class="pagination" id="paginationWrap">
-        <span id="pageInfo">Page 1 of 1</span>
+      <div class="pagination">
+        <span id="pageInfo"></span>
         <div>
-          <button class="secondary" id="prevPageBtn" style="padding:3px 8px; font-size:0.8em;">&larr; Newer</button>
-          <button class="secondary" id="nextPageBtn" style="padding:3px 8px; font-size:0.8em;">Older &rarr;</button>
+          <button class="secondary small" id="prevPageBtn">&larr; Newer</button>
+          <button class="secondary small" id="nextPageBtn">Older &rarr;</button>
         </div>
       </div>
     </div>
     <div class="toolbar">
       <button class="secondary" id="exportBtn">Export JSON</button>
       <button class="secondary" id="importBtn">Import JSON</button>
-      <input type="file" id="fileImport" accept="application/json">
+      <input type="file" id="fileImport" accept=".json,application/json" hidden>
     </div>
     <div id="trackedSpanNote" class="footnote"></div>
   </section>
 
-  <section id="goalsSection" style="display:none;">
+  <section id="goalsSection" hidden>
     <div class="section-header">
       <h2>Goal Weights</h2>
       <button class="icon-btn" id="exportImageBtn" title="Export progress as image" aria-label="Export goals as image">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
       </button>
     </div>
-    <div class="row" style="margin-top: 8px;">
+    <div class="row">
       <div>
         <label for="goalInput">Add goal weight</label>
         <input type="number" id="goalInput" step="0.1" min="0" placeholder="e.g. 150">
       </div>
-      <div style="flex: 0 0 auto; align-self: flex-end;">
-        <button id="addGoalBtn" class="secondary">Add Goal</button>
-      </div>
+      <div class="btn-cell"><button id="addGoalBtn" class="secondary">Add Goal</button></div>
     </div>
 
     <div class="proj-box">
@@ -612,63 +269,52 @@
         <button type="button" class="mode-btn active" data-rate-mode="trend">Current trend</button>
         <button type="button" class="mode-btn" data-rate-mode="custom">Custom weekly %</button>
       </div>
-      <div id="customRateWrap">
+      <div id="customRateWrap" hidden>
         <div class="rate-head">
           <label for="customRate">Custom weekly rate toward goal</label>
           <span class="rate-value" id="customRateValue">0%</span>
         </div>
         <input type="range" id="customRate" step="0.25" min="-2" max="1" value="0" autocomplete="off">
-        <div class="rate-ticks" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <div class="rate-labels">
-          <span class="rl-min">&minus;2%</span>
-          <span class="rl-zero">0%</span>
-          <span class="rl-max">+1%</span>
-        </div>
+        <div class="rate-ticks" aria-hidden="true"></div>
+        <div class="rate-labels"><span class="rl-min">&minus;2%</span><span class="rl-zero">0%</span><span class="rl-max">+1%</span></div>
       </div>
-      <div id="goalsRateNote" style="font-size:0.8em; color: var(--muted); margin-top:8px;"></div>
-      <div class="stat-grid" id="futureWeightGrid" style="margin-top:10px;"></div>
+      <div id="goalsRateNote" class="note"></div>
+      <div class="stat-grid" id="futureWeightGrid"></div>
     </div>
 
-    <div style="margin-top:14px;">
-      <table>
-        <thead><tr><th>Goal</th><th>Status</th><th>ETA / Date Achieved</th><th></th></tr></thead>
-        <tbody id="goalsBody"></tbody>
-      </table>
-    </div>
+    <table class="goals-table">
+      <thead><tr><th>Goal</th><th>Status</th><th>ETA / Date Achieved</th><th></th></tr></thead>
+      <tbody id="goalsBody"></tbody>
+    </table>
   </section>
 
-  <section id="chartSection" style="display:none;">
+  <section id="chartSection" hidden>
     <h2>Chart</h2>
     <svg id="chartSvg" viewBox="0 0 640 320" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="legend">
-      <span><span class="swatch" style="background:#2563eb;"></span> Actual history</span>
-      <span><span class="swatch" style="background:#e11d48; border-top:2px dashed #e11d48; background:none; height:0;"></span> Active goals</span>
+      <span><span class="swatch"></span> Actual history</span>
+      <span><span class="swatch goal"></span> Active goals</span>
     </div>
   </section>
 
   <footer>
-    Weight Tracker &middot; Offline single-file HTML5 app &middot; <a href="#" id="reportBugLink" class="bugreport-link">Report a bug</a>
+    Weight Tracker &middot; Offline single-file HTML5 app &middot; <a href="#" id="reportBugLink">Report a bug</a>
   </footer>
 </div>
 
 <div class="app-version-tag" id="appVersionTag"></div>
 <div class="dev-badge" id="devBadge" title="Developer mode (Ctrl+9)">DEV</div>
-<div class="dev-panel" id="devPanel" style="position:fixed;">
+<div class="dev-panel" id="devPanel">
   <button class="dev-close" id="devPanelClose" aria-label="Close">&times;</button>
   <h3>Developer Mode</h3>
   <div class="dev-version">Version <span id="devVersionNum"></span></div>
-  <button class="secondary" id="reopenOneTimeInfoBtn" style="margin-bottom:10px; font-size:0.85em; padding:5px 10px;">Edit start-up info</button>
+  <button class="secondary small" id="reopenOneTimeInfoBtn">Edit start-up info</button>
   <div class="dev-bugreports">
-    <div class="dev-bugreports-head">
-      <span>Bug reports: <strong id="devBugReportCount">0</strong></span>
-    </div>
+    <div class="dev-bugreports-head">Bug reports: <strong id="devBugReportCount">0</strong></div>
     <div class="dev-bugreports-actions">
-      <button class="secondary" id="devCopyBugReportsBtn" style="font-size:0.8em; padding:4px 8px;">Copy all</button>
-      <button class="secondary" id="devDownloadBugReportsBtn" style="font-size:0.8em; padding:4px 8px;">Download .md</button>
-      <button class="danger" id="devClearBugReportsBtn" style="font-size:0.8em; padding:3px 8px;">Clear</button>
+      <button class="secondary small" id="devCopyBugReportsBtn">Copy all</button>
+      <button class="secondary small" id="devDownloadBugReportsBtn">Download .md</button>
+      <button class="danger" id="devClearBugReportsBtn">Clear</button>
     </div>
   </div>
   <div id="devChangelog"></div>
@@ -680,9 +326,7 @@
     <h3>Report a Bug</h3>
     <p class="bugreport-hint">Describe what happened and what you expected, then Submit. That saves the report locally (with environment, app state, and recent console activity &mdash; no personal data) and copies it to your clipboard. Saved reports are managed from Developer Mode.</p>
     <textarea id="bugReportText" rows="5" placeholder="What went wrong? What did you expect to happen?"></textarea>
-    <div class="bugreport-actions">
-      <button id="bugReportSubmitBtn">Submit Report</button>
-    </div>
+    <div class="actions"><button id="bugReportSubmitBtn">Submit Report</button></div>
     <div class="bugreport-status" id="bugReportStatus"></div>
   </div>
 </div>
@@ -691,88 +335,54 @@
 (function () {
   "use strict";
 
-  // ============================================================================
-  // APP STATE & CONSTANTS
-  // ============================================================================
-  const STORAGE_KEY = "weightTrackerEntries_v1";
-  const GOALS_KEY = "weightTrackerGoals_v1";
-  const CALORIES_KEY = "weightTrackerCalories_v1";
-  const BUG_REPORTS_KEY = "weightTrackerBugReports_v1";
+  // ==========================================================================
+  // CONSTANTS & STATE
+  // ==========================================================================
+  const KEYS = {
+    entries: "weightTrackerEntries_v1",
+    goals: "weightTrackerGoals_v1",
+    profile: "weightTrackerProfile_v1",
+    theme: "weightTrackerTheme_v1",
+    bugReports: "weightTrackerBugReports_v1"
+  };
+  // Storage left behind by removed features; cleared on load.
+  const LEGACY_KEYS = ["weightTrackerCalories_v1"];
+  const DEFAULT_GOALS = [200, 175, 160, 150]; // lb
+  const LB_PER_KG = 2.20462;
+  const PAGE_SIZE = 7;
+  const MAX_UPCOMING_DOSES = 3;
+  const MAX_ETA_WEEKS = 5200; // ~100 years; anything slower counts as a flat rate
   const BUG_REPORTS_MAX = 20;
-  const THEME_KEY = "weightTrackerTheme_v1";
-  const PROFILE_KEY = "weightTrackerProfile_v1";
-  const DEFAULT_GOALS = [200, 175, 160, 150];
-
-  // One-time info: things we only ever need to ask for once. Defined as a list
-  // so more fields can be added later without changing the surrounding logic.
-  // The "Get Started" section shows required fields until they're filled, and
-  // optional fields until they've been asked at least once (an optional field
-  // left blank still counts as "answered" so it doesn't keep reappearing).
-  const ONE_TIME_FIELDS = [
-    { key: "name", label: "Your name", placeholder: "e.g. Jordan", type: "text" },
-    { key: "unit", label: "Units", type: "select", default: "lb", options: [
-      { value: "lb", label: "lb" },
-      { value: "kg", label: "kg" }
-    ] },
-    { key: "usesTirzepatide", label: "Do you take Tirzepatide?", type: "boolean", optional: true, default: true }
-  ];
-  let profile = {};
-  let unsavedChanges = false;
-
-  // Data schema version for exported/imported JSON backups. Bump this only
-  // when the backup file's *shape* changes in a way that needs migration
-  // logic below — independent of APP_VERSION, which tracks the UI/app itself.
-  // v2: entries gained an optional doseMg field.
+  const DEBUG_LOG_MAX = 40;
+  // Backup file format. Bump only when the shape changes in a way import has
+  // to migrate. v2: entries gained doseMg.
   const DATA_SCHEMA_VERSION = 2;
 
-  // Core state objects
-  // `entries` format matches JSON schema: { date: string, weight: number | null, calories: number | null, doseMg: number | null }
-  let entries = [];
-  let goals = [];
-  // Locally-saved bug reports (see BUG REPORTING section below): { id, timestamp,
-  // description, markdown }. Capped at BUG_REPORTS_MAX, oldest dropped first.
-  let bugReports = [];
-  // The whole app — entries, goals, every display string — lives in exactly one
-  // unit at a time; nothing here ever mixes kg and lb. This mirrors profile.unit
-  // (a one-time start-up field, re-answerable only via Developer Mode's "Edit
-  // start-up info"), and is kept in sync with it via getActiveUnit() below.
-  let unit = "lb";
-  const LB_PER_KG = 2.20462;
+  // Start-up questions. Required ones show until answered; optional ones until
+  // asked once. Add more here without touching the surrounding logic.
+  const ONE_TIME_FIELDS = [
+    { key: "name", label: "Your name", type: "text", placeholder: "e.g. Jordan" },
+    { key: "unit", label: "Units", type: "select", options: ["lb", "kg"], default: "lb" },
+    { key: "usesTirzepatide", label: "Do you take Tirzepatide?", type: "boolean", optional: true, default: true }
+  ];
 
-  // Converts a single weight value between units, rounded to the same 1-decimal
-  // precision entries/goals are always stored at. Used both when the unit is
-  // changed via start-up info and when importing a backup saved in a different
-  // unit than the one currently active — either way, nothing is ever left mixed.
-  function convertWeightValue(value, fromUnit, toUnit) {
-    if (typeof value !== "number" || isNaN(value) || fromUnit === toUnit) return value;
-    if (fromUnit === "kg" && toUnit === "lb") return Math.round(value * LB_PER_KG * 10) / 10;
-    if (fromUnit === "lb" && toUnit === "kg") return Math.round(value / LB_PER_KG * 10) / 10;
-    return value;
-  }
-
-  // Converts every stored weight (entries + goals) from one unit to the other
-  // in place, e.g. when the start-up unit choice is changed via Developer Mode.
-  function convertAllWeightsToUnit(fromUnit, toUnit) {
-    if (fromUnit === toUnit) return;
-    entries.forEach(e => {
-      if (typeof e.weight === "number" && !isNaN(e.weight)) e.weight = convertWeightValue(e.weight, fromUnit, toUnit);
-    });
-    goals = goals.map(g => convertWeightValue(g, fromUnit, toUnit));
-  }
-  let rateMode = "trend"; // "trend" or "custom"
-  let trendWindow = "all"; // Controls which data points feed the regression AND the calorie/TDEE window
-  let avgCalories = 0; // Fallback moving average if recent inputs are sparse
-
-  const PAGE_SIZE = 7;
+  let entries = [];        // { date: "YYYY-MM-DD", weight: number|null, doseMg: number|null }, one per date, sorted
+  let goals = [];          // goal weights, sorted high to low
+  let profile = {};        // start-up answers
+  let unit = "lb";         // the whole app uses one unit at a time: profile.unit, or lb until chosen
+  let bugReports = [];     // { id, timestamp, description, markdown }
+  let rateMode = "trend";  // "trend" | "custom"
+  let trendWindow = "all"; // "all" | "7" | "30" | "60" | "90"
   let currentPage = 1;
+  let unsavedChanges = false;
+  let devModeOn = false;
 
-  // ============================================================================
-  // VERSION CONTROL & CHANGELOG
-  // ============================================================================
-  // Versioning scheme: X.YYY — each digit is a size-of-change tier:
-  //   +0.001 = bug fix, +0.010 = tiny tweak, +0.100 = small feature, +1 = large feature.
-  const APP_VERSION = "1.924";
+  // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
+  // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "2.924", date: "2026-09-24", changes: [
+      "Removed calorie tracking and slimmed down the code, fixing dates shifting a day in some timezones, goals marked Reached too early, and flat weigh-ins or damaged data breaking the app."
+    ] },
     { version: "1.924", date: "2026-09-14", changes: [
       "Fixed bug reports not actually being submitted: the 'Report a bug' form now saves each report locally (until exported or cleared) instead of only copying it once and forgetting it, and Developer Mode's export now works on that whole saved log — copy all, download as one .md file, or clear it — instead of just re-generating whatever was currently typed."
     ] },
@@ -821,924 +431,412 @@
     { version: "1.100", date: "2026-09-08", changes: [
       "Added optional Tirzepatide dose tracking with an Upcoming Doses panel and History column, and dropped kg support in favor of lb-only."
     ] },
-    { version: "1.000", date: "2026-09-08", changes: ["Initial versioned release."] },
+    { version: "1.030", date: "2026-09-08", changes: [
+      "Added versioned, validated JSON backups — malformed rows are dropped on import instead of crashing, and newer-version backups show a warning."
+    ] },
     { version: "1.010", date: "2026-09-08", changes: [
       "Weight and calories can now be logged independently of each other, with trend/stats/goals/chart calculations using only days with a recorded weight."
     ] },
-    { version: "1.030", date: "2026-09-08", changes: [
-      "Added versioned, validated JSON backups — malformed rows are dropped on import instead of crashing, and newer-version backups show a warning."
-    ] }
+    { version: "1.000", date: "2026-09-08", changes: ["Initial versioned release."] }
   ];
-  let devModeOn = false;
+  const APP_VERSION = CHANGELOG[0].version;
 
-  // ============================================================================
-  // BUG REPORTING (in-memory console log capture)
-  // ============================================================================
-  // Runs first so it captures console activity from the rest of init, not just
-  // from user interaction afterward.
-  const DEBUG_LOG_MAX = 40;
-  let debugLog = [];
-
+  // ==========================================================================
+  // CONSOLE CAPTURE (for bug reports) — first, so init problems are caught too
+  // ==========================================================================
+  const debugLog = [];
   function logDebug(level, message) {
-    debugLog.push({ time: new Date().toISOString(), level: level, message: String(message) });
+    debugLog.push({ time: new Date().toISOString(), level, message: String(message) });
     if (debugLog.length > DEBUG_LOG_MAX) debugLog.shift();
   }
-
-  const nativeConsoleError = console.error.bind(console);
-  console.error = function (...args) {
-    logDebug("error", args.map(a => (a && a.stack) ? a.stack : a).join(" "));
-    nativeConsoleError(...args);
-  };
-  const nativeConsoleWarn = console.warn.bind(console);
-  console.warn = function (...args) {
-    logDebug("warn", args.join(" "));
-    nativeConsoleWarn(...args);
-  };
-  window.addEventListener("error", (e) => {
-    logDebug("error", `${e.message} (${e.filename}:${e.lineno})`);
+  ["error", "warn"].forEach(level => {
+    const native = console[level].bind(console);
+    console[level] = (...args) => {
+      logDebug(level, args.map(a => (a && a.stack) || a).join(" "));
+      native(...args);
+    };
   });
-  window.addEventListener("unhandledrejection", (e) => {
-    logDebug("error", `Unhandled rejection: ${e.reason && e.reason.message ? e.reason.message : e.reason}`);
-  });
+  window.addEventListener("error", e => logDebug("error", `${e.message} (${e.filename}:${e.lineno})`));
+  window.addEventListener("unhandledrejection", e => logDebug("error", `Unhandled rejection: ${(e.reason && e.reason.message) || e.reason}`));
 
-  function renderDevPanel() {
-    document.getElementById("devVersionNum").textContent = APP_VERSION;
-    renderDevBugReportCount();
-    let log = document.getElementById("devChangelog");
-    log.innerHTML = CHANGELOG.map(entry => `
-      <div class="changelog-entry">
-        <span class="changelog-version">v${entry.version}</span><span class="changelog-date">${entry.date}</span>
-        <ul>${entry.changes.map(c => `<li>${c}</li>`).join('')}</ul>
-      </div>
-    `).join('');
+  // ==========================================================================
+  // HELPERS
+  // ==========================================================================
+  const $ = id => document.getElementById(id);
+  const isNum = v => typeof v === "number" && isFinite(v);
+  const isPos = v => isNum(v) && v > 0;
+  const hasWeight = e => isNum(e.weight);
+  const hasDose = e => isNum(e.doseMg);
+  const byDate = (a, b) => a.date.localeCompare(b.date);
+  const mean = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
+  const extent = arr => [arr.reduce((a, b) => Math.min(a, b)), arr.reduce((a, b) => Math.max(a, b))];
+
+  // Dates are "YYYY-MM-DD" calendar days. Date math runs in UTC so timezones and
+  // daylight saving can't shift a day; only "today" reads the local clock.
+  const DAY_MS = 86400000;
+  const dateMs = d => Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+  const msDate = ms => new Date(ms).toISOString().slice(0, 10);
+  const isDate = d => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d) && msDate(dateMs(d)) === d;
+  const daysBetween = (a, b) => (dateMs(b) - dateMs(a)) / DAY_MS;
+  const addDays = (d, n) => msDate(dateMs(d) + n * DAY_MS);
+  const todayStr = () => { const n = new Date(); return msDate(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())); };
+  const fmtDate = (d, opts = { year: "numeric", month: "short", day: "numeric" }) =>
+    new Date(dateMs(d)).toLocaleDateString(undefined, { ...opts, timeZone: "UTC" });
+  const fmtDateShort = d => fmtDate(d, { month: "short", day: "numeric" });
+  // Exported image: show the year only when it isn't this year.
+  const fmtDateExport = d => (d.slice(0, 4) === todayStr().slice(0, 4) ? fmtDateShort(d) : fmtDate(d));
+  // First/middle/last dates for a chart's x-axis (fewer on very short spans).
+  const axisDates = (first, totalDays) => [...new Set([0, 0.5, 1].map(f => addDays(first, Math.round(totalDays * f))))];
+
+  // Weights are kept at 1-decimal precision in whichever unit is active.
+  function convertWeight(v, from, to) {
+    if (!isNum(v) || from === to) return v;
+    return Math.round((to === "kg" ? v / LB_PER_KG : v * LB_PER_KG) * 10) / 10;
   }
 
-  function toggleDevMode() {
-    devModeOn = !devModeOn;
-    document.body.classList.toggle("dev-mode", devModeOn);
-    if (devModeOn) renderDevPanel();
+  const tirzepatideEnabled = () => profile.usesTirzepatide !== false;
+
+  // ==========================================================================
+  // STORAGE
+  // ==========================================================================
+  // Storage can be blocked (strict privacy settings); the app then keeps working
+  // in memory and warns once that nothing will be kept.
+  let storageWarned = false;
+  function storageGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
   }
-
-  document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && (e.key === "9" || e.code === "Digit9")) {
-      e.preventDefault();
-      toggleDevMode();
-    }
-  });
-
-  // ============================================================================
-  // THEME MANAGEMENT
-  // ============================================================================
-  function initTheme() {
-    let saved = localStorage.getItem(THEME_KEY);
-    if (!saved) {
-      // Default to dark mode in the evening/night
-      let hour = new Date().getHours();
-      saved = (hour >= 19 || hour < 7) ? "dark" : "light";
-    }
-    setTheme(saved);
-  }
-
-  function setTheme(t) {
-    document.documentElement.setAttribute("data-theme", t);
-    localStorage.setItem(THEME_KEY, t);
-  }
-
-  document.getElementById("themeToggle").addEventListener("click", () => {
-    let current = document.documentElement.getAttribute("data-theme");
-    setTheme(current === "dark" ? "light" : "dark");
-    // Re-render chart to update stroke and text colors based on CSS variable swaps
-    renderChart(computeTrend());
-  });
-
-  // ============================================================================
-  // DATA PERSISTENCE (Local Storage)
-  // ============================================================================
-  function updateExportButtonState() {
-    let exportBtn = document.getElementById("exportBtn");
-    if (exportBtn) {
-      if (unsavedChanges) {
-        exportBtn.classList.add("unsaved");
-      } else {
-        exportBtn.classList.remove("unsaved");
-      }
-    }
-  }
-
-  function loadData() {
+  function storageSet(key, value) {
     try {
-      entries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      goals = JSON.parse(localStorage.getItem(GOALS_KEY)) || DEFAULT_GOALS.slice();
-      avgCalories = parseFloat(localStorage.getItem(CALORIES_KEY)) || 0;
+      localStorage.setItem(key, value);
     } catch (e) {
-      console.warn("Failed to load existing data, starting fresh.", e);
-      entries = [];
-      goals = DEFAULT_GOALS.slice();
-    }
-    // Ensure chronological order for math calculations
-    entries.sort((a, b) => a.date.localeCompare(b.date));
-
-    // Force the rate slider back to 0 on every load — some browsers restore
-    // a form control's last value on refresh regardless of its HTML default.
-    document.getElementById("customRate").value = "0";
-
-    sortGoals();
-  }
-
-  // Lose/gain direction is no longer a manual toggle — in custom mode it
-  // follows the sign of the rate slider (negative = lose, positive = gain),
-  // and otherwise (trend mode, or the slider parked at 0) it falls back to
-  // whichever direction the last 90 days of weigh-ins actually show.
-  function currentGoalDirection() {
-    if (rateMode === "custom") {
-      let v = parseFloat(document.getElementById("customRate").value);
-      if (!isNaN(v) && v !== 0) return v > 0 ? "gain" : "lose";
-    }
-    return getDefaultGoalDirection();
-  }
-
-  // Descending when the goal is to lose (nearest/highest goal first) and
-  // ascending when the goal is to gain (nearest/lowest goal first), so the
-  // table always lists the soonest-reachable goal first.
-  function sortGoalsArray(arr) {
-    arr.sort((a, b) => currentGoalDirection() === "gain" ? a - b : b - a);
-    return arr;
-  }
-  function sortGoals() {
-    sortGoalsArray(goals);
-  }
-
-  function saveData() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-      localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
-      localStorage.setItem(CALORIES_KEY, avgCalories);
-      unsavedChanges = true;
-      updateExportButtonState();
-    } catch (e) {
-      console.error("Local storage quota exceeded or unavailable.", e);
+      console.error("Couldn't save to local storage.", e);
+      if (!storageWarned) alert("This browser isn't letting the app save your data, so it will be lost when the page closes. Use Export JSON to keep a copy.");
+      storageWarned = true;
     }
   }
-
-  function loadProfile() {
-    try {
-      profile = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {};
-    } catch (e) {
-      profile = {};
-    }
-    if (typeof profile.name !== "string") profile.name = "";
-    // Left unset ("") until the start-up "Units" question is actually answered,
-    // same as name — see getActiveUnit() for what the app uses in the meantime.
-    if (profile.unit !== "kg" && profile.unit !== "lb") profile.unit = "";
+  function storageRemove(key) {
+    try { localStorage.removeItem(key); } catch (e) { /* nothing to clean up */ }
+  }
+  function readJSON(key) {
+    try { return JSON.parse(storageGet(key)); } catch (e) { return null; }
   }
 
-  // The unit actually in effect: whatever was chosen at start-up, or "lb" as
-  // the working default before that question has been answered.
-  function getActiveUnit() {
-    return (profile.unit === "kg" || profile.unit === "lb") ? profile.unit : "lb";
+  function save(unsaved = true) {
+    storageSet(KEYS.entries, JSON.stringify(entries));
+    storageSet(KEYS.goals, JSON.stringify(goals));
+    storageSet(KEYS.profile, JSON.stringify(profile));
+    setUnsaved(unsaved);
   }
 
-  function saveProfile() {
-    try {
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-      unsavedChanges = true;
-      updateExportButtonState();
-    } catch (e) {
-      console.error("Local storage quota exceeded or unavailable.", e);
-    }
-  }
-
-  // Bug reports are kept separate from the entries/goals backup — they're
-  // debugging notes for the developer, not tracker data, and never travel
-  // through the JSON export/import flow.
-  function loadBugReports() {
-    try {
-      bugReports = JSON.parse(localStorage.getItem(BUG_REPORTS_KEY)) || [];
-    } catch (e) {
-      bugReports = [];
-    }
-  }
-
-  function saveBugReports() {
-    try {
-      localStorage.setItem(BUG_REPORTS_KEY, JSON.stringify(bugReports));
-    } catch (e) {
-      console.error("Local storage quota exceeded or unavailable.", e);
-    }
+  // Highlights Export JSON while there are changes that aren't in a backup yet.
+  function setUnsaved(value) {
+    unsavedChanges = value;
+    $("exportBtn").classList.toggle("unsaved", value);
   }
 
   /**
-   * Normalizes a parsed backup JSON object into a clean internal state,
-   * regardless of which app version produced it.
-   *
-   * Backward compatibility notes:
-   * - Backups from before schema versioning existed (no `schemaVersion` field,
-   *   i.e. anything exported prior to v1.030) are treated as schema 0. Their
-   *   entries always had a numeric `weight` and may be missing `calories`
-   *   entirely, may be missing `goals`/`avgCalories`, and never had `unit`
-   *   guaranteed to be valid — all handled below.
-   * - Backups from v1.030+ include `schemaVersion`, `appVersion`, and always
-   *   write out `weight`/`calories` as `number | null`.
-   * - Forward compatibility: a backup with a schemaVersion newer than this
-   *   app understands is still imported best-effort (unknown extra fields
-   *   are simply ignored), with a warning surfaced to the user.
-   * - Everything in the app lives in one unit at a time — never mixed. A
-   *   backup's own "unit" field (missing/invalid means "lb", the only unit
-   *   before this feature existed) is converted into whichever unit is
-   *   currently active here, so imported weights/goals stay accurate instead
-   *   of being silently relabeled or left mismatched with existing data.
-   *
-   * Malformed rows (missing/invalid date, or a weight/calories/dose value
-   * that isn't a usable number) are dropped rather than crashing the import.
+   * Cleans backup (or saved) data from any app version into the current shape,
+   * converting weights from the data's unit (lb when missing, the only unit
+   * older backups had) into targetUnit. Rows with an invalid date, or without a
+   * valid weight or dose, are dropped — as are fields from removed features.
+   * On duplicate dates the last row wins. Missing goals fall back to defaults.
    */
-  function normalizeBackupData(raw) {
-    let schemaVersion = typeof raw.schemaVersion === "number" ? raw.schemaVersion : 0;
-    let sourceUnit = (raw.unit === "kg" || raw.unit === "lb") ? raw.unit : "lb";
-    let targetUnit = unit;
-
-    let cleanEntries = Array.isArray(raw.entries) ? raw.entries.map(e => {
-      if (!e || typeof e.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return null;
-
-      let w = e.weight;
-      let weight = (typeof w === "number" && !isNaN(w) && w > 0) ? w : null;
-      if (weight !== null) weight = convertWeightValue(weight, sourceUnit, targetUnit);
-
-      let c = e.calories;
-      let calories = (typeof c === "number" && !isNaN(c) && c > 0) ? c : null;
-
-      let d = e.doseMg;
-      let doseMg = (typeof d === "number" && !isNaN(d) && d > 0) ? d : null;
-
-      // Pre-1.010 backups never had calorie-only (or dose-only) rows and
-      // always required weight, so a row with none of these is genuinely malformed.
-      if (weight === null && calories === null && doseMg === null) return null;
-
-      return { date: e.date, weight: weight, calories: calories, doseMg: doseMg };
-    }).filter(Boolean) : [];
-
-    // Collapse any duplicate dates (keep the last one) and sort chronologically
-    let byDate = new Map();
-    cleanEntries.forEach(e => byDate.set(e.date, e));
-    cleanEntries = Array.from(byDate.values()).sort((a, b) => a.date.localeCompare(b.date));
-
-    let cleanGoals = Array.isArray(raw.goals)
-      ? raw.goals.filter(g => typeof g === "number" && !isNaN(g) && g > 0)
-          .map(g => convertWeightValue(g, sourceUnit, targetUnit))
-      // DEFAULT_GOALS is defined in lb regardless of what unit is active.
-      : DEFAULT_GOALS.map(g => convertWeightValue(g, "lb", targetUnit));
-    sortGoalsArray(cleanGoals);
-
-    let cleanAvgCal = (typeof raw.avgCalories === "number" && !isNaN(raw.avgCalories) && raw.avgCalories > 0)
-      ? raw.avgCalories : 0;
-
-    // Older backups (pre-name support) simply won't have this field — the
-    // caller keeps whatever name is already saved locally in that case.
-    let cleanName = typeof raw.name === "string" ? raw.name.trim() : "";
-
+  function normalizeBackup(raw, targetUnit) {
+    const from = raw.unit === "kg" ? "kg" : "lb";
+    const pos = v => (isPos(v) ? v : null);
+    const days = new Map();
+    (Array.isArray(raw.entries) ? raw.entries : []).forEach(e => {
+      if (!e || !isDate(e.date)) return;
+      const weight = pos(convertWeight(pos(e.weight), from, targetUnit));
+      const doseMg = pos(e.doseMg);
+      if (weight !== null || doseMg !== null) days.set(e.date, { date: e.date, weight, doseMg });
+    });
+    const goalList = Array.isArray(raw.goals)
+      ? raw.goals.filter(isPos).map(g => convertWeight(g, from, targetUnit))
+      : DEFAULT_GOALS.map(g => convertWeight(g, "lb", targetUnit));
     return {
-      schemaVersion: schemaVersion,
-      entries: cleanEntries,
-      goals: cleanGoals,
-      avgCalories: cleanAvgCal,
-      name: cleanName
+      schemaVersion: isNum(raw.schemaVersion) ? raw.schemaVersion : 0,
+      entries: [...days.values()].sort(byDate),
+      goals: [...new Set(goalList.filter(isPos))].sort((a, b) => b - a),
+      name: typeof raw.name === "string" ? raw.name.trim() : ""
     };
   }
 
-  // ============================================================================
-  // UTILITY & MATH HELPERS
-  // ============================================================================
-  
-  // Formats "YYYY-MM-DD" to "MMM DD, YYYY" (e.g., "Jan 01, 2026")
-  function fmtDate(d) {
-    let dt = new Date(d + "T00:00:00");
-    return dt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  function loadAll() {
+    const p = readJSON(KEYS.profile);
+    profile = p && typeof p === "object" && !Array.isArray(p) ? p : {};
+    if (typeof profile.name !== "string") profile.name = "";
+    if (profile.unit !== "kg" && profile.unit !== "lb") profile.unit = ""; // not answered yet
+    unit = profile.unit || "lb";
+
+    // Saved data goes through the same cleanup as imports, so damaged storage
+    // can't break the app; write it back if anything had to change.
+    const storedEntries = storageGet(KEYS.entries), storedGoals = storageGet(KEYS.goals);
+    const clean = normalizeBackup({ unit, entries: readJSON(KEYS.entries), goals: readJSON(KEYS.goals) }, unit);
+    entries = clean.entries;
+    goals = clean.goals;
+    if (storedEntries !== null && (storedEntries !== JSON.stringify(entries) || storedGoals !== JSON.stringify(goals))) {
+      storageSet(KEYS.entries, JSON.stringify(entries));
+      storageSet(KEYS.goals, JSON.stringify(goals));
+    }
+    LEGACY_KEYS.forEach(storageRemove);
+
+    const reports = readJSON(KEYS.bugReports);
+    bugReports = Array.isArray(reports) ? reports.filter(r => r && typeof r.markdown === "string") : [];
   }
 
-  // Minimal date format with no year (e.g., "Jan 1") — used on the exported
-  // progress image where space is tight and the year is rarely the point.
-  function fmtDateShort(d) {
-    let dt = new Date(d + "T00:00:00");
-    return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  // ==========================================================================
+  // TREND MATH
+  // ==========================================================================
+  const weightEntries = () => entries.filter(hasWeight);
+  const customRate = () => parseFloat($("customRate").value) || 0;
+
+  // Weigh-ins within `days` of the latest one.
+  function lastDays(w, days) {
+    if (!w.length) return w;
+    const last = w[w.length - 1].date;
+    return w.filter(e => daysBetween(e.date, last) <= days);
   }
 
-  // Same as fmtDateShort, but falls back to the full year-bearing format for
-  // any date outside the current year — used on the exported progress image
-  // so dates from a past/future year aren't shown ambiguously.
-  function fmtDateExport(d) {
-    let dt = new Date(d + "T00:00:00");
-    return dt.getFullYear() === new Date().getFullYear() ? fmtDateShort(d) : fmtDate(d);
+  /**
+   * Fits ln(weight) over time — a constant percentage change per week, which
+   * suits body weight better than a straight line — and returns the fractional
+   * weekly rate: positive = losing, negative = gaining, null = too few points.
+   */
+  function fitWeeklyRate(w) {
+    if (w.length < 2) return null;
+    const ts = w.map(e => daysBetween(w[0].date, e.date) / 7);
+    const ys = w.map(e => Math.log(e.weight));
+    const mt = mean(ts), my = mean(ys);
+    let num = 0, den = 0;
+    ts.forEach((t, i) => { num += (t - mt) * (ys[i] - my); den += (t - mt) * (t - mt); });
+    return den ? 1 - Math.exp(num / den) : null;
   }
 
-  // Returns exact integer days elapsed between two "YYYY-MM-DD" strings
-  function daysBetween(d1, d2) {
-    return (new Date(d2 + "T00:00:00") - new Date(d1 + "T00:00:00")) / (1000 * 60 * 60 * 24);
+  // Which way counts as progress: the custom slider's sign when it's in use,
+  // otherwise the last 90 days of weigh-ins ("lose" unless they show a gain).
+  function goalDirection(w) {
+    const custom = customRate();
+    if (rateMode === "custom" && custom !== 0) return custom > 0 ? "gain" : "lose";
+    const r = fitWeeklyRate(lastDays(w, 90));
+    return r !== null && r < 0 ? "gain" : "lose";
   }
 
-  // Adds `days` to a date string and returns a new "YYYY-MM-DD" string
-  function addDays(dateStr, days) {
-    let d = new Date(dateStr + "T00:00:00");
-    d.setDate(d.getDate() + days);
-    return d.toISOString().slice(0, 10);
+  // Everything the views need, derived once per render.
+  function model() {
+    const w = weightEntries();
+    const trend = fitWeeklyRate(trendWindow === "all" ? w : lastDays(w, +trendWindow));
+    const dir = goalDirection(w);
+    // The slider is signed like the display (negative = lose); rates are positive = lose.
+    const rate = rateMode === "trend" ? trend || 0 : -customRate() / 100;
+    const sorted = goals.slice().sort((a, b) => (dir === "gain" ? a - b : b - a)); // nearest goal first
+    return { w, trend, dir, rate, goals: sorted };
   }
 
-  // Entries that have a recorded weight. Calorie-only entries (added without a
-  // weight, e.g. logging dinner calories before the morning weigh-in) are
-  // excluded from anything weight-based: trend, chart, goals, stats.
-  function weightEntries() {
-    return entries.filter(e => typeof e.weight === "number" && !isNaN(e.weight));
+  // A goal is reached once the latest weigh-in has moved from the starting
+  // weight to (or past) it; returns the first weigh-in date that got there.
+  function reachedDate(goal, w) {
+    const start = w[0].weight, cur = w[w.length - 1].weight;
+    if (goal < Math.min(start, cur) || goal > Math.max(start, cur)) return null;
+    return w.find(e => (goal <= start ? e.weight <= goal : e.weight >= goal)).date;
   }
 
-  // Returns up to the next 3 dated doses that are today or in the future,
-  // ascending by date. Doses are logged the same way as any other entry —
-  // just add a dose value on a future date in the Add Entry form.
-  function getUpcomingDoses() {
-    let todayStr = new Date().toISOString().slice(0, 10);
-    return entries
-      .filter(e => typeof e.doseMg === "number" && !isNaN(e.doseMg) && e.date >= todayStr)
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 3);
+  function goalStatus(goal, w, rate) {
+    const reached = reachedDate(goal, w);
+    if (reached) return { status: "reached", date: reached };
+    if (!rate) return { status: "flat" };
+    const last = w[w.length - 1];
+    const weeks = Math.log(goal / last.weight) / Math.log1p(-rate);
+    if (!(weeks > 0)) return { status: "unreachable" }; // moving away from it
+    if (weeks > MAX_ETA_WEEKS) return { status: "flat" };
+    return { status: "projected", weeks, date: addDays(last.date, Math.round(weeks * 7)) };
   }
 
-  // Total count of scheduled (today-or-future) doses, unsliced — used to enforce
-  // the 3-upcoming-dose cap when adding a new entry.
-  function countUpcomingDoses() {
-    let todayStr = new Date().toISOString().slice(0, 10);
-    return entries.filter(e => typeof e.doseMg === "number" && !isNaN(e.doseMg) && e.date >= todayStr).length;
-  }
-
-  // History (page 1) only ever shows this many of the most recent past-or-today
-  // entries, so a dose logged further back than this can silently scroll out of
-  // view if doses aren't taken every entry. When none of those recent entries
-  // carry a dose, this surfaces the most recent one actually taken so it's
-  // never more than a glance away.
-  function getLastKnownDose() {
-    let todayStr = new Date().toISOString().slice(0, 10);
-    let past = entries.filter(e => e.date <= todayStr).sort((a, b) => b.date.localeCompare(a.date));
-    let recentWindow = past.slice(0, PAGE_SIZE);
-    let doseVisibleInWindow = recentWindow.some(e => typeof e.doseMg === "number" && !isNaN(e.doseMg));
-    if (doseVisibleInWindow) return null;
-    return past.find(e => typeof e.doseMg === "number" && !isNaN(e.doseMg)) || null;
-  }
-
-  // Sums every dose actually taken (today-or-past — scheduled future doses
-  // haven't happened yet and don't count), for the cumulative total in exports.
-  function getCumulativeDoseMg() {
-    let todayStr = new Date().toISOString().slice(0, 10);
-    let total = entries
-      .filter(e => e.date <= todayStr && typeof e.doseMg === "number" && !isNaN(e.doseMg))
-      .reduce((sum, e) => sum + e.doseMg, 0);
+  function cumulativeDoseMg() {
+    const today = todayStr();
+    const total = entries.filter(e => hasDose(e) && e.date <= today).reduce((s, e) => s + e.doseMg, 0);
     return Math.round(total * 100) / 100;
   }
 
-  // Averages the non-null, strictly positive calories in the given list (defaults
-  // to every entry). Pass a windowed subset (see getWindowedEntries) to scope
-  // the average to the same all/7d/30d/60d/90d window as the trend calculation.
-  function getAvgCalories(list) {
-    let src = list || entries;
-    let entriesWithCal = src.filter(e => typeof e.calories === "number" && !isNaN(e.calories) && e.calories > 0);
-    if (entriesWithCal.length > 0) {
-      let sum = entriesWithCal.reduce((acc, e) => acc + e.calories, 0);
-      return Math.round(sum / entriesWithCal.length);
-    }
-    return avgCalories || 0;
+  // ==========================================================================
+  // RENDERING
+  // ==========================================================================
+  function renderAll() {
+    const m = model();
+    document.body.classList.toggle("no-tirz", !tirzepatideEnabled());
+    $("appTitle").textContent = profile.name ? `${profile.name}'s Weight Tracker & Projections` : "Weight Tracker & Projections";
+    $("weightInputLabel").textContent = `Weight, ${unit}`;
+    $("weightInput").placeholder = unit === "kg" ? "e.g. 84.1" : "e.g. 185.4";
+    $("goalInput").placeholder = unit === "kg" ? "e.g. 68" : "e.g. 150";
+    const custom = customRate();
+    $("customRateValue").textContent = `${custom > 0 ? "+" : ""}${custom}%`;
+    renderHistory(m);
+    renderUpcomingDoses();
+    renderStats(m);
+    renderGoals(m);
+    renderChart(m);
   }
 
-  // Returns entries falling within the selected Current Trend window (all/7d/30d/60d/90d),
-  // anchored to the most recent weigh-in date — the same anchor the trend regression
-  // uses. This is what lets "30d" on Current Trend also scope the calorie average and
-  // TDEE, not just the fitted rate.
-  function getWindowedEntries() {
-    if (!entries.length) return [];
-    let wEntries = weightEntries();
-    let anchorDate = wEntries.length ? wEntries[wEntries.length - 1].date : entries[entries.length - 1].date;
-    let bounded = entries.filter(e => e.date <= anchorDate);
-    if (trendWindow === "all") return bounded;
-    let days = parseInt(trendWindow, 10);
-    return bounded.filter(e => daysBetween(e.date, anchorDate) <= days);
-  }
+  function renderHistory({ w, dir }) {
+    const today = todayStr();
+    // Future dose-only entries are listed under Upcoming Doses instead.
+    const visible = entries.filter(e => e.date <= today || hasWeight(e)).reverse();
+    $("historyWrap").hidden = !visible.length;
+    $("historyEmpty").hidden = visible.length > 0;
+    $("trackedSpanNote").textContent = w.length < 2 ? "" :
+      `Tracked span: ${(daysBetween(w[0].date, w[w.length - 1].date) / 30.44).toFixed(1)} mo (${fmtDate(w[0].date)} – ${fmtDate(w[w.length - 1].date)})`;
+    if (!visible.length) return;
 
-  // Checks if a goal has been reached chronologically, and returns the date of occurrence
-  function getGoalReachedDate(goalWeight) {
-    let wEntries = weightEntries();
-    if (!wEntries.length) return null;
-    let startW = wEntries[0].weight;
-    let match;
-    // Handle both weight loss and weight gain tracking paths
-    if (goalWeight <= startW) match = wEntries.find(e => e.weight <= goalWeight);
-    else match = wEntries.find(e => e.weight >= goalWeight);
-    return match ? match.date : null;
-  }
-
-  // ============================================================================
-  // CORE STATISTICS & REGRESSION
-  // ============================================================================
-  
-  // Filters entries based on the user's selected trend window (All, 7d, 30d, 60d, etc.)
-  function getTrendEntries() {
-    let wEntries = weightEntries();
-    if (!wEntries.length || trendWindow === "all") return wEntries;
-    let days = parseInt(trendWindow, 10);
-    let lastDate = wEntries[wEntries.length - 1].date;
-    return wEntries.filter(e => daysBetween(e.date, lastDate) <= days);
-  }
-
-  /**
-   * Computes the trend line using logarithmic (exponential) regression to find the
-   * constant percentage rate of change per week.
-   * Model: y = A * (1 - rate)^t => ln(y) = ln(A) + t * ln(1 - rate)
-   * This provides a smoother, more realistic curve for human bodyweight changes
-   * than a standard linear regression (which assumes constant absolute lb/kg loss).
-   * Returns the signed fractional weekly rate: positive means net loss over the
-   * subset, negative means net gain.
-   */
-  function computeTrendForEntries(subset) {
-    if (subset.length < 2) return null;
-    let t0 = subset[0].date;
-    let n = subset.length;
-    let sumT = 0, sumY = 0, sumTT = 0, sumTY = 0;
-
-    for (let i = 0; i < n; i++) {
-      let t = daysBetween(t0, subset[i].date) / 7; // Convert days to weeks for standard rate formatting
-      let y = Math.log(subset[i].weight);
-      sumT += t; sumY += y; sumTT += t * t; sumTY += t * y;
-    }
-
-    let denom = (n * sumTT - sumT * sumT);
-    if (Math.abs(denom) < 1e-9) return null;
-
-    let m = (n * sumTY - sumT * sumY) / denom; // Slope in log space
-    return 1 - Math.exp(m); // Convert back to fractional weekly rate of change
-  }
-
-  function computeTrend() {
-    return computeTrendForEntries(getTrendEntries());
-  }
-
-  // Always the last 90 days regardless of the Current Trend window selector —
-  // used only to pick a starting gain/lose default for the Projection
-  // settings toggle before the user has chosen one explicitly.
-  function computeTrend90() {
-    let wEntries = weightEntries();
-    if (!wEntries.length) return null;
-    let lastDate = wEntries[wEntries.length - 1].date;
-    return computeTrendForEntries(wEntries.filter(e => daysBetween(e.date, lastDate) <= 90));
-  }
-
-  // Defaults to "gain" only when the last 90 days show a clear net gain;
-  // no data, too little data, or a net loss/flat trend all default to "lose",
-  // matching the app's original loss-oriented defaults (DEFAULT_GOALS, etc.).
-  function getDefaultGoalDirection() {
-    let rate = computeTrend90();
-    return (rate !== null && rate < 0) ? "gain" : "lose";
-  }
-
-  function compute7DayAvg() {
-    let wEntries = weightEntries();
-    if (!wEntries.length) return null;
-    let lastDate = wEntries[wEntries.length - 1].date;
-    let recent = wEntries.filter(e => daysBetween(e.date, lastDate) <= 6);
-    if (!recent.length) return null;
-    let sum = recent.reduce((a, b) => a + b.weight, 0);
-    return sum / recent.length;
-  }
-
-  /**
-   * Calculates the estimated time to target weight using exponential decay.
-   * If rate <= 0, or if the direction is opposite of the goal, it gracefully handles failure states.
-   */
-  function computeGoalETA(goalWeight, currentWeight, rate, lastDate) {
-    if (rate === null || rate === 0) return { status: "flat" };
-    let alreadyThere = rate > 0 ? goalWeight >= currentWeight : goalWeight <= currentWeight;
-    if (alreadyThere) return { status: "reached" };
-    
-    // t = ln(target/current) / ln(1 - rate)
-    let t = Math.log(goalWeight / currentWeight) / Math.log(1 - rate);
-    if (!isFinite(t) || t <= 0) return { status: "unreachable" };
-    
-    return { status: "projected", weeks: t, date: addDays(lastDate, Math.round(t * 7)) };
-  }
-
-  // Projects a single future weight `weeks` out along the exponential curve,
-  // used by the 1/3/6/12-month preview row.
-  function projectWeightAfterWeeks(startWeight, weeklyRateFraction, weeks) {
-    return startWeight * Math.pow(1 - weeklyRateFraction, weeks);
-  }
-
-  // Extracts the specific rate being used based on UI toggle (Fitted Trend vs Custom Rate).
-  // The slider itself is signed (negative = lose, positive = gain), which is
-  // the opposite of the internal fractional-rate convention (positive = lose),
-  // so its value is negated here.
-  function getEffectiveRate(trendRate) {
-    if (rateMode === "trend") return trendRate !== null ? trendRate : 0;
-    let custom = parseFloat(document.getElementById("customRate").value);
-    if (isNaN(custom)) return 0;
-    return -custom / 100;
-  }
-
-  // ============================================================================
-  // ONE-TIME PROFILE INFO (name, and any future one-time fields)
-  // ============================================================================
-
-  // Shows the "Get Started" section only for fields not yet answered — a
-  // required field counts as answered once it has a value; an optional field
-  // counts as answered once it's been asked, even if left blank. Pass
-  // forceAll=true to show every field pre-filled with its current value, for
-  // editing later via Developer Mode's "Edit start-up info" button.
-  function renderOneTimeInfo(forceAll) {
-    let section = document.getElementById("oneTimeInfoSection");
-    let fieldsToShow = forceAll ? ONE_TIME_FIELDS : ONE_TIME_FIELDS.filter(f =>
-      f.optional ? !profile[`${f.key}Asked`] : !String(profile[f.key] || "").trim()
-    );
-
-    if (!fieldsToShow.length) {
-      section.style.display = "none";
-      return;
-    }
-
-    section.style.display = "block";
-    document.getElementById("oneTimeInfoCancelBtn").style.display = forceAll ? "inline-block" : "none";
-    let wrap = document.getElementById("oneTimeInfoFields");
-    wrap.innerHTML = fieldsToShow.map(f => {
-      if (f.type === "boolean") {
-        let current = typeof profile[f.key] === "boolean" ? profile[f.key] : !!f.default;
-        return `
-          <div>
-            <label>${f.label}</label>
-            <div class="mode-toggle" id="oneTimeInput_${f.key}" data-value="${current}">
-              <button type="button" class="mode-btn${current ? ' active' : ''}" data-bool="true">Yes</button>
-              <button type="button" class="mode-btn${!current ? ' active' : ''}" data-bool="false">No</button>
-            </div>
-          </div>
-        `;
-      }
-      if (f.type === "select") {
-        let current = f.options.some(o => o.value === profile[f.key]) ? profile[f.key] : f.default;
-        return `
-          <div>
-            <label>${f.label}</label>
-            <div class="mode-toggle" id="oneTimeInput_${f.key}" data-value="${current}">
-              ${f.options.map(o => `<button type="button" class="mode-btn${current === o.value ? ' active' : ''}" data-select="${o.value}">${o.label}</button>`).join('')}
-            </div>
-          </div>
-        `;
-      }
-      return `
-        <div>
-          <label for="oneTimeInput_${f.key}">${f.label}</label>
-          <input type="${f.type || 'text'}" id="oneTimeInput_${f.key}" placeholder="${f.placeholder}" value="${String(profile[f.key] || "").replace(/"/g, "&quot;")}">
-        </div>
-      `;
-    }).join('');
-
-    // Boolean and select fields render as a mode-toggle rather than an <input>,
-    // so their current selection is tracked in a data-value attribute instead.
-    wrap.querySelectorAll('.mode-toggle[id^="oneTimeInput_"]').forEach(toggle => {
-      toggle.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener("click", () => {
-          toggle.querySelectorAll('button').forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          toggle.dataset.value = btn.getAttribute("data-bool") || btn.getAttribute("data-select");
-        });
-      });
-    });
-  }
-
-  // Updates the unit-dependent labels/placeholders outside the Get Started
-  // section (History, Add Entry, etc. read `unit` directly at render time).
-  function updateUnitLabels() {
-    document.getElementById("weightInputLabel").textContent = `Weight, ${unit}`;
-    document.getElementById("weightInput").placeholder = unit === "kg" ? "e.g. 84.1" : "e.g. 185.4";
-    document.getElementById("goalInput").placeholder = unit === "kg" ? "e.g. 68" : "e.g. 150";
-  }
-
-  // Applies the current profile name to the on-screen header, e.g.
-  // "Jordan's Weight Tracker & Projections", falling back to the plain
-  // title until a name has been entered.
-  function updateHeaderTitle() {
-    let titleEl = document.getElementById("appTitleText");
-    titleEl.textContent = profile.name ? `${profile.name}'s Weight Tracker & Projections` : "Weight Tracker & Projections";
-  }
-
-  // Whether to show any Tirzepatide-related UI at all — the Add Entry dose
-  // field, the History Dose column, and Upcoming Doses. Defaults to shown
-  // (true) until the person explicitly answers "No" at start-up; existing
-  // dose data already logged is never deleted by this, only hidden.
-  function tirzepatideEnabled() {
-    return profile.usesTirzepatide !== false;
-  }
-
-  // Shows/hides the Tirzepatide-related chrome that isn't already gated by
-  // its own render function (Upcoming Doses and the History Dose column
-  // handle themselves). Called after start-up info changes.
-  function applyTirzepatideVisibility() {
-    let enabled = tirzepatideEnabled();
-    document.getElementById("doseFieldWrap").style.display = enabled ? "" : "none";
-  }
-
-  // ============================================================================
-  // RENDERING & DOM UPDATES
-  // ============================================================================
-  
-  // Small footnote in the History section showing total tracked span across all
-  // logged weigh-ins (always all-time, independent of the Current Trend window).
-  function renderTrackedSpanNote() {
-    let note = document.getElementById("trackedSpanNote");
-    let wEntries = weightEntries();
-
-    if (wEntries.length < 2) {
-      note.textContent = "";
-      return;
-    }
-    let spanDays = daysBetween(wEntries[0].date, wEntries[wEntries.length - 1].date);
-    let months = spanDays / 30.44; // average month length, keeps this in sync with the mo units used in the projection preview
-    note.textContent = `Tracked span: ${months.toFixed(1)} mo (${fmtDate(wEntries[0].date)} \u2013 ${fmtDate(wEntries[wEntries.length - 1].date)})`;
-  }
-
-  function renderHistory() {
-    let body = document.getElementById("historyBody");
-    let wrap = document.getElementById("historyWrap");
-    let empty = document.getElementById("historyEmpty");
-    body.innerHTML = "";
-
-    let showDose = tirzepatideEnabled();
-    document.getElementById("doseColHeader").style.display = showDose ? "" : "none";
-
-    // History only ever shows today-or-past entries — future-dated entries (e.g.
-    // scheduled doses) live in Upcoming Tirzepatide Doses instead, not here.
-    let todayStr = new Date().toISOString().slice(0, 10);
-    let visible = entries
-      .map((e, i) => ({ e: e, i: i }))
-      .filter(x => x.e.date <= todayStr);
-
-    if (!visible.length) {
-      wrap.style.display = "none";
-      empty.style.display = "block";
-      renderTrackedSpanNote();
-      return;
-    }
-    wrap.style.display = "block";
-    empty.style.display = "none";
-    renderTrackedSpanNote();
-
-    // Standard pagination logic (reversed so newest dates appear first)
-    let totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
-    if (currentPage > totalPages) currentPage = totalPages;
-
-    let startK = (currentPage - 1) * PAGE_SIZE;
-    let endK = Math.min(startK + PAGE_SIZE, visible.length);
-
-    for (let k = startK; k < endK; k++) {
-      let { e, i } = visible[visible.length - 1 - k];
-      let prev = i > 0 ? entries[i - 1] : null;
-      
-      let hasWeight = typeof e.weight === "number" && !isNaN(e.weight);
-      let prevHasWeight = prev && typeof prev.weight === "number" && !isNaN(prev.weight);
-
-      let change = (hasWeight && prevHasWeight) ? (e.weight - prev.weight) : 0;
-      let changeStr = (hasWeight && prevHasWeight) ? (change <= 0 ? "" : "+") + change.toFixed(1) + " " + unit : "&mdash;";
-      let isNetLoss = change < 0;
-      let isNetGain = change > 0;
-      let changeClass = (isNetLoss || isNetGain)
-        ? ((currentGoalDirection() === "gain") === isNetGain ? "good" : "bad")
-        : "";
-      let weightStr = hasWeight ? `${e.weight.toFixed(1)} ${unit}` : "&mdash;";
-      let calStr = (e.calories !== undefined && e.calories !== null) ? e.calories : "&mdash;";
-      let doseStr = (typeof e.doseMg === "number" && !isNaN(e.doseMg)) ? `${e.doseMg} mg` : "&mdash;";
-
-      let tr = document.createElement("tr");
-      tr.innerHTML = `
+    const pages = Math.ceil(visible.length / PAGE_SIZE);
+    currentPage = Math.min(Math.max(currentPage, 1), pages);
+    const prevWeight = new Map(w.map((e, i) => [e.date, i ? w[i - 1].weight : null])); // change vs last weigh-in
+    $("historyBody").innerHTML = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map(e => {
+      const prev = hasWeight(e) ? prevWeight.get(e.date) : null;
+      const change = prev === null ? null : e.weight - prev;
+      const cls = change ? ((dir === "gain") === (change > 0) ? "good" : "bad") : "";
+      return `<tr>
         <td>${fmtDate(e.date)}</td>
-        <td>${weightStr}</td>
-        <td class="${changeClass}">${changeStr}</td>
-        <td>${calStr}</td>
-        <td${showDose ? '' : ' style="display:none;"'}>${doseStr}</td>
-        <td><button class="danger" data-idx="${i}">Delete</button></td>
-      `;
-      body.appendChild(tr);
-    }
-
-    // Pagination controls
-    document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages} (${visible.length} entries)`;
-    document.getElementById("prevPageBtn").disabled = (currentPage === 1);
-    document.getElementById("nextPageBtn").disabled = (currentPage === totalPages);
-
-    // Delete event binding via event delegation
-    body.querySelectorAll("button.danger").forEach(btn => {
-      btn.addEventListener("click", () => {
-        entries.splice(parseInt(btn.getAttribute("data-idx"), 10), 1);
-        saveData();
-        renderAll();
-      });
-    });
+        <td>${hasWeight(e) ? `${e.weight.toFixed(1)} ${unit}` : "&mdash;"}</td>
+        <td class="${cls}">${change === null ? "&mdash;" : `${change > 0 ? "+" : ""}${change.toFixed(1)} ${unit}`}</td>
+        <td class="tirz">${hasDose(e) ? `${e.doseMg} mg` : "&mdash;"}</td>
+        <td><button class="danger" data-date="${e.date}">Delete</button></td>
+      </tr>`;
+    }).join("");
+    $("pageInfo").textContent = `Page ${currentPage} of ${pages} (${visible.length} entries)`;
+    $("prevPageBtn").disabled = currentPage === 1;
+    $("nextPageBtn").disabled = currentPage === pages;
   }
 
   function renderUpcomingDoses() {
-    let section = document.getElementById("upcomingDosesSection");
-    let grid = document.getElementById("upcomingDosesGrid");
-
-    if (!tirzepatideEnabled()) {
-      section.style.display = "none";
-      return;
-    }
-
-    let upcoming = getUpcomingDoses();
-    let lastKnown = getLastKnownDose();
-
-    if (!upcoming.length && !lastKnown) {
-      section.style.display = "none";
-      return;
-    }
-    section.style.display = "block";
-
-    let lastKnownHtml = lastKnown ? `
-      <div class="stat upcoming-dose">
-        <div class="val">${lastKnown.doseMg} mg</div>
-        <div class="lbl">Last dose taken &middot; ${fmtDate(lastKnown.date)}</div>
-      </div>
-    ` : "";
-
-    grid.innerHTML = lastKnownHtml + upcoming.map(e => `
-      <div class="stat upcoming-dose">
+    const today = todayStr();
+    const upcoming = entries.filter(e => hasDose(e) && e.date >= today).slice(0, MAX_UPCOMING_DOSES);
+    const past = entries.filter(e => e.date <= today);
+    // History's first page only shows the latest entries; if none of those has
+    // a dose, show the last one taken so it's never out of sight.
+    const last = past.slice(-PAGE_SIZE).some(hasDose) ? null : past.filter(hasDose).pop();
+    $("upcomingDosesSection").hidden = !upcoming.length && !last;
+    $("upcomingDosesGrid").innerHTML =
+      (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken &middot; ${fmtDate(last.date)}</div></div>` : "") +
+      upcoming.map(e => `<div class="stat">
         <button class="subtle-remove" data-dose-date="${e.date}" title="Remove this dose" aria-label="Remove upcoming dose">&times;</button>
-        <div class="val">${e.doseMg} mg</div>
-        <div class="lbl">${fmtDate(e.date)}</div>
-      </div>
-    `).join('');
-
-    // Deleting an upcoming dose only clears the dose field — if that was the
-    // only thing logged on that date, the now-empty entry is dropped too.
-    grid.querySelectorAll(".subtle-remove").forEach(btn => {
-      btn.addEventListener("click", () => {
-        let d = btn.getAttribute("data-dose-date");
-        let idx = entries.findIndex(e => e.date === d);
-        if (idx === -1) return;
-        entries[idx].doseMg = null;
-        if (entries[idx].weight === null && entries[idx].calories === null && entries[idx].doseMg === null) {
-          entries.splice(idx, 1);
-        }
-        saveData();
-        renderAll();
-      });
-    });
+        <div class="val">${e.doseMg} mg</div><div class="lbl">${fmtDate(e.date)}</div>
+      </div>`).join("");
   }
 
-  function renderStats(trendRate) {
-    let section = document.getElementById("statsSection");
-    let wEntries = weightEntries();
-    if (wEntries.length < 2) {
-      section.style.display = "none";
-      return;
-    }
-    section.style.display = "block";
-
-    // 1. Render Fitted Weekly Rate
-    let rateEl = document.getElementById("statRate");
-    if (trendRate === null) {
+  function renderStats({ w, trend, dir }) {
+    $("statsSection").hidden = w.length < 2;
+    if (w.length < 2) return;
+    const rateEl = $("statRate");
+    if (trend === null) {
       rateEl.textContent = "n/a";
       rateEl.className = "val";
     } else {
-      let pct = trendRate * 100;
-      let isNetLoss = pct >= 0;
-      rateEl.textContent = (isNetLoss ? "-" : "+") + Math.abs(pct).toFixed(2) + "%/wk";
-      rateEl.className = "val " + ((currentGoalDirection() === "gain") === !isNetLoss ? "good" : "bad");
+      const losing = trend >= 0;
+      rateEl.textContent = `${losing ? "-" : "+"}${Math.abs(trend * 100).toFixed(2)}%/wk`;
+      rateEl.className = "val " + ((dir === "gain") !== losing ? "good" : "bad");
     }
-
-    // 2. Render 7-day rolling avg (always based on the most recent week, regardless of window)
-    let avg7 = compute7DayAvg();
-    document.getElementById("stat7DayAvg").textContent = avg7 ? `${avg7.toFixed(1)} ${unit}` : "&mdash;";
-
-    // 3. Render Estimated TDEE
-    // Calculation: TDEE = Avg Intake + Daily Caloric Deficit
-    // (A 1 lb weekly deficit implies ~500 cal/day burn; ~1102 cal/day per kg)
-    // Both the avg intake and TDEE are scoped to the same all/7d/30d/60d/90d window
-    // selected above, so switching windows updates these numbers too.
-    let windowed = getWindowedEntries();
-    let computedAvgCal = getAvgCalories(windowed);
-    let avgCalEl = document.getElementById("avgCalorieDisplay");
-    let tdeeEl = document.getElementById("tdeeResult");
-
-    if (computedAvgCal > 0) {
-      avgCalEl.textContent = `${computedAvgCal} kcal/day`;
-    } else {
-      avgCalEl.textContent = "&mdash;";
-    }
-
-    if (computedAvgCal > 0 && trendRate !== null) {
-      let curW = wEntries[wEntries.length - 1].weight;
-      let weeklyChange = curW * trendRate;
-      // 3500 kcal per lb of body weight, scaled to 3500 * LB_PER_KG kcal/kg when in kg.
-      let kcalPerUnitPerWeek = unit === "kg" ? 3500 * LB_PER_KG : 3500;
-      let dailyDeficit = weeklyChange * (kcalPerUnitPerWeek / 7);
-      let tdee = Math.round(computedAvgCal + dailyDeficit);
-      tdeeEl.textContent = `${tdee} kcal/day`;
-    } else {
-      tdeeEl.textContent = "&mdash; kcal/day";
-    }
+    $("stat7DayAvg").textContent = `${mean(lastDays(w, 6).map(e => e.weight)).toFixed(1)} ${unit}`;
   }
 
-  function renderGoals(trendRate) {
-    let section = document.getElementById("goalsSection");
-    let wEntries = weightEntries();
-    if (!wEntries.length) {
-      section.style.display = "none";
-      return;
+  function renderGoals({ w, rate, dir, goals: sorted }) {
+    $("goalsSection").hidden = !w.length;
+    if (!w.length) return;
+    const last = w[w.length - 1];
+    $("goalsRateNote").textContent = rateMode === "trend"
+      ? `Using the fitted trend from the ${trendWindow === "all" ? "all-time" : trendWindow + "d"} window (set above in Current Trend).`
+      : `Using the custom weekly rate above, applied toward your goal to ${dir} weight.`;
+
+    // Projected weight 1/3/6/12 months out at the selected rate.
+    $("futureWeightGrid").innerHTML = [1, 3, 6, 12].map(months => {
+      const weeks = Math.round(months * 4.345);
+      const v = last.weight * Math.pow(1 - rate, weeks);
+      return `<div class="stat">
+        <div class="val">${isPos(v) ? `${v.toFixed(1)} ${unit}` : "&mdash;"}</div>
+        <div class="lbl">${months} mo${isPos(v) ? ` &bull; ${fmtDateShort(addDays(last.date, weeks * 7))}` : ""}</div>
+      </div>`;
+    }).join("");
+
+    $("goalsBody").innerHTML = !sorted.length
+      ? `<tr><td colspan="4" class="empty-msg">No goals added yet.</td></tr>`
+      : sorted.map(g => {
+        const s = goalStatus(g, w, rate);
+        const [label, eta] =
+          s.status === "reached" ? ["Reached", fmtDate(s.date)] :
+          s.status === "projected" ? ["In progress", `${s.weeks.toFixed(1)} wks (${fmtDate(s.date)})`] :
+          s.status === "flat" ? ["Flat rate", "Requires active rate"] :
+          ["Wrong direction", "Moving away"];
+        return `<tr>
+          <td>${g.toFixed(1)} ${unit}</td>
+          <td><span class="badge ${s.status}">${label}</span></td>
+          <td>${eta}</td>
+          <td><button class="danger" data-goal="${g}">Remove</button></td>
+        </tr>`;
+      }).join("");
+  }
+
+  // Weigh-in history plus lines for goals not yet reached, as inline SVG.
+  function renderChart({ w }) {
+    $("chartSection").hidden = !w.length;
+    if (!w.length) return;
+    const W = 640, H = 320, padL = 45, padR = 20, padT = 20, padB = 35;
+    const innerW = W - padL - padR, innerH = H - padT - padB;
+    const active = goals.filter(g => !reachedDate(g, w));
+    let [min, max] = extent(w.map(e => e.weight).concat(active));
+    if (min === max) { min -= 1; max += 1; }
+    const pad = (max - min) * 0.1;
+    min -= pad;
+    max += pad;
+    const first = w[0].date, total = Math.max(1, daysBetween(first, w[w.length - 1].date));
+    const x = d => padL + daysBetween(first, d) / total * innerW;
+    const y = v => padT + (1 - (v - min) / (max - min)) * innerH;
+
+    const parts = [];
+    for (let i = 0; i <= 4; i++) {
+      const v = min + i / 4 * (max - min), yy = y(v);
+      parts.push(`<line class="grid" x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}"/><text x="${padL - 6}" y="${yy + 3}" text-anchor="end">${v.toFixed(0)}</text>`);
     }
-    section.style.display = "block";
-
-    let body = document.getElementById("goalsBody");
-    body.innerHTML = "";
-    let current = wEntries[wEntries.length - 1].weight;
-    let lastDate = wEntries[wEntries.length - 1].date;
-    let effectiveRate = getEffectiveRate(trendRate);
-
-    let windowLabel = trendWindow === "all" ? "all-time" : `${trendWindow}d`;
-    let directionLabel = currentGoalDirection() === "gain" ? "gain weight" : "lose weight";
-    document.getElementById("goalsRateNote").textContent =
-      rateMode === "trend"
-        ? `Using the fitted trend from the ${windowLabel} window (set above in Current Trend).`
-        : `Using the custom weekly rate above, applied toward your goal to ${directionLabel}.`;
-
-    renderFutureWeightGrid(current, effectiveRate, lastDate);
-
-    if (!goals.length) {
-      body.innerHTML = "<tr><td colspan='4' class='empty-msg'>No goals added yet.</td></tr>";
-      return;
-    }
-
-    // Evaluate state and generate table elements for each goal
-    goals.forEach((g, idx) => {
-      let res = computeGoalETA(g, current, effectiveRate, lastDate);
-      let statusHtml, etaHtml;
-
-      if (res.status === "reached") {
-        statusHtml = "<span class='badge reached'>Reached</span>";
-        let reachedDate = getGoalReachedDate(g);
-        etaHtml = reachedDate ? fmtDate(reachedDate) : "&mdash;";
-      } else if (res.status === "flat") {
-        statusHtml = "<span class='badge flat'>Flat rate</span>";
-        etaHtml = "Requires active rate";
-      } else if (res.status === "unreachable") {
-        statusHtml = "<span class='badge unreachable'>Wrong direction</span>";
-        etaHtml = "Moving away";
-      } else {
-        statusHtml = "<span class='badge projected'>In progress</span>";
-        etaHtml = `${res.weeks.toFixed(1)} wks (${fmtDate(res.date)})`;
-      }
-
-      let tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${g.toFixed(1)} ${unit}</td>
-        <td>${statusHtml}</td>
-        <td>${etaHtml}</td>
-        <td><button class="danger" data-goal-idx="${idx}">Remove</button></td>
-      `;
-      body.appendChild(tr);
+    const dates = axisDates(first, total);
+    dates.forEach((d, i) => {
+      const anchor = i === 0 ? "start" : i === dates.length - 1 ? "end" : "middle";
+      parts.push(`<text x="${x(d)}" y="${H - 10}" text-anchor="${anchor}">${fmtDate(d)}</text>`);
     });
-
-    body.querySelectorAll("button.danger").forEach(btn => {
-      btn.addEventListener("click", () => {
-        goals.splice(parseInt(btn.getAttribute("data-goal-idx"), 10), 1);
-        saveData();
-        renderAll();
-      });
+    active.forEach(g => {
+      const gy = y(g), right = W - padR - 4;
+      parts.push(`<line class="goal" x1="${padL}" y1="${gy.toFixed(1)}" x2="${W - padR}" y2="${gy.toFixed(1)}"/>`,
+        `<rect class="goal-tag" x="${right - 64}" y="${gy - 8}" width="64" height="16" rx="4"/>`,
+        `<text class="goal-label" x="${right - 32}" y="${gy + 3}" text-anchor="middle">Goal: ${g.toFixed(0)} ${unit}</text>`);
     });
+    const pts = w.map(e => [x(e.date).toFixed(1), y(e.weight).toFixed(1)]);
+    parts.push(`<path class="line" d="M${pts.map(p => p.join(",")).join(" L")}"/>`);
+    pts.forEach(([cx, cy]) => parts.push(`<circle cx="${cx}" cy="${cy}" r="2.5"/>`));
+    $("chartSvg").innerHTML = parts.join("");
   }
 
-  // Single row showing projected weight at 1/3/6/12 months out, using whichever
-  // rate (fitted trend or custom) is currently selected above. Replaces the old
-  // "months to project" number input with an at-a-glance preview.
-  function renderFutureWeightGrid(currentWeight, effectiveRate, lastDate) {
-    let grid = document.getElementById("futureWeightGrid");
-    let months = [1, 3, 6, 12];
-    grid.innerHTML = months.map(m => {
-      let weeks = Math.round(m * 4.345);
-      let projected = projectWeightAfterWeeks(currentWeight, effectiveRate, weeks);
-      let display = (isFinite(projected) && projected > 0) ? `${projected.toFixed(1)} ${unit}` : "&mdash;";
-      
-      // Calculate the projected date based on the baseline
-      let projDate = addDays(lastDate, Math.round(weeks * 7));
-      let dateDisplay = (isFinite(projected) && projected > 0) ? fmtDateShort(projDate) : "";
-
-      return `
-        <div class="stat">
-          <div class="val">${display}</div>
-          <div class="lbl">${m} mo ${dateDisplay ? `&bull; ${dateDisplay}` : ''}</div>
-        </div>
-      `;
-    }).join('');
+  // Shows the unanswered start-up questions — or all of them, prefilled, when
+  // editing from Developer Mode.
+  function renderOneTimeInfo(editAll) {
+    const fields = ONE_TIME_FIELDS.filter(f => editAll || (f.optional ? !profile[f.key + "Asked"] : !String(profile[f.key] || "").trim()));
+    $("oneTimeInfoSection").hidden = !fields.length;
+    $("oneTimeInfoCancelBtn").hidden = !editAll;
+    $("oneTimeInfoFields").innerHTML = fields.map(f => {
+      const id = "oneTimeInput_" + f.key;
+      if (f.type === "text") return `<div><label for="${id}">${f.label}</label><input type="text" id="${id}" placeholder="${f.placeholder}"></div>`;
+      // Choices render as a button toggle; the pick is kept in data-value.
+      const options = f.type === "boolean" ? [[true, "Yes"], [false, "No"]] : f.options.map(o => [o, o]);
+      const current = options.some(([v]) => v === profile[f.key]) ? profile[f.key] : f.default;
+      return `<div><label>${f.label}</label><div class="mode-toggle" id="${id}" data-value="${current}">${
+        options.map(([v, text]) => `<button type="button" class="mode-btn${v === current ? " active" : ""}" data-value="${v}">${text}</button>`).join("")
+      }</div></div>`;
+    }).join("");
+    fields.filter(f => f.type === "text").forEach(f => { $("oneTimeInput_" + f.key).value = profile[f.key] || ""; });
   }
 
-  // ============================================================================
-  // GOAL PROGRESS IMAGE EXPORT (PNG)
-  // ============================================================================
-  // Renders a portrait share-card — title, a minimal trend line (no goal lines,
-  // just the actual weigh-in history), and the goal table — onto an offscreen
-  // canvas, then saves it as a PNG. Colors are pulled directly from the app's
-  // light-theme CSS variables and .badge classes so the export reads as a
-  // clean extension of the app itself, not a separate look. Width is fixed at
-  // 1080px; height is derived from the goal count and clamped to 1350-1920px.
-
-  // Rounded-rect path helper (manual, for broad canvas support)
+  // ==========================================================================
+  // PROGRESS IMAGE EXPORT (PNG)
+  // ==========================================================================
+  // A portrait share card: title, a minimal weigh-in curve, and the goal table,
+  // in the app's light-theme colors. 1080px wide; 1350-1920px tall, growing
+  // past that only when there are too many goals to fit.
   function roundRectPath(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -1749,501 +847,226 @@
     ctx.closePath();
   }
 
-  // Draws a smooth curve through `pts` on the canvas's *current* path (caller
-  // must beginPath() first) using the midpoint/quadratic-curve technique —
-  // avoids sharp joints without needing a charting library.
+  // Smooth curve through pts (midpoint quadratic technique) on the current path.
   function tracePath(ctx, pts) {
     ctx.moveTo(pts[0].x, pts[0].y);
-    // Loop stops one point earlier than the last midpoint segment so the
-    // closing curve below isn't drawn twice through the same control point —
-    // that double-draw was what made the curve look pinched/discontinuous
-    // near the end, especially with only a few points.
     for (let i = 1; i < pts.length - 2; i++) {
-      let mx = (pts[i].x + pts[i + 1].x) / 2;
-      let my = (pts[i].y + pts[i + 1].y) / 2;
-      ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+      ctx.quadraticCurveTo(pts[i].x, pts[i].y, (pts[i].x + pts[i + 1].x) / 2, (pts[i].y + pts[i + 1].y) / 2);
     }
     if (pts.length > 1) {
-      let last = pts[pts.length - 1], prev = pts[pts.length - 2];
+      const last = pts[pts.length - 1], prev = pts[pts.length - 2];
       ctx.quadraticCurveTo(prev.x, prev.y, last.x, last.y);
     }
   }
 
-  function drawPill(ctx, text, x, midY, bg, textColor) {
-    ctx.font = "600 22px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
-    let padX = 16;
-    let pillW = ctx.measureText(text).width + padX * 2;
-    let pillH = 38;
-    roundRectPath(ctx, x, midY - pillH / 2, pillW, pillH, pillH / 2);
-    ctx.fillStyle = bg;
-    ctx.fill();
-    ctx.fillStyle = textColor;
-    ctx.textAlign = "left";
-    ctx.fillText(text, x + padX, midY + 7);
-  }
-
-  async function exportGoalsImage() {
-    let wEntries = weightEntries();
-    if (!wEntries.length) {
-      alert("Add at least one weigh-in before exporting your progress.");
-      return;
-    }
-
-    let filename = `weight-progress-${new Date().toISOString().slice(0, 10)}.png`;
-
-    // Ask where to save right away, while the click's user-activation is still
-    // fresh — Chromium/Edge support a native save dialog via this API. Browsers
-    // without it (Firefox, Safari) fall through to a normal download below,
-    // which still lets the person choose a folder if their browser is set to
-    // "always ask where to save files".
-    let fileHandle = null;
-    if (window.showSaveFilePicker) {
-      try {
-        fileHandle = await window.showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ description: "PNG image", accept: { "image/png": [".png"] } }]
-        });
-      } catch (err) {
-        if (err.name === "AbortError") return; // person cancelled the save dialog
-        console.warn("Save picker unavailable, falling back to a direct download.", err);
-        fileHandle = null;
-      }
-    }
-
+  function drawReport({ w, rate, goals: list }) {
     const FONT = "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
-    const W = 1080;
-    const PAD_X = 90;
-    const trendRate = computeTrend();
-    const effectiveRate = getEffectiveRate(trendRate);
-    const current = wEntries[wEntries.length - 1].weight;
-    const lastDate = wEntries[wEntries.length - 1].date;
-    const goalList = goals || [];
-
-    // --- Layout: fixed blocks + goal rows, clamped to a 1350-1920 tall canvas ---
-    const topPad = 96, titleH = 66;
-    // Chart and goal table both live inside one card (see "Chart + goal-table
-    // card" below); cardPadTop/cardPadBottom are the padding *inside* that
-    // card, chartToTableGap is the internal gap between the two, and
-    // cardToFooterGap/bottomPad are the room *outside* the card for the
-    // footer disclaimer, which stays off the frame.
-    const chartGapTop = 56, cardPadTop = 44, chartH = 540, chartToTableGap = 96;
+    const TEXT = "#1f2430", MUTED = "#6b7280", BORDER = "#dcdfe4", ACCENT = "#2563eb";
+    const last = w[w.length - 1];
+    const W = 1080, PAD_X = 90;
+    const topPad = 96, titleH = 66, chartGapTop = 56, cardPadTop = 44, chartH = 540, chartToTableGap = 96;
     const tableHeaderH = 56, cardPadBottom = 48, cardToFooterGap = 64, bottomPad = 40;
-    const n = Math.max(goalList.length, 1);
+    const n = Math.max(list.length, 1);
     const fixedH = topPad + titleH + chartGapTop + cardPadTop + chartH + chartToTableGap + tableHeaderH + cardPadBottom + cardToFooterGap + bottomPad;
     let rowH = Math.min(112, Math.max(58, Math.round((1650 - fixedH) / n)));
     let H = Math.min(1920, Math.max(1350, Math.round(fixedH + rowH * n)));
     rowH = Math.max(50, Math.floor((H - fixedH) / n));
+    H = Math.max(H, fixedH + rowH * n);
 
     const canvas = document.createElement("canvas");
     canvas.width = W;
     canvas.height = H;
     const ctx = canvas.getContext("2d");
+    const text = (s, x, y, font, color, align = "left") => {
+      ctx.font = `${font} ${FONT}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.fillText(s, x, y);
+    };
+    const hLine = (x1, x2, y) => {
+      ctx.strokeStyle = BORDER;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x2, y);
+      ctx.stroke();
+    };
 
-    // --- Background: flat white, matching the app's light theme panel color ---
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, W, H);
+    text(profile.name ? `${profile.name}'s weight report` : "Weight report", W / 2, topPad + 50, "700 56px", TEXT, "center");
 
-    // --- Title (colors pulled straight from the app's light CSS vars) ---
-    ctx.textBaseline = "alphabetic";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#1f2430"; // --text
-    ctx.font = `700 56px ${FONT}`;
-    let titleText = profile.name ? `${profile.name}'s weight report` : "Weight report";
-    ctx.fillText(titleText, W / 2, topPad + 50);
-
-    // --- Chart + goal-table card: a light-grey framed panel (mirrors the
-    // app's own section/card styling — see --bg and the white .section
-    // panels) so the whole data block reads as one contained unit instead of
-    // spilling into the rest of the report. Light grey fill + a clean white
-    // inset border, centered on the canvas's vertical centerline via the
-    // symmetric PAD_X margins. The footer disclaimer below stays outside it.
-    let cardTop = topPad + titleH + chartGapTop;
-    let cardLeft = PAD_X;
-    let cardRight = W - PAD_X;
-    let chartTop = cardTop + cardPadTop;
-    let chartLeft = cardLeft + 116;
-    let chartRight = cardRight - 40;
-    let chartBottom = chartTop + chartH;
-    let tableLeft = cardLeft + 40;
-    let tableRight = cardRight - 40;
-    let tableTop = chartBottom + chartToTableGap;
-    let rowAreaBottom = tableTop + tableHeaderH + n * rowH;
-    let cardBottom = rowAreaBottom + cardPadBottom;
-
+    // Chart and goal table share one light-grey card; the footer sits below it.
+    const cardTop = topPad + titleH + chartGapTop, cardLeft = PAD_X, cardRight = W - PAD_X;
+    const chartTop = cardTop + cardPadTop, chartLeft = cardLeft + 116, chartRight = cardRight - 40, chartBottom = chartTop + chartH;
+    const tableLeft = cardLeft + 40, tableRight = cardRight - 40, tableTop = chartBottom + chartToTableGap;
+    const cardBottom = tableTop + tableHeaderH + n * rowH + cardPadBottom;
     roundRectPath(ctx, cardLeft, cardTop, cardRight - cardLeft, cardBottom - cardTop, 20);
-    ctx.fillStyle = "#f4f5f7"; // --bg, subtle light grey
+    ctx.fillStyle = "#f4f5f7";
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#ffffff";
     ctx.stroke();
 
-    let minDate = wEntries[0].date, maxDate = wEntries[wEntries.length - 1].date;
-    let weightsArr = wEntries.map(p => p.weight);
-    let minW = Math.min(...weightsArr), maxW = Math.max(...weightsArr);
-    if (minW === maxW) { minW -= 1; maxW += 1; }
-    let padW = (maxW - minW) * 0.12 || 1;
-    minW -= padW; maxW += padW;
-    let totalDays = Math.max(1, daysBetween(minDate, maxDate));
+    let [min, max] = extent(w.map(e => e.weight));
+    if (min === max) { min -= 1; max += 1; }
+    const pad = (max - min) * 0.12;
+    min -= pad;
+    max += pad;
+    const first = w[0].date, total = Math.max(1, daysBetween(first, last.date));
+    const cx = d => chartLeft + daysBetween(first, d) / total * (chartRight - chartLeft);
+    const cy = v => chartTop + (1 - (v - min) / (max - min)) * chartH;
 
-    const cx = d => chartLeft + (daysBetween(minDate, d) / totalDays) * (chartRight - chartLeft);
-    const cy = w => chartTop + (1 - (w - minW) / (maxW - minW)) * chartH;
-
-    // minimal y-axis: three faint dashed gridlines + weight labels (matches the
-    // in-app chart's own gridline treatment: --border color, dashed, --muted text)
-    ctx.font = `400 22px ${FONT}`;
-    ctx.fillStyle = "#6b7280"; // --muted
-    ctx.textAlign = "right";
     [0, 0.5, 1].forEach(f => {
-      let wv = minW + f * (maxW - minW);
-      let yy = cy(wv);
-      ctx.strokeStyle = "#dcdfe4"; // --border
-      ctx.lineWidth = 1;
+      const v = min + f * (max - min);
       ctx.setLineDash([3, 3]);
-      ctx.beginPath();
-      ctx.moveTo(chartLeft, yy);
-      ctx.lineTo(chartRight, yy);
-      ctx.stroke();
+      hLine(chartLeft, chartRight, cy(v));
       ctx.setLineDash([]);
-      ctx.fillText(`${Math.round(wv)} ${unit}`, chartLeft - 16, yy + 7);
+      text(`${Math.round(v)} ${unit}`, chartLeft - 16, cy(v) + 7, "400 22px", MUTED, "right");
     });
+    axisDates(first, total).forEach(d => text(fmtDateExport(d), cx(d), chartBottom + 36, "400 22px", MUTED, "center"));
 
-    // minimal x-axis: first / mid / last date, year added back only when it
-    // isn't the current year
-    ctx.textAlign = "center";
-    [0, 0.5, 1].forEach(f => {
-      let d = addDays(minDate, Math.round(totalDays * f));
-      ctx.fillText(fmtDateExport(d), cx(d), chartBottom + 36);
-    });
-
-    let pts = wEntries.map(p => ({ x: cx(p.date), y: cy(p.weight) }));
-
-    // soft accent-blue area fill beneath the curve
+    const pts = w.map(e => ({ x: cx(e.date), y: cy(e.weight) }));
     ctx.beginPath();
     tracePath(ctx, pts);
     ctx.lineTo(pts[pts.length - 1].x, chartBottom);
     ctx.lineTo(pts[0].x, chartBottom);
     ctx.closePath();
-    let fillGrad = ctx.createLinearGradient(0, chartTop, 0, chartBottom);
-    fillGrad.addColorStop(0, "rgba(37,99,235,0.14)"); // --accent, faded
-    fillGrad.addColorStop(1, "rgba(37,99,235,0)");
-    ctx.fillStyle = fillGrad;
+    const fill = ctx.createLinearGradient(0, chartTop, 0, chartBottom);
+    fill.addColorStop(0, "rgba(37,99,235,0.14)");
+    fill.addColorStop(1, "rgba(37,99,235,0)");
+    ctx.fillStyle = fill;
     ctx.fill();
-
-    // the trend line itself: solid accent blue, same color as the in-app chart
     ctx.beginPath();
     tracePath(ctx, pts);
-    ctx.strokeStyle = "#2563eb"; // --accent
+    ctx.strokeStyle = ACCENT;
     ctx.lineWidth = 4;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.stroke();
-
-    // endpoint marker on the latest weigh-in
-    let lastPt = pts[pts.length - 1];
+    const end = pts[pts.length - 1];
     ctx.beginPath();
-    ctx.arc(lastPt.x, lastPt.y, 7, 0, Math.PI * 2);
-    ctx.fillStyle = "#2563eb"; // --accent
+    ctx.arc(end.x, end.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = ACCENT;
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#ffffff";
     ctx.stroke();
 
-    // --- Goal table (inside the same card as the chart) ---
-    ctx.font = `600 20px ${FONT}`;
-    ctx.fillStyle = "#6b7280"; // --muted
-    ctx.textAlign = "left";
-    ctx.fillText("GOAL", tableLeft, tableTop);
-    ctx.fillText("STATUS", tableLeft + 260, tableTop);
-    ctx.textAlign = "right";
-    ctx.fillText("DATE", tableRight, tableTop);
-
-    ctx.strokeStyle = "#dcdfe4"; // --border
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(tableLeft, tableTop + 20);
-    ctx.lineTo(tableRight, tableTop + 20);
-    ctx.stroke();
-
+    text("GOAL", tableLeft, tableTop, "600 20px", MUTED);
+    text("STATUS", tableLeft + 260, tableTop, "600 20px", MUTED);
+    text("DATE", tableRight, tableTop, "600 20px", MUTED, "right");
+    hLine(tableLeft, tableRight, tableTop + 20);
     let rowY = tableTop + tableHeaderH;
-    if (!goalList.length) {
-      ctx.font = `400 26px ${FONT}`;
-      ctx.fillStyle = "#6b7280";
-      ctx.textAlign = "left";
-      ctx.fillText("No goals added yet.", tableLeft, rowY + rowH / 2 + 8);
-    } else {
-      goalList.forEach((g, idx) => {
-        let res = computeGoalETA(g, current, effectiveRate, lastDate);
-        let pillText, pillColor, pillTextColor, etaText;
+    if (!list.length) text("No goals added yet.", tableLeft, rowY + rowH / 2 + 8, "400 26px", MUTED);
+    // Pill colors match the in-app .badge classes.
+    const PILLS = {
+      reached: ["Reached", "#dcfce7", "#16a34a"],
+      projected: ["In progress", "#fef3c7", "#92400e"],
+      flat: ["Flat rate", BORDER, MUTED],
+      unreachable: ["Off track", "#fee2e2", "#dc2626"]
+    };
+    list.forEach((g, i) => {
+      const s = goalStatus(g, w, rate);
+      const [label, bg, fg] = PILLS[s.status];
+      const mid = rowY + rowH / 2;
+      text(`${g.toFixed(0)} ${unit}`, tableLeft, mid + 11, "700 32px", TEXT);
+      ctx.font = `600 22px ${FONT}`;
+      const pillW = ctx.measureText(label).width + 32;
+      roundRectPath(ctx, tableLeft + 260, mid - 19, pillW, 38, 19);
+      ctx.fillStyle = bg;
+      ctx.fill();
+      text(label, tableLeft + 276, mid + 7, "600 22px", fg);
+      text(s.date ? fmtDateExport(s.date) : "—", tableRight, mid + 9, "500 26px", MUTED, "right");
+      if (i < list.length - 1) hLine(tableLeft, tableRight, rowY + rowH);
+      rowY += rowH;
+    });
 
-        // Pill colors are lifted directly from the app's own .badge classes
-        // (light theme) so the export reads as an extension of the app, not a
-        // reinterpretation of it.
-        if (res.status === "reached") {
-          pillText = "Reached"; pillColor = "#dcfce7"; pillTextColor = "#16a34a";
-          let rd = getGoalReachedDate(g);
-          etaText = rd ? fmtDateExport(rd) : "\u2014";
-        } else if (res.status === "flat") {
-          pillText = "Flat rate"; pillColor = "#dcdfe4"; pillTextColor = "#6b7280";
-          etaText = "\u2014";
-        } else if (res.status === "unreachable") {
-          pillText = "Off track"; pillColor = "#fee2e2"; pillTextColor = "#dc2626";
-          etaText = "\u2014";
-        } else {
-          pillText = "In progress"; pillColor = "#fef3c7"; pillTextColor = "#92400e";
-          etaText = fmtDateExport(res.date);
-        }
+    let footer = `Current weight: ${last.weight.toFixed(1)} ${unit} as of ${fmtDateExport(last.date)}`;
+    const dose = cumulativeDoseMg();
+    if (tirzepatideEnabled() && dose > 0) footer += ` | Tirzepatide cumulative dosage: ${dose} mg`;
+    text(footer, W / 2, cardBottom + cardToFooterGap, "500 22px", "#94a3b8", "center");
+    return canvas;
+  }
 
-        let midY = rowY + rowH / 2;
-
-        ctx.font = `700 32px ${FONT}`;
-        ctx.fillStyle = "#1f2430"; // --text
-        ctx.textAlign = "left";
-        ctx.fillText(`${g.toFixed(0)} ${unit}`, tableLeft, midY + 11);
-
-        drawPill(ctx, pillText, tableLeft + 260, midY, pillColor, pillTextColor);
-
-        ctx.font = `500 26px ${FONT}`;
-        ctx.fillStyle = "#6b7280"; // --muted
-        ctx.textAlign = "right";
-        ctx.fillText(etaText, tableRight, midY + 9);
-
-        if (idx < goalList.length - 1) {
-          ctx.strokeStyle = "#dcdfe4"; // --border (kept visible against the card's grey fill)
-          ctx.beginPath();
-          ctx.moveTo(tableLeft, rowY + rowH);
-          ctx.lineTo(tableRight, rowY + rowH);
-          ctx.stroke();
-        }
-        rowY += rowH;
-      });
-    }
-
-    // --- Footer: current weight (its date already covers "as of when"),
-    // plus cumulative dosage when Tirzepatide tracking is in use ---
-    ctx.font = `500 22px ${FONT}`;
-    ctx.fillStyle = "#94a3b8"; // Matches the app's --muted variable
-    ctx.textAlign = "center";
-    let footerText = `Current weight: ${current.toFixed(1)} ${unit} as of ${fmtDateExport(lastDate)}`;
-    let cumulativeDose = getCumulativeDoseMg();
-    if (tirzepatideEnabled() && cumulativeDose > 0) {
-      footerText += ` | Tirzepatide cumulative dosage: ${cumulativeDose} mg`;
-    }
-    ctx.fillText(footerText, W / 2, cardBottom + cardToFooterGap);
-
-    canvas.toBlob(async blob => {
-      if (fileHandle) {
-        try {
-          const writable = await fileHandle.createWritable();
-          await writable.write(blob);
-          await writable.close();
-        } catch (err) {
-          console.error("Failed to write the exported image.", err);
-          alert("Couldn't save the file to that location.");
-        }
-        return;
+  async function exportGoalsImage() {
+    const m = model();
+    if (!m.w.length) return alert("Add at least one weigh-in before exporting your progress.");
+    const filename = `weight-progress-${todayStr()}.png`;
+    // Ask where to save while the click still counts as user activation. Browsers
+    // without a save picker (Firefox, Safari) fall back to a normal download.
+    let handle = null;
+    if (window.showSaveFilePicker) {
+      try {
+        handle = await window.showSaveFilePicker({ suggestedName: filename, types: [{ description: "PNG image", accept: { "image/png": [".png"] } }] });
+      } catch (err) {
+        if (err.name === "AbortError") return; // save dialog cancelled
+        console.warn("Save picker unavailable, falling back to a direct download.", err);
       }
-      let url = URL.createObjectURL(blob);
-      let a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }, "image/png");
-  }
-
-  // Prepares the vectors required by the chart SVG drawing function
-  function renderChart(trendRate) {
-    let chartSection = document.getElementById("chartSection");
-
-    let wEntries = weightEntries();
-    if (!wEntries.length) {
-      chartSection.style.display = "none";
-      return;
     }
-    chartSection.style.display = "block";
-
-    // Chart shows every logged weigh-in only — no future projection is drawn here.
-    drawChart(wEntries, goals, trendRate);
-  }
-
-  // Native SVG render implementation (keeps app zero-dependency)
-  function drawChart(history, goalList, trendRate) {
-    let svg = document.getElementById("chartSvg");
-    let W = 640, H = 320, padL = 45, padR = 20, padT = 20, padB = 35;
-    let innerW = W - padL - padR, innerH = H - padT - padB;
-
-    if (!history.length) { svg.innerHTML = ""; return; }
-
-    let lastWeight = history[history.length - 1].weight;
-    let effRate = getEffectiveRate(trendRate);
-
-    // Only plot goals that have not been reached yet
-    let activeGoals = (goalList || []).filter(g => {
-      let res = computeGoalETA(g, lastWeight, effRate, history[history.length - 1].date);
-      return res.status !== "reached";
-    });
-
-    let minDate = history[0].date, maxDate = history[history.length - 1].date;
-    let weights = history.map(p => p.weight);
-    let allWeights = weights.concat(activeGoals);
-    let minW = Math.min(...allWeights);
-    let maxW = Math.max(...allWeights);
-
-    if (minW === maxW) { minW -= 1; maxW += 1; }
-    let pad = (maxW - minW) * 0.1 || 1;
-    minW -= pad; maxW += pad;
-
-    let totalDays = Math.max(1, daysBetween(minDate, maxDate));
-    
-    // Scale functions transforming data coordinates to pixel coordinates
-    const x = dStr => padL + (daysBetween(minDate, dStr) / totalDays) * innerW;
-    const y = w => padT + (1 - (w - minW) / (maxW - minW)) * innerH;
-
-    let strokeColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
-    let textColor = getComputedStyle(document.documentElement).getPropertyValue('--muted').trim();
-
-    let parts = [];
-
-    // Horizontal Y-Axis grid lines
-    for (let g = 0; g <= 4; g++) {
-      let wVal = minW + (g / 4) * (maxW - minW);
-      let yy = y(wVal);
-      parts.push(`<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="${strokeColor}" stroke-width="0.5" stroke-dasharray="2,2"/>`);
-      parts.push(`<text x="${padL - 6}" y="${yy + 3}" font-size="9" fill="${textColor}" text-anchor="end">${wVal.toFixed(0)}</text>`);
+    const blob = await new Promise(resolve => drawReport(m).toBlob(resolve, "image/png"));
+    if (!blob) return alert("Couldn't create the image.");
+    if (!handle) return downloadBlob(blob, filename);
+    try {
+      const out = await handle.createWritable();
+      await out.write(blob);
+      await out.close();
+    } catch (err) {
+      console.error("Failed to write the exported image.", err);
+      alert("Couldn't save the file to that location.");
     }
-
-    // X-Axis date labels (first/last anchored inward so they don't clip off the edge)
-    [0, 0.5, 1].forEach(frac => {
-      let d = addDays(minDate, Math.round(totalDays * frac));
-      let anchor = frac === 0 ? "start" : (frac === 1 ? "end" : "middle");
-      parts.push(`<text x="${padL + frac * innerW}" y="${H - 10}" font-size="9" fill="${textColor}" text-anchor="${anchor}">${fmtDate(d)}</text>`);
-    });
-
-    // Plot target goals as horizontal lines with badge indicators
-    activeGoals.forEach(g => {
-      let gy = y(g);
-      let labelText = `Goal: ${g.toFixed(0)} ${unit}`;
-      let boxWidth = 64;
-      let boxHeight = 16;
-      let textX = W - padR - 4;
-      
-      parts.push(`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${W - padR}" y2="${gy.toFixed(1)}" stroke="#e11d48" stroke-width="2" stroke-dasharray="4,4"/>`);
-      parts.push(`<rect x="${textX - boxWidth}" y="${gy - (boxHeight / 2)}" width="${boxWidth}" height="${boxHeight}" rx="4" fill="#e11d48"/>`);
-      parts.push(`<text x="${textX - (boxWidth / 2)}" y="${gy + 3}" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle">${labelText}</text>`);
-    });
-
-    // Plot main historical trend line & points
-    if (history.length > 0) {
-      let pStr = history.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p.date).toFixed(1)},${y(p.weight).toFixed(1)}`).join(' ');
-      parts.push(`<path d="${pStr}" fill="none" stroke="#2563eb" stroke-width="2"/>`);
-      history.forEach(p => parts.push(`<circle cx="${x(p.date).toFixed(1)}" cy="${y(p.weight).toFixed(1)}" r="2.5" fill="#2563eb"/>`));
-    }
-
-    svg.innerHTML = parts.join('');
   }
 
-  // Reflects the custom rate slider's current value in its live label.
-  function updateCustomRateLabel() {
-    let v = parseFloat(document.getElementById("customRate").value);
-    let formatted = v.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
-    document.getElementById("customRateValue").textContent = (v > 0 ? "+" : "") + formatted + "%";
-  }
-
-  // Master render trigger function to update all UI modules sequentially
-  function renderAll() {
-    updateCustomRateLabel();
-    renderHistory();
-    renderUpcomingDoses();
-    let trendRate = computeTrend();
-    renderStats(trendRate);
-    renderGoals(trendRate);
-    renderChart(trendRate);
-  }
-
-  // ============================================================================
-  // BUG REPORTING (report builder + modal)
-  // ============================================================================
-
-  // Builds a Markdown bug report meant to be pasted straight into Claude Code:
-  // the person's own description first, then everything needed to reproduce or
-  // diagnose it. Deliberately omits actual entry/goal values (weights, dates,
-  // calories) since this report is meant to leave the device.
+  // ==========================================================================
+  // BUG REPORTS & DEVELOPER MODE
+  // ==========================================================================
+  // Markdown meant to be pasted into Claude Code: the description, then what's
+  // needed to diagnose it. Leaves out every weight, dose, and date.
   function buildBugReportText(description) {
-    let lines = [];
-    lines.push("# Bug Report — Weight Tracker & Projections");
-    lines.push("");
-    lines.push(`**Reported:** ${new Date().toISOString()}`);
-    lines.push(`**App Version:** ${APP_VERSION}`);
-    lines.push(`**Data Schema Version:** ${DATA_SCHEMA_VERSION}`);
-    lines.push("");
-    lines.push("## Description");
-    lines.push(description && description.trim() ? description.trim() : "_(no description provided)_");
-    lines.push("");
-    lines.push("## Environment");
-    lines.push(`- Platform: ${navigator.platform || "unknown"}`);
-    lines.push(`- User agent: ${navigator.userAgent}`);
-    lines.push(`- Viewport: ${window.innerWidth}x${window.innerHeight}`);
-    lines.push(`- Theme: ${document.documentElement.getAttribute("data-theme")}`);
-    lines.push(`- Language: ${navigator.language}`);
-    lines.push(`- Online: ${navigator.onLine}`);
-    lines.push("");
-    lines.push("## App State");
-    lines.push(`- Unit: ${unit}`);
-    lines.push(`- Tirzepatide tracking enabled: ${tirzepatideEnabled()}`);
-    lines.push(`- Entry count: ${entries.length}`);
-    lines.push(`- Goal count: ${goals.length}`);
-    lines.push(`- Rate mode: ${rateMode}`);
-    lines.push(`- Trend window: ${trendWindow}`);
-    lines.push(`- History page: ${currentPage}`);
-    lines.push(`- Unsaved changes since last export: ${unsavedChanges}`);
-    lines.push(`- Dev mode: ${devModeOn}`);
-    lines.push("");
-    lines.push("## Recent Console Activity");
-    if (debugLog.length) {
-      lines.push("```");
-      debugLog.forEach(l => lines.push(`[${l.time}] ${l.level.toUpperCase()}: ${l.message}`));
-      lines.push("```");
-    } else {
-      lines.push("_(none captured this session)_");
-    }
-    lines.push("");
-    lines.push("## Recent Changelog");
-    CHANGELOG.slice(0, 3).forEach(entry => {
-      lines.push(`- v${entry.version} (${entry.date}): ${entry.changes.join(" ")}`);
-    });
-    return lines.join("\n");
+    return [
+      "# Bug Report — Weight Tracker & Projections", "",
+      `**Reported:** ${new Date().toISOString()}`,
+      `**App Version:** ${APP_VERSION}`,
+      `**Data Schema Version:** ${DATA_SCHEMA_VERSION}`, "",
+      "## Description", description || "_(no description provided)_", "",
+      "## Environment",
+      `- Platform: ${navigator.platform || "unknown"}`,
+      `- User agent: ${navigator.userAgent}`,
+      `- Viewport: ${window.innerWidth}x${window.innerHeight}`,
+      `- Theme: ${document.documentElement.dataset.theme}`,
+      `- Language: ${navigator.language}`,
+      `- Online: ${navigator.onLine}`, "",
+      "## App State",
+      `- Unit: ${unit}`,
+      `- Tirzepatide tracking enabled: ${tirzepatideEnabled()}`,
+      `- Entry count: ${entries.length}`,
+      `- Goal count: ${goals.length}`,
+      `- Rate mode: ${rateMode}`,
+      `- Trend window: ${trendWindow}`,
+      `- History page: ${currentPage}`,
+      `- Unsaved changes since last export: ${unsavedChanges}`,
+      `- Dev mode: ${devModeOn}`, "",
+      "## Recent Console Activity",
+      ...(debugLog.length ? ["```", ...debugLog.map(l => `[${l.time}] ${l.level.toUpperCase()}: ${l.message}`), "```"] : ["_(none captured this session)_"]), "",
+      "## Recent Changelog",
+      ...CHANGELOG.slice(0, 3).map(c => `- v${c.version} (${c.date}): ${c.changes.join(" ")}`)
+    ].join("\n");
   }
 
-  function openBugReportModal() {
-    document.getElementById("bugReportText").value = "";
-    let statusEl = document.getElementById("bugReportStatus");
-    statusEl.textContent = "";
-    statusEl.className = "bugreport-status";
-    document.getElementById("bugReportOverlay").classList.add("open");
-    document.getElementById("bugReportText").focus();
-  }
-
-  function closeBugReportModal() {
-    document.getElementById("bugReportOverlay").classList.remove("open");
-  }
-
-  // Copies text to the clipboard, falling back to a hidden-textarea + execCommand
-  // for contexts without the async Clipboard API (older iOS Safari, etc.). Shared
-  // by the submit flow and the Developer Mode "Copy all" action.
+  // Falls back to a hidden textarea + execCommand where the Clipboard API is missing.
   async function copyTextToClipboard(text) {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
       } else {
-        let ta = document.createElement("textarea");
+        const ta = document.createElement("textarea");
         ta.value = text;
         ta.style.position = "fixed";
         ta.style.opacity = "0";
         document.body.appendChild(ta);
-        ta.focus();
         ta.select();
         document.execCommand("copy");
-        document.body.removeChild(ta);
+        ta.remove();
       }
       return true;
     } catch (err) {
@@ -2251,365 +1074,298 @@
     }
   }
 
-  // The actual "submit": saves the report to the local bug-report log (so it
-  // survives closing the modal, unlike a clipboard-only copy) and copies it to
-  // the clipboard as a convenience. Saved reports are reviewed, copied as a
-  // batch, or exported to a file from Developer Mode — see below.
+  function setBugReportStatus(message, cls) {
+    $("bugReportStatus").textContent = message;
+    $("bugReportStatus").className = `bugreport-status ${cls}`;
+  }
+
+  function openBugReportModal() {
+    $("bugReportText").value = "";
+    setBugReportStatus("", "");
+    $("bugReportOverlay").classList.add("open");
+    $("bugReportText").focus();
+  }
+
+  function closeBugReportModal() {
+    $("bugReportOverlay").classList.remove("open");
+  }
+
+  // Saves the report to the local log (kept until cleared in Developer Mode)
+  // and copies it to the clipboard as a convenience.
   async function submitBugReport() {
-    let descriptionEl = document.getElementById("bugReportText");
-    let description = descriptionEl.value.trim();
-    let text = buildBugReportText(description);
-    let statusEl = document.getElementById("bugReportStatus");
-
-    bugReports.push({ id: Date.now(), timestamp: new Date().toISOString(), description: description, markdown: text });
-    if (bugReports.length > BUG_REPORTS_MAX) bugReports = bugReports.slice(bugReports.length - BUG_REPORTS_MAX);
-    saveBugReports();
-    renderDevBugReportCount();
-
-    let copied = await copyTextToClipboard(text);
-    statusEl.textContent = copied
-      ? `Saved and copied to clipboard (${bugReports.length} report${bugReports.length === 1 ? "" : "s"} logged — manage them from Developer Mode).`
-      : `Saved (${bugReports.length} report${bugReports.length === 1 ? "" : "s"} logged), but couldn't copy automatically — export it from Developer Mode instead.`;
-    statusEl.className = "bugreport-status " + (copied ? "good" : "bad");
-    descriptionEl.value = "";
+    const description = $("bugReportText").value.trim();
+    const markdown = buildBugReportText(description);
+    bugReports = bugReports.concat({ id: Date.now(), timestamp: new Date().toISOString(), description, markdown }).slice(-BUG_REPORTS_MAX);
+    storageSet(KEYS.bugReports, JSON.stringify(bugReports));
+    $("devBugReportCount").textContent = bugReports.length;
+    const logged = `${bugReports.length} report${bugReports.length === 1 ? "" : "s"} logged`;
+    const copied = await copyTextToClipboard(markdown);
+    setBugReportStatus(copied
+      ? `Saved and copied to clipboard (${logged} — manage them from Developer Mode).`
+      : `Saved (${logged}), but couldn't copy automatically — export it from Developer Mode instead.`, copied ? "good" : "bad");
+    $("bugReportText").value = "";
   }
 
-  // Concatenates every saved report into one Markdown document, separated by
-  // horizontal rules, for the Developer Mode "Copy all" / "Download .md" actions.
-  function combinedBugReportsMarkdown() {
-    return bugReports.map(r => r.markdown).join("\n\n---\n\n");
+  const combinedBugReports = () => bugReports.map(r => r.markdown).join("\n\n---\n\n");
+
+  function toggleDevMode() {
+    devModeOn = !devModeOn;
+    document.body.classList.toggle("dev-mode", devModeOn);
+    if (!devModeOn) return;
+    $("devVersionNum").textContent = APP_VERSION;
+    $("devBugReportCount").textContent = bugReports.length;
+    $("devChangelog").innerHTML = CHANGELOG.map(c => `<div class="changelog-entry">
+      <span class="changelog-version">v${c.version}</span><span class="changelog-date">${c.date}</span>
+      <ul>${c.changes.map(x => `<li>${x}</li>`).join("")}</ul>
+    </div>`).join("");
   }
 
-  function renderDevBugReportCount() {
-    let el = document.getElementById("devBugReportCount");
-    if (el) el.textContent = String(bugReports.length);
+  // ==========================================================================
+  // IMPORT / EXPORT
+  // ==========================================================================
+  function downloadBlob(blob, filename) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); // some browsers ignore clicks on detached links
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000); // revoking immediately can cancel the download
   }
 
-  // ============================================================================
-  // EVENT BINDINGS & LISTENERS
-  // ============================================================================
-
-  document.getElementById("addBtn").addEventListener("click", () => {
-    let dateVal = document.getElementById("dateInput").value;
-    let weightRaw = document.getElementById("weightInput").value;
-    let caloriesRaw = document.getElementById("caloriesInput").value;
-    let doseRaw = document.getElementById("doseInput").value;
-
-    if (!dateVal) {
-      alert("Please enter a date.");
-      return;
-    }
-
-    // Weight, calories, and dose are each optional and independent, so you
-    // can log any one of them without the others — e.g. schedule a future
-    // dose with no weigh-in yet, or add calories without a dose that day.
-    let weightVal = weightRaw === "" ? null : parseFloat(weightRaw);
-    if (weightVal !== null && (isNaN(weightVal) || weightVal <= 0)) {
-      alert("Please enter a valid positive weight, or leave it blank.");
-      return;
-    }
-
-    let caloriesVal = caloriesRaw === "" ? null : parseInt(caloriesRaw, 10);
-    if (caloriesVal !== null && (isNaN(caloriesVal) || caloriesVal <= 0)) {
-      alert("Please enter a valid positive calorie count, or leave it blank.");
-      return;
-    }
-
-    let doseVal = doseRaw === "" ? null : parseFloat(doseRaw);
-    if (doseVal !== null && (isNaN(doseVal) || doseVal <= 0)) {
-      alert("Please enter a valid positive dose, or leave it blank.");
-      return;
-    }
-
-    if (weightVal === null && caloriesVal === null && doseVal === null) {
-      alert("Enter a weight, calories, or dose.");
-      return;
-    }
-
-    let existing = entries.find(e => e.date === dateVal);
-
-    // Cap scheduled (today-or-future) doses at 3 — this only blocks *new* upcoming
-    // doses; editing the mg value of an already-scheduled date is always allowed.
-    let todayStr = new Date().toISOString().slice(0, 10);
-    if (doseVal !== null && dateVal >= todayStr) {
-      let alreadyScheduledHere = existing && typeof existing.doseMg === "number" && !isNaN(existing.doseMg);
-      if (!alreadyScheduledHere && countUpcomingDoses() >= 3) {
-        alert("You can only have 3 upcoming doses scheduled at once. Remove one before adding another.");
-        return;
-      }
-    }
-
-    if (existing) {
-      // Only overwrite fields that were actually provided, so adding calories
-      // later in the day doesn't blank out that morning's weigh-in (or vice versa).
-      if (weightVal !== null) existing.weight = weightVal;
-      if (caloriesVal !== null) existing.calories = caloriesVal;
-      if (doseVal !== null) existing.doseMg = doseVal;
-    } else {
-      entries.push({ date: dateVal, weight: weightVal, calories: caloriesVal, doseMg: doseVal });
-      entries.sort((a, b) => a.date.localeCompare(b.date));
-    }
-
-    saveData();
-    document.getElementById("weightInput").value = "";
-    document.getElementById("caloriesInput").value = "";
-    document.getElementById("doseInput").value = "";
-    currentPage = 1;
-    renderAll();
-  });
-
-  // Execute Add on enter keypress for quick inputs
-  ["dateInput", "weightInput", "caloriesInput", "doseInput"].forEach(id => {
-    let el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          document.getElementById("addBtn").click();
-        }
-      });
-    }
-  });
-
-  let goalInput = document.getElementById("goalInput");
-  if (goalInput) {
-    goalInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        document.getElementById("addGoalBtn").click();
-      }
-    });
-  }
-
-  // Window selectors for Exponential Regression Trend
-  document.querySelectorAll('button.pill[data-window]').forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll('button.pill[data-window]').forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      trendWindow = btn.getAttribute("data-window");
-      renderAll();
-    });
-  });
-
-  document.getElementById("prevPageBtn").addEventListener("click", () => { if (currentPage > 1) { currentPage--; renderHistory(); } });
-  document.getElementById("nextPageBtn").addEventListener("click", () => {
-    if (currentPage < Math.ceil(entries.length / PAGE_SIZE)) { currentPage++; renderHistory(); }
-  });
-
-  document.querySelectorAll('#rateModeToggle button').forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll('#rateModeToggle button').forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      rateMode = btn.getAttribute("data-rate-mode");
-      document.getElementById("customRateWrap").style.display = (rateMode === "custom") ? "block" : "none";
-      sortGoals();
-      renderAll();
-    });
-  });
-
-  document.getElementById("addGoalBtn").addEventListener("click", () => {
-    let val = parseFloat(document.getElementById("goalInput").value);
-    if (!isNaN(val) && val > 0 && !goals.includes(val)) {
-      goals.push(val);
-      sortGoals();
-      saveData();
-      document.getElementById("goalInput").value = "";
-      renderAll();
-    }
-  });
-
-  document.getElementById("exportImageBtn").addEventListener("click", exportGoalsImage);
-
-  document.getElementById("customRate").addEventListener("input", () => {
-    sortGoals();
-    renderAll();
-  });
-
-  // Trigger Local Download adhering directly to JSON standard requirements
-  document.getElementById("exportBtn").addEventListener("click", () => {
-    let computedAvgCal = getAvgCalories();
-    let data = {
+  function exportBackup() {
+    const backup = {
       schemaVersion: DATA_SCHEMA_VERSION,
       appVersion: APP_VERSION,
-      unit: unit,
-      name: profile.name || "",
-      entries: entries,
-      goals: goals,
-      avgCalories: computedAvgCal,
-      // Kept separate from `entries` since it's a derived total, not a logged
-      // data point — the cumulative mg of Tirzepatide actually taken to date.
-      cumulativeTirzepatideDoseMg: getCumulativeDoseMg()
+      unit,
+      name: profile.name,
+      entries,
+      goals,
+      cumulativeTirzepatideDoseMg: cumulativeDoseMg() // derived total for reference; not read on import
     };
-    let blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = `weight-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    unsavedChanges = false;
-    updateExportButtonState();
-  });
+    downloadBlob(new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" }), `weight-backup-${todayStr()}.json`);
+    setUnsaved(false);
+  }
 
-  // Map hidden file input logic to button
-  document.getElementById("importBtn").addEventListener("click", () => document.getElementById("fileImport").click());
-
-  document.getElementById("fileImport").addEventListener("change", (e) => {
-    let file = e.target.files[0];
-    if (!file) return;
-    let reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        let raw = JSON.parse(evt.target.result);
-        if (!raw || !Array.isArray(raw.entries)) {
-          alert("Invalid backup file: no entries found.");
-          return;
-        }
-
-        let clean = normalizeBackupData(raw);
-
-        if (!clean.entries.length) {
-          alert("Invalid backup file: no usable entries found.");
-          return;
-        }
-
-        if (clean.schemaVersion > DATA_SCHEMA_VERSION) {
-          alert("Heads up: this backup was made by a newer version of the app. Importing it anyway, but some data may not carry over.");
-        }
-
-        entries = clean.entries;
-        goals = clean.goals;
-        avgCalories = clean.avgCalories;
-        saveData();
-        // Only overwrite the locally-saved name if this backup actually has one
-        // (older backups won't) — don't blank out a name that's already set.
-        if (clean.name) {
-          profile.name = clean.name;
-        }
-        // A backup carrying real dose entries proves Tirzepatide is in use —
-        // skip asking the start-up question and just turn the UI on.
-        if (entries.some(e => typeof e.doseMg === "number" && !isNaN(e.doseMg))) {
-          profile.usesTirzepatide = true;
-          profile.usesTirzepatideAsked = true;
-        }
-        saveProfile();
-        updateHeaderTitle();
-        applyTirzepatideVisibility();
-        renderOneTimeInfo();
-        unsavedChanges = false;
-        updateExportButtonState();
-        currentPage = 1;
-        renderAll();
-      } catch (err) {
-        alert("Invalid backup file.");
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = "";
-  });
-
-  document.getElementById("oneTimeInfoSaveBtn").addEventListener("click", () => {
-    let previousUnit = getActiveUnit();
-    ONE_TIME_FIELDS.forEach(f => {
-      let el = document.getElementById(`oneTimeInput_${f.key}`);
-      if (el) {
-        if (f.type === "boolean") profile[f.key] = (el.dataset.value === "true");
-        else if (f.type === "select") profile[f.key] = el.dataset.value;
-        else profile[f.key] = el.value.trim();
-        if (f.optional) profile[`${f.key}Asked`] = true;
-      }
-    });
-
-    // Changing units (only reachable by re-answering start-up info via Developer
-    // Mode) converts every existing weight — the app only ever holds one unit
-    // at a time, never a mix, so the numbers move with the label instead of
-    // being silently relabeled.
-    let newUnit = getActiveUnit();
-    if (newUnit !== previousUnit) {
-      convertAllWeightsToUnit(previousUnit, newUnit);
-      unit = newUnit;
-      saveData();
+  // Replaces all entries and goals with the backup's, after validating it first
+  // so a bad file never changes anything.
+  function importBackup(text) {
+    let raw;
+    try { raw = JSON.parse(text); } catch (err) { return alert("Invalid backup file."); }
+    if (!raw || !Array.isArray(raw.entries)) return alert("Invalid backup file: no entries found.");
+    const clean = normalizeBackup(raw, unit);
+    if (!clean.entries.length) return alert("Invalid backup file: no usable entries found.");
+    if (clean.schemaVersion > DATA_SCHEMA_VERSION) {
+      alert("Heads up: this backup was made by a newer version of the app. Importing it anyway, but some data may not carry over.");
     }
-
-    saveProfile();
-    updateHeaderTitle();
-    updateUnitLabels();
-    renderOneTimeInfo();
-    applyTirzepatideVisibility();
+    entries = clean.entries;
+    goals = clean.goals;
+    if (clean.name) profile.name = clean.name; // older backups have no name; keep ours
+    // Dose entries prove Tirzepatide is in use, so that start-up question is answered.
+    if (entries.some(hasDose)) Object.assign(profile, { usesTirzepatide: true, usesTirzepatideAsked: true });
+    save(false);
     currentPage = 1;
+    renderOneTimeInfo();
+    renderAll();
+  }
+
+  // ==========================================================================
+  // EVENTS
+  // ==========================================================================
+  // Returns null for an empty field and NaN for one the browser couldn't parse.
+  function readNumber(id) {
+    const el = $(id);
+    if (el.validity.badInput) return NaN;
+    return el.value === "" ? null : parseFloat(el.value);
+  }
+
+  function addEntry() {
+    const date = $("dateInput").value;
+    const weight = readNumber("weightInput");
+    const dose = tirzepatideEnabled() ? readNumber("doseInput") : null;
+    const today = todayStr();
+    if (!isDate(date)) return alert("Please enter a date.");
+    if (weight !== null && !isPos(weight)) return alert("Please enter a valid positive weight, or leave it blank.");
+    if (dose !== null && !isPos(dose)) return alert("Please enter a valid positive dose, or leave it blank.");
+    if (weight === null && dose === null) return alert(tirzepatideEnabled() ? "Enter a weight or dose." : "Enter a weight.");
+    if (weight !== null && date > today) return alert("Weigh-ins can't be dated in the future.");
+    const existing = entries.find(e => e.date === date);
+    // At most 3 scheduled doses; changing an already-scheduled dose is always fine.
+    if (dose !== null && date >= today && !(existing && hasDose(existing)) &&
+        entries.filter(e => hasDose(e) && e.date >= today).length >= MAX_UPCOMING_DOSES) {
+      return alert("You can only have 3 upcoming doses scheduled at once. Remove one before adding another.");
+    }
+    if (existing) {
+      // Only overwrite what was entered, so a later dose keeps that day's weigh-in.
+      if (weight !== null) existing.weight = weight;
+      if (dose !== null) existing.doseMg = dose;
+    } else {
+      entries.push({ date, weight, doseMg: dose });
+      entries.sort(byDate);
+    }
+    save();
+    $("weightInput").value = "";
+    $("doseInput").value = "";
+    currentPage = 1;
+    renderAll();
+  }
+
+  function addGoal() {
+    const goal = readNumber("goalInput");
+    if (goal === null) return;
+    if (!isPos(goal)) return alert("Please enter a valid positive goal weight.");
+    if (!goals.includes(goal)) {
+      goals = goals.concat(goal).sort((a, b) => b - a);
+      save();
+    }
+    $("goalInput").value = "";
+    renderAll();
+  }
+
+  // Button groups: marks the clicked button active and passes on its value.
+  function onToggle(container, attr, pick) {
+    container.addEventListener("click", e => {
+      const btn = e.target.closest(`button[${attr}]`);
+      if (!btn) return;
+      btn.parentElement.querySelectorAll(`button[${attr}]`).forEach(b => b.classList.toggle("active", b === btn));
+      pick(btn.getAttribute(attr), btn);
+    });
+  }
+
+  // Delegated clicks on buttons rendered into a container.
+  function onButton(container, selector, handler) {
+    container.addEventListener("click", e => {
+      const btn = e.target.closest(selector);
+      if (btn) handler(btn);
+    });
+  }
+
+  function setTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    storageSet(KEYS.theme, theme);
+  }
+
+  $("themeToggle").addEventListener("click", () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+  $("addBtn").addEventListener("click", addEntry);
+  $("addGoalBtn").addEventListener("click", addGoal);
+  $("exportImageBtn").addEventListener("click", exportGoalsImage);
+  $("exportBtn").addEventListener("click", exportBackup);
+  $("importBtn").addEventListener("click", () => $("fileImport").click());
+  $("fileImport").addEventListener("change", e => {
+    const file = e.target.files[0];
+    e.target.value = ""; // so picking the same file again still triggers an import
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => importBackup(reader.result);
+    reader.onerror = () => alert("Couldn't read that file.");
+    reader.readAsText(file);
+  });
+  $("prevPageBtn").addEventListener("click", () => { currentPage--; renderAll(); });
+  $("nextPageBtn").addEventListener("click", () => { currentPage++; renderAll(); });
+  $("customRate").addEventListener("input", renderAll);
+
+  onToggle($("trendWindowWrap"), "data-window", value => { trendWindow = value; renderAll(); });
+  onToggle($("rateModeToggle"), "data-rate-mode", value => {
+    rateMode = value;
+    $("customRateWrap").hidden = value !== "custom";
+    renderAll();
+  });
+  onToggle($("oneTimeInfoFields"), "data-value", (value, btn) => { btn.parentElement.dataset.value = value; });
+
+  onButton($("historyBody"), "button[data-date]", btn => {
+    entries = entries.filter(e => e.date !== btn.dataset.date);
+    save();
+    renderAll();
+  });
+  // Removing an upcoming dose clears just the dose; an entry left empty goes too.
+  onButton($("upcomingDosesGrid"), "button[data-dose-date]", btn => {
+    const entry = entries.find(e => e.date === btn.dataset.doseDate);
+    if (!entry) return;
+    entry.doseMg = null;
+    if (!hasWeight(entry)) entries = entries.filter(e => e !== entry);
+    save();
+    renderAll();
+  });
+  onButton($("goalsBody"), "button[data-goal]", btn => {
+    goals = goals.filter(g => g !== parseFloat(btn.dataset.goal));
+    save();
     renderAll();
   });
 
-  document.getElementById("oneTimeInfoCancelBtn").addEventListener("click", () => {
+  $("oneTimeInfoSaveBtn").addEventListener("click", () => {
+    const prevUnit = unit;
+    ONE_TIME_FIELDS.forEach(f => {
+      const el = $("oneTimeInput_" + f.key);
+      if (!el) return;
+      profile[f.key] = f.type === "text" ? el.value.trim() : f.type === "boolean" ? el.dataset.value === "true" : el.dataset.value;
+      if (f.optional) profile[f.key + "Asked"] = true;
+    });
+    unit = profile.unit || "lb";
+    if (unit !== prevUnit) {
+      // Changing units converts every stored weight, so nothing is ever mixed.
+      const converted = normalizeBackup({ unit: prevUnit, entries, goals }, unit);
+      entries = converted.entries;
+      goals = converted.goals;
+    }
+    save();
+    currentPage = 1;
     renderOneTimeInfo();
+    renderAll();
   });
-
-  document.getElementById("reopenOneTimeInfoBtn").addEventListener("click", () => {
+  $("oneTimeInfoCancelBtn").addEventListener("click", () => renderOneTimeInfo());
+  $("reopenOneTimeInfoBtn").addEventListener("click", () => {
     toggleDevMode();
     renderOneTimeInfo(true);
-    document.getElementById("oneTimeInfoSection").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("oneTimeInfoSection").scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
-  document.getElementById("devBadge").addEventListener("click", toggleDevMode);
-  document.getElementById("devPanelClose").addEventListener("click", toggleDevMode);
+  $("devBadge").addEventListener("click", toggleDevMode);
+  $("devPanelClose").addEventListener("click", toggleDevMode);
+  $("reportBugLink").addEventListener("click", e => { e.preventDefault(); openBugReportModal(); });
+  $("bugReportClose").addEventListener("click", closeBugReportModal);
+  $("bugReportOverlay").addEventListener("click", e => { if (e.target.id === "bugReportOverlay") closeBugReportModal(); });
+  $("bugReportSubmitBtn").addEventListener("click", submitBugReport);
+  $("devCopyBugReportsBtn").addEventListener("click", async () => {
+    if (!bugReports.length) return alert("No bug reports logged yet.");
+    if (!(await copyTextToClipboard(combinedBugReports()))) alert("Couldn't copy automatically — try the Download button instead.");
+  });
+  $("devDownloadBugReportsBtn").addEventListener("click", () => {
+    if (!bugReports.length) return alert("No bug reports logged yet.");
+    downloadBlob(new Blob([combinedBugReports()], { type: "text/markdown" }), `bug-reports-${todayStr()}.md`);
+  });
+  $("devClearBugReportsBtn").addEventListener("click", () => {
+    if (!bugReports.length || !confirm(`Clear all ${bugReports.length} logged bug report(s)? This can't be undone.`)) return;
+    bugReports = [];
+    storageSet(KEYS.bugReports, "[]");
+    $("devBugReportCount").textContent = 0;
+  });
 
-  document.getElementById("reportBugLink").addEventListener("click", (e) => {
-    e.preventDefault();
-    openBugReportModal();
-  });
-  document.getElementById("bugReportClose").addEventListener("click", closeBugReportModal);
-  document.getElementById("bugReportOverlay").addEventListener("click", (e) => {
-    if (e.target.id === "bugReportOverlay") closeBugReportModal();
-  });
-  document.getElementById("bugReportSubmitBtn").addEventListener("click", submitBugReport);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && document.getElementById("bugReportOverlay").classList.contains("open")) {
+  // Enter in an input submits its form row; Ctrl+9 toggles developer mode.
+  const ENTER_SUBMITS = { dateInput: addEntry, weightInput: addEntry, doseInput: addEntry, goalInput: addGoal };
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey && (e.key === "9" || e.code === "Digit9")) {
+      e.preventDefault();
+      toggleDevMode();
+    } else if (e.key === "Escape") {
       closeBugReportModal();
+    } else if (e.key === "Enter" && ENTER_SUBMITS[e.target.id]) {
+      e.preventDefault();
+      ENTER_SUBMITS[e.target.id]();
     }
   });
 
-  document.getElementById("devCopyBugReportsBtn").addEventListener("click", async () => {
-    if (!bugReports.length) { alert("No bug reports logged yet."); return; }
-    let ok = await copyTextToClipboard(combinedBugReportsMarkdown());
-    if (!ok) alert("Couldn't copy automatically — try the Download button instead.");
-  });
-
-  document.getElementById("devDownloadBugReportsBtn").addEventListener("click", () => {
-    if (!bugReports.length) { alert("No bug reports logged yet."); return; }
-    let blob = new Blob([combinedBugReportsMarkdown()], { type: "text/markdown" });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = `bug-reports-${new Date().toISOString().slice(0, 10)}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  document.getElementById("devClearBugReportsBtn").addEventListener("click", () => {
-    if (!bugReports.length) return;
-    if (confirm(`Clear all ${bugReports.length} logged bug report(s)? This can't be undone.`)) {
-      bugReports = [];
-      saveBugReports();
-      renderDevBugReportCount();
-    }
-  });
-
-  // ============================================================================
-  // APP INITIALIZATION
-  // ============================================================================
-  initTheme();
-  loadProfile();
-  unit = getActiveUnit();
-  loadData();
-  loadBugReports();
-  updateHeaderTitle();
+  // ==========================================================================
+  // INIT
+  // ==========================================================================
+  const savedTheme = storageGet(KEYS.theme);
+  const hour = new Date().getHours();
+  setTheme(savedTheme === "dark" || savedTheme === "light" ? savedTheme : hour >= 19 || hour < 7 ? "dark" : "light");
+  loadAll();
+  $("customRate").value = "0"; // some browsers restore the last position on reload
+  $("dateInput").value = todayStr();
+  $("appVersionTag").textContent = `v${APP_VERSION}`;
   renderOneTimeInfo();
-  applyTirzepatideVisibility();
-  updateUnitLabels();
-  document.getElementById("appVersionTag").textContent = `v${APP_VERSION}`;
-  document.getElementById("dateInput").value = new Date().toISOString().slice(0, 10);
   renderAll();
-  updateExportButtonState();
 })();
 </script>
 </body>
