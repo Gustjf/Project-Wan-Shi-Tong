@@ -92,10 +92,11 @@
   .subtle-remove { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; padding: 0; line-height: 14px; text-align: center; border-radius: 50%; background: transparent; color: var(--muted); font-size: 13px; opacity: .55; transition: opacity .2s, background-color .2s, color .2s; }
   .subtle-remove:hover { opacity: 1; background: var(--border); color: var(--bad); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .78em; font-weight: 600; }
-  .badge.reached { background: #dcfce7; color: var(--good); }
+  /* Pills on a fixed light background keep their dark text in both themes (as in the exported image). */
+  .badge.reached { background: #dcfce7; color: #16a34a; }
   .badge.projected { background: #fef3c7; color: #92400e; }
   .badge.flat { background: var(--border); color: var(--muted); }
-  .badge.unreachable { background: #fee2e2; color: var(--bad); }
+  .badge.unreachable { background: #fee2e2; color: #dc2626; }
 
   /* --- Goals & projection settings --- */
   .proj-box { border-top: 1px dashed var(--border); margin-top: 12px; padding-top: 10px; }
@@ -388,10 +389,17 @@
   let currentPage = 1;
   let unsavedChanges = false;
   let devModeOn = false;
+  let entryDateDefault = ""; // the "today" the Date field was last set to
 
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "3.035", date: "2026-09-25", changes: [
+      "The entry date now rolls over when the app is left open past midnight, and replacing a weigh-in or importing over existing data asks first, so nothing is overwritten silently.",
+      "History hides dose-only days while Tirzepatide tracking is off, and a kg backup imported before choosing units stays in kg.",
+      "Chart and exported image: goals show their exact value (e.g. 75.5), goal tags are no longer hidden by the weight line, and very little data no longer gives a made-up date, repeated axis labels, or an exaggerated slope.",
+      "Bug reports no longer say they were copied when copying failed, and Reached badges are readable in dark mode."
+    ] },
     { version: "3.034", date: "2026-09-24", changes: [
       "Renamed the app file to index.html so it opens at a clean link when hosted on GitHub Pages."
     ] },
@@ -505,6 +513,13 @@
   const fmtDateExport = d => (d.slice(0, 4) === todayStr().slice(0, 4) ? fmtDateShort(d) : fmtDate(d));
   // First/middle/last dates for a chart's x-axis (fewer on very short spans).
   const axisDates = (first, totalDays) => [...new Set([0, 0.5, 1].map(f => addDays(first, Math.round(totalDays * f))))];
+  // A chart's weight axis: the data padded by padFrac each side, but at least 4 units
+  // tall so tiny changes don't fill the chart and whole-number labels never repeat.
+  function weightRange(values, padFrac) {
+    const [min, max] = extent(values);
+    const pad = Math.max((max - min) * padFrac, (4 - (max - min)) / 2);
+    return [min - pad, max + pad];
+  }
 
   // Weights are kept at 1-decimal precision in whichever unit is active.
   function convertWeight(v, from, to) {
@@ -697,8 +712,9 @@
 
   function renderHistory({ w, dir }) {
     const today = todayStr();
-    // Future dose-only entries are listed under Upcoming Doses instead.
-    const visible = entries.filter(e => e.date <= today || hasWeight(e)).reverse();
+    // Dose-only days are listed only while dose tracking is on, and future ones
+    // under Upcoming Doses instead.
+    const visible = entries.filter(e => hasWeight(e) || (tirzepatideEnabled() && e.date <= today)).reverse();
     $("historyWrap").hidden = !visible.length;
     $("historyEmpty").hidden = visible.length > 0;
     $("trackedSpanNote").textContent = w.length < 2 ? "" :
@@ -710,7 +726,7 @@
     const prevWeight = new Map(w.map((e, i) => [e.date, i ? w[i - 1].weight : null])); // change vs last weigh-in
     $("historyBody").innerHTML = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map(e => {
       const prev = hasWeight(e) ? prevWeight.get(e.date) : null;
-      const change = prev === null ? null : e.weight - prev;
+      const change = prev === null ? null : Math.round((e.weight - prev) * 10) / 10; // as displayed
       const cls = change ? ((dir === "gain") === (change > 0) ? "good" : "bad") : "";
       return `<tr>
         <td>${fmtDate(e.date)}</td>
@@ -802,13 +818,9 @@
     const W = 640, H = 320, padL = 45, padR = 20, padT = 20, padB = 35;
     const innerW = W - padL - padR, innerH = H - padT - padB;
     const active = goals.filter(g => !reachedDate(g, w));
-    let [min, max] = extent(w.map(e => e.weight).concat(active));
-    if (min === max) { min -= 1; max += 1; }
-    const pad = (max - min) * 0.1;
-    min -= pad;
-    max += pad;
-    const first = w[0].date, total = Math.max(1, daysBetween(first, w[w.length - 1].date));
-    const x = d => padL + daysBetween(first, d) / total * innerW;
+    const [min, max] = weightRange(w.map(e => e.weight).concat(active), 0.1);
+    const first = w[0].date, span = daysBetween(first, w[w.length - 1].date);
+    const x = d => padL + (span ? daysBetween(first, d) / span : 0.5) * innerW; // a single day sits mid-chart
     const y = v => padT + (1 - (v - min) / (max - min)) * innerH;
 
     const parts = [];
@@ -816,20 +828,24 @@
       const v = min + i / 4 * (max - min), yy = y(v);
       parts.push(`<line class="grid" x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}"/><text x="${padL - 6}" y="${yy + 3}" text-anchor="end">${v.toFixed(0)}</text>`);
     }
-    const dates = axisDates(first, total);
+    const dates = axisDates(first, span);
     dates.forEach((d, i) => {
-      const anchor = i === 0 ? "start" : i === dates.length - 1 ? "end" : "middle";
+      const anchor = !span ? "middle" : i === 0 ? "start" : i === dates.length - 1 ? "end" : "middle";
       parts.push(`<text x="${x(d)}" y="${H - 10}" text-anchor="${anchor}">${fmtDate(d)}</text>`);
     });
-    active.forEach(g => {
-      const gy = y(g), right = W - padR - 4;
-      parts.push(`<line class="goal" x1="${padL}" y1="${gy.toFixed(1)}" x2="${W - padR}" y2="${gy.toFixed(1)}"/>`,
-        `<rect class="goal-tag" x="${right - 64}" y="${gy - 8}" width="64" height="16" rx="4"/>`,
-        `<text class="goal-label" x="${right - 32}" y="${gy + 3}" text-anchor="middle">Goal: ${g.toFixed(0)} ${unit}</text>`);
-    });
+    active.forEach(g => parts.push(`<line class="goal" x1="${padL}" y1="${y(g).toFixed(1)}" x2="${W - padR}" y2="${y(g).toFixed(1)}"/>`));
     const pts = w.map(e => [x(e.date).toFixed(1), y(e.weight).toFixed(1)]);
     parts.push(`<path class="line" d="M${pts.map(p => p.join(",")).join(" L")}"/>`);
     pts.forEach(([cx, cy]) => parts.push(`<circle cx="${cx}" cy="${cy}" r="2.5"/>`));
+    // Goal tags go on top, hanging off the side of their line away from the latest
+    // weigh-in, where the recent data isn't.
+    const right = W - padR - 4, current = w[w.length - 1].weight;
+    active.forEach(g => {
+      const label = `Goal: ${+g.toFixed(1)} ${unit}`, tagW = label.length * 5 + 4;
+      const top = g < current ? y(g) + 2 : y(g) - 18;
+      parts.push(`<rect class="goal-tag" x="${right - tagW}" y="${top.toFixed(1)}" width="${tagW}" height="16" rx="4"/>`,
+        `<text class="goal-label" x="${right - tagW / 2}" y="${(top + 11).toFixed(1)}" text-anchor="middle">${label}</text>`);
+    });
     $("chartSvg").innerHTML = parts.join("");
   }
 
@@ -929,13 +945,9 @@
     ctx.strokeStyle = "#ffffff";
     ctx.stroke();
 
-    let [min, max] = extent(w.map(e => e.weight));
-    if (min === max) { min -= 1; max += 1; }
-    const pad = (max - min) * 0.12;
-    min -= pad;
-    max += pad;
-    const first = w[0].date, total = Math.max(1, daysBetween(first, last.date));
-    const cx = d => chartLeft + daysBetween(first, d) / total * (chartRight - chartLeft);
+    const [min, max] = weightRange(w.map(e => e.weight), 0.12);
+    const first = w[0].date, span = daysBetween(first, last.date);
+    const cx = d => chartLeft + (span ? daysBetween(first, d) / span : 0.5) * (chartRight - chartLeft);
     const cy = v => chartTop + (1 - (v - min) / (max - min)) * chartH;
 
     [0, 0.5, 1].forEach(f => {
@@ -945,7 +957,7 @@
       ctx.setLineDash([]);
       text(`${Math.round(v)} ${unit}`, chartLeft - 16, cy(v) + 7, "400 22px", MUTED, "right");
     });
-    axisDates(first, total).forEach(d => text(fmtDateExport(d), cx(d), chartBottom + 36, "400 22px", MUTED, "center"));
+    axisDates(first, span).forEach(d => text(fmtDateExport(d), cx(d), chartBottom + 36, "400 22px", MUTED, "center"));
 
     const pts = w.map(e => ({ x: cx(e.date), y: cy(e.weight) }));
     ctx.beginPath();
@@ -991,7 +1003,7 @@
       const s = goalStatus(g, w, rate);
       const [label, bg, fg] = PILLS[s.status];
       const mid = rowY + rowH / 2;
-      text(`${g.toFixed(0)} ${unit}`, tableLeft, mid + 11, "700 32px", TEXT);
+      text(`${+g.toFixed(1)} ${unit}`, tableLeft, mid + 11, "700 32px", TEXT);
       ctx.font = `600 22px ${FONT}`;
       const pillW = ctx.measureText(label).width + 32;
       roundRectPath(ctx, tableLeft + 260, mid - 19, pillW, 38, 19);
@@ -1087,8 +1099,9 @@
         ta.style.opacity = "0";
         document.body.appendChild(ta);
         ta.select();
-        document.execCommand("copy");
+        const copied = document.execCommand("copy");
         ta.remove();
+        return copied;
       }
       return true;
     } catch (err) {
@@ -1170,16 +1183,21 @@
   }
 
   // Replaces all entries and goals with the backup's, after validating it first
-  // so a bad file never changes anything.
+  // so a bad file never changes anything, and asking first if there's data to lose.
   function importBackup(text) {
     let raw;
     try { raw = JSON.parse(text); } catch (err) { return alert("Invalid backup file."); }
     if (!raw || !Array.isArray(raw.entries)) return alert("Invalid backup file: no entries found.");
-    const clean = normalizeBackup(raw, unit);
+    // Until Units is answered, the backup's own unit answers it, so its weights aren't converted.
+    const backupUnit = !profile.unit && (raw.unit === "kg" || raw.unit === "lb") ? raw.unit : "";
+    const clean = normalizeBackup(raw, backupUnit || unit);
     if (!clean.entries.length) return alert("Invalid backup file: no usable entries found.");
     if (clean.schemaVersion > DATA_SCHEMA_VERSION) {
       alert("Heads up: this backup was made by a newer version of the app. Importing it anyway, but some data may not carry over.");
     }
+    const count = n => `${n} ${n === 1 ? "entry" : "entries"}`;
+    if (entries.length && !confirm(`Replace your ${count(entries.length)} and goals with the ${count(clean.entries.length)} in this backup? This can't be undone.`)) return;
+    if (backupUnit) unit = profile.unit = backupUnit;
     entries = clean.entries;
     goals = clean.goals;
     if (clean.name) profile.name = clean.name; // older backups have no name; keep ours
@@ -1217,6 +1235,9 @@
         entries.filter(e => hasDose(e) && e.date >= today).length >= MAX_UPCOMING_DOSES) {
       return alert("You can only have 3 upcoming doses scheduled at once. Remove one before adding another.");
     }
+    // Re-adding a date is how a weigh-in gets corrected, but never silently.
+    if (weight !== null && existing && hasWeight(existing) && existing.weight !== weight &&
+        !confirm(`${fmtDate(date)} already has a weigh-in of ${existing.weight.toFixed(1)} ${unit}. Replace it with ${weight.toFixed(1)} ${unit}?`)) return;
     if (existing) {
       // Only overwrite what was entered, so a later dose keeps that day's weigh-in.
       if (weight !== null) existing.weight = weight;
@@ -1377,6 +1398,18 @@
     }
   });
 
+  // The Date field starts on today. If the app is left open past midnight (a phone
+  // tab, say), move it to the new day, unless the user picked a date themselves.
+  function rollOverToday() {
+    const today = todayStr();
+    if (today === entryDateDefault) return;
+    if ($("dateInput").value === entryDateDefault) $("dateInput").value = today;
+    entryDateDefault = today;
+    renderAll();
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) rollOverToday(); });
+  setInterval(rollOverToday, 60000);
+
   // ==========================================================================
   // INIT
   // ==========================================================================
@@ -1385,7 +1418,7 @@
   setTheme(savedTheme === "dark" || savedTheme === "light" ? savedTheme : hour >= 19 || hour < 7 ? "dark" : "light");
   loadAll();
   $("customRate").value = "0"; // some browsers restore the last position on reload
-  $("dateInput").value = todayStr();
+  $("dateInput").value = entryDateDefault = todayStr();
   $("appVersionTag").textContent = `v${APP_VERSION}`;
   renderOneTimeInfo();
   renderAll();
