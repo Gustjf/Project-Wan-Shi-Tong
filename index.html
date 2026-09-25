@@ -61,6 +61,8 @@
   button.small { padding: 3px 8px; font-size: .8em; }
   #exportBtn.unsaved { background: var(--unsaved-bg); border-color: var(--unsaved-border); }
   #exportBtn.unsaved:hover { background: rgba(245, 158, 11, .28); border-color: rgba(245, 158, 11, .6); }
+  .sync-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--unsaved-bg); border-color: var(--unsaved-border); font-size: .9em; }
+  .sync-banner button { flex: 0 0 auto; }
   button.pill { padding: 3px 8px; font-size: .78em; border-radius: 4px; background: transparent; border: 1px solid var(--border); color: var(--muted); }
   button.pill:hover:not(.active) { background: var(--border); }
   button.pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
@@ -177,6 +179,11 @@
     <button class="theme-toggle" id="themeToggle">🌓 Theme</button>
   </div>
 
+  <section id="syncBanner" class="sync-banner" hidden>
+    <span id="syncBannerText"></span>
+    <button id="syncBannerBtn">Reconnect</button>
+  </section>
+
   <section id="oneTimeInfoSection" hidden>
     <h2>Get Started</h2>
     <div class="row" id="oneTimeInfoFields"></div>
@@ -255,8 +262,10 @@
     <div class="toolbar">
       <button class="secondary" id="exportBtn">Export JSON</button>
       <button class="secondary" id="importBtn">Import JSON</button>
+      <button class="secondary" id="syncBtn" hidden>Sync Folder&hellip;</button>
       <input type="file" id="fileImport" accept=".json,application/json" hidden>
     </div>
+    <div id="syncStatus" class="note"></div>
     <div id="trackedSpanNote" class="footnote"></div>
   </section>
 
@@ -355,7 +364,8 @@
     goals: "weightTrackerGoals_v1",
     profile: "weightTrackerProfile_v1",
     theme: "weightTrackerTheme_v1",
-    bugReports: "weightTrackerBugReports_v1"
+    bugReports: "weightTrackerBugReports_v1",
+    sync: "weightTrackerSync_v1"
   };
   // Storage left behind by removed features; cleared on load.
   const LEGACY_KEYS = ["weightTrackerCalories_v1"];
@@ -366,6 +376,8 @@
   const MAX_ETA_WEEKS = 5200; // ~100 years; anything slower counts as a flat rate
   const BUG_REPORTS_MAX = 20;
   const DEBUG_LOG_MAX = 40;
+  const SYNC_CHECK_MS = 5000;    // how often the sync folder is checked for other devices' saves
+  const AUTOSAVE_DELAY_MS = 400; // quick edits in a row are saved to the folder once
   // Backup file format. Bump only when the shape changes in a way import has
   // to migrate. v2: entries gained doseMg.
   const DATA_SCHEMA_VERSION = 2;
@@ -391,9 +403,25 @@
   let devModeOn = false;
   let entryDateDefault = ""; // the "today" the Date field was last set to
 
+  // Folder autosave & sync (see that section below).
+  const syncSupported = typeof window.showDirectoryPicker === "function";
+  let syncMeta = {};         // this device's sync identity: { device, file, clock, changedAt, dirty }
+  let syncDir = null;        // the chosen folder
+  let syncState = "off";     // "off" | "on" | "paused" (needs permission again) | "error"
+  let syncMessage = "";      // banner text while in "error"
+  let syncNote = "";         // the last thing sync did, for the status line
+  let syncSeen = new Map();  // file name -> "lastModified:size" already read
+  let syncQueue = Promise.resolve();
+  let syncQueued = false;
+  let autosaveTimer = 0;
+
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.035", date: "2026-09-25", changes: [
+      "Added autosave & sync to a folder you choose (e.g. a Syncthing folder): changes save there automatically, the newest save loads on start, and other devices' changes load in while the app is open.",
+      "Changes made on two devices while out of sync are combined instead of one overwriting the other."
+    ] },
     { version: "3.035", date: "2026-09-25", changes: [
       "The entry date now rolls over when the app is left open past midnight, and replacing a weigh-in or importing over existing data asks first, so nothing is overwritten silently.",
       "History hides dose-only days while Tirzepatide tracking is off, and a kg backup imported before choosing units stays in kg.",
@@ -554,11 +582,30 @@
     try { return JSON.parse(storageGet(key)); } catch (e) { return null; }
   }
 
-  function save(unsaved = true) {
+  function persist() {
     storageSet(KEYS.entries, JSON.stringify(entries));
     storageSet(KEYS.goals, JSON.stringify(goals));
     storageSet(KEYS.profile, JSON.stringify(profile));
-    setUnsaved(unsaved);
+  }
+
+  // Keeps a change made on this device: stored locally, then autosaved to the
+  // sync folder (if one is on, that save stands in for Export JSON).
+  function save(unsaved = true) {
+    persist();
+    markLocalChange();
+    setUnsaved(unsaved && syncState !== "on");
+    scheduleAutosave();
+  }
+
+  const storeSyncMeta = () => storageSet(KEYS.sync, JSON.stringify(syncMeta));
+
+  // Each change made here counts up this device's version, which is how other
+  // devices tell its saves apart from ones they've already seen.
+  function markLocalChange() {
+    syncMeta.clock[syncMeta.device] = (syncMeta.clock[syncMeta.device] || 0) + 1;
+    syncMeta.changedAt = new Date().toISOString();
+    syncMeta.dirty = true; // not in the sync folder yet
+    storeSyncMeta();
   }
 
   // Highlights Export JSON while there are changes that aren't in a backup yet.
@@ -613,6 +660,17 @@
       storageSet(KEYS.goals, JSON.stringify(goals));
     }
     LEGACY_KEYS.forEach(storageRemove);
+
+    // This device's sync identity. A new one counts data already here as a change,
+    // so a sync folder's data is combined with it rather than replacing it.
+    const s = readJSON(KEYS.sync), clock = s && cleanClock(s.clock);
+    if (clock && typeof s.device === "string" && typeof s.file === "string") {
+      syncMeta = { device: s.device, file: s.file, clock, changedAt: String(s.changedAt || ""), dirty: !!s.dirty };
+    } else {
+      const device = Math.random().toString(36).slice(2, 8).padEnd(6, "0");
+      const kind = /Android|iPhone|iPad|Mobi/i.test(navigator.userAgent) ? "phone" : "desktop";
+      syncMeta = { device, file: `weight-autosave-${kind}-${device}.json`, clock: entries.length ? { [device]: 1 } : {}, changedAt: "", dirty: entries.length > 0 };
+    }
 
     const reports = readJSON(KEYS.bugReports);
     bugReports = Array.isArray(reports) ? reports.filter(r => r && typeof r.markdown === "string") : [];
@@ -1079,6 +1137,7 @@
       `- Average window: ${avgWindow}`,
       `- History page: ${currentPage}`,
       `- Unsaved changes since last export: ${unsavedChanges}`,
+      `- Folder sync: ${syncSupported ? syncState : "unsupported"}`,
       `- Dev mode: ${devModeOn}`, "",
       "## Recent Console Activity",
       ...(debugLog.length ? ["```", ...debugLog.map(l => `[${l.time}] ${l.level.toUpperCase()}: ${l.message}`), "```"] : ["_(none captured this session)_"]), "",
@@ -1168,8 +1227,8 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 10000); // revoking immediately can cancel the download
   }
 
-  function exportBackup() {
-    const backup = {
+  function buildBackup() {
+    return {
       schemaVersion: DATA_SCHEMA_VERSION,
       appVersion: APP_VERSION,
       unit,
@@ -1178,8 +1237,22 @@
       goals,
       cumulativeTirzepatideDoseMg: cumulativeDoseMg() // derived total for reference; not read on import
     };
-    downloadBlob(new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" }), `weight-backup-${todayStr()}.json`);
+  }
+
+  function exportBackup() {
+    downloadBlob(new Blob([JSON.stringify(buildBackup(), null, 2)], { type: "application/json" }), `weight-backup-${todayStr()}.json`);
     setUnsaved(false);
+  }
+
+  // Swaps in cleaned backup data (from Import JSON or the sync folder) for all
+  // entries and goals. A backupUnit answers the Units question with the backup's.
+  function applyBackup(clean, backupUnit) {
+    if (backupUnit) unit = profile.unit = backupUnit;
+    entries = clean.entries;
+    goals = clean.goals;
+    if (clean.name) profile.name = clean.name; // older backups have no name; keep ours
+    // Dose entries prove Tirzepatide is in use, so that start-up question is answered.
+    if (entries.some(hasDose)) Object.assign(profile, { usesTirzepatide: true, usesTirzepatideAsked: true });
   }
 
   // Replaces all entries and goals with the backup's, after validating it first
@@ -1197,16 +1270,273 @@
     }
     const count = n => `${n} ${n === 1 ? "entry" : "entries"}`;
     if (entries.length && !confirm(`Replace your ${count(entries.length)} and goals with the ${count(clean.entries.length)} in this backup? This can't be undone.`)) return;
-    if (backupUnit) unit = profile.unit = backupUnit;
-    entries = clean.entries;
-    goals = clean.goals;
-    if (clean.name) profile.name = clean.name; // older backups have no name; keep ours
-    // Dose entries prove Tirzepatide is in use, so that start-up question is answered.
-    if (entries.some(hasDose)) Object.assign(profile, { usesTirzepatide: true, usesTirzepatideAsked: true });
+    applyBackup(clean, backupUnit);
     save(false);
     currentPage = 1;
     renderOneTimeInfo();
     renderAll();
+  }
+
+  // ==========================================================================
+  // FOLDER AUTOSAVE & SYNC
+  // ==========================================================================
+  // Changes are saved as JSON into a folder the user picks (e.g. one Syncthing
+  // shares between their phone and computer), and other devices' saves are
+  // loaded from it, checking every few seconds. Each device writes only its own
+  // file, so a sync tool never sees two devices edit the same file. Saves carry
+  // version counters (how many changes each device has made) that tell whether
+  // another device's save is newer (load it), older (ignore it), or was made
+  // while this device also had unsynced changes (combine the two).
+  const SYNC_RETRY_NOTE = "Couldn't reach the folder, retrying";
+  const clockTime = () => new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+  // The folder's handle can't go in localStorage, so it's kept in IndexedDB.
+  function folderStore(mode, action) {
+    return new Promise((resolve, reject) => {
+      const open = indexedDB.open("weightTracker", 1);
+      open.onupgradeneeded = () => open.result.createObjectStore("handles");
+      open.onerror = () => reject(open.error);
+      open.onsuccess = () => {
+        const db = open.result;
+        try {
+          const tx = db.transaction("handles", mode), req = action(tx.objectStore("handles"));
+          tx.oncomplete = () => { db.close(); resolve(req.result); };
+          tx.onerror = tx.onabort = () => { db.close(); reject(tx.error); };
+        } catch (err) { db.close(); reject(err); }
+      };
+    });
+  }
+  const loadSyncFolder = () => folderStore("readonly", store => store.get("syncFolder"));
+  const storeSyncFolder = dir => folderStore("readwrite", store => (dir ? store.put(dir, "syncFolder") : store.delete("syncFolder")));
+
+  // A save's version counters, { deviceId: changes made there }, minus anything invalid.
+  function cleanClock(c) {
+    if (!c || typeof c !== "object" || Array.isArray(c)) return null;
+    const out = {};
+    Object.keys(c).forEach(k => { if (isPos(c[k])) out[k] = c[k]; });
+    return out;
+  }
+
+  // Whether version a is the "same" as b, "ahead" (has all of b's changes and
+  // more), "behind", or "diverged" (each has changes the other doesn't).
+  function compareClocks(a, b) {
+    let ahead = false, behind = false;
+    Object.keys({ ...a, ...b }).forEach(k => {
+      if ((a[k] || 0) > (b[k] || 0)) ahead = true;
+      if ((a[k] || 0) < (b[k] || 0)) behind = true;
+    });
+    return ahead && behind ? "diverged" : ahead ? "ahead" : behind ? "behind" : "same";
+  }
+  const maxClocks = (a, b) => Object.keys(b).reduce((c, k) => ({ ...c, [k]: Math.max(c[k] || 0, b[k]) }), { ...a });
+
+  // Combines two versions changed separately: every day and goal from either is
+  // kept (so something deleted meanwhile can come back), and a day both changed
+  // takes each value from the more recent save. Gives the same result on every
+  // device, so two devices combining at once still agree.
+  function mergeVersions(a, b) {
+    const [older, newer] = a.savedAt + a.device > b.savedAt + b.device ? [b, a] : [a, b];
+    const days = new Map(older.entries.map(e => [e.date, e]));
+    newer.entries.forEach(e => {
+      const o = days.get(e.date) || {};
+      days.set(e.date, { date: e.date, weight: e.weight ?? o.weight ?? null, doseMg: e.doseMg ?? o.doseMg ?? null });
+    });
+    return {
+      entries: [...days.values()].sort(byDate),
+      goals: [...new Set(older.goals.concat(newer.goals))].sort((x, y) => y - x),
+      name: newer.name || older.name
+    };
+  }
+  const dataKey = d => JSON.stringify([d.entries, d.goals, d.name]);
+
+  // Brings in a save found in the folder; returns what happened, or "" if nothing.
+  function incorporate(raw) {
+    const clock = raw.sync && cleanClock(raw.sync.clock);
+    const rel = clock ? compareClocks(syncMeta.clock, clock) : "plain";
+    // A device with no entries yet (a new phone, say) takes a save as it is.
+    // Plain backups (Export JSON files) are only ever used that way.
+    const replace = rel === "behind" || (!entries.length && (rel === "diverged" || rel === "plain"));
+    const merge = rel === "diverged" && !replace;
+    if (!replace && !merge) return "";
+    // Taking a save whole can answer Units, as an import does; combining keeps ours.
+    const backupUnit = replace && !profile.unit && (raw.unit === "kg" || raw.unit === "lb") ? raw.unit : "";
+    const theirs = normalizeBackup(raw, backupUnit || unit);
+    if (!clock && !theirs.entries.length) return "";
+    const next = replace ? theirs : mergeVersions(
+      { entries, goals, name: profile.name, savedAt: syncMeta.changedAt, device: syncMeta.device },
+      { ...theirs, savedAt: String(raw.savedAt || ""), device: String(raw.sync.device || "") });
+    if (clock) syncMeta.clock = maxClocks(syncMeta.clock, clock);
+    if (!clock || dataKey(next) !== dataKey(theirs)) {
+      markLocalChange(); // a version the folder doesn't have yet, so it gets saved there
+    } else {
+      syncMeta.changedAt = String(raw.savedAt || syncMeta.changedAt);
+      storeSyncMeta();
+    }
+    if (!backupUnit && dataKey({ ...next, name: next.name || profile.name }) === dataKey({ entries, goals, name: profile.name })) return ""; // nothing new here
+    applyBackup(next, backupUnit);
+    return replace ? "Loaded" : "Combined changes with";
+  }
+
+  // Reads the folder's saves that are new or changed since last time, most up to
+  // date first, and brings them in.
+  async function readFolder(dir) {
+    const changed = [];
+    for await (const [name, handle] of dir.entries()) {
+      if (handle.kind !== "file" || !/\.json$/i.test(name)) continue;
+      try {
+        const file = await handle.getFile();
+        const sig = `${file.lastModified}:${file.size}`;
+        if (syncSeen.get(name) !== sig) changed.push({ name, file, sig });
+      } catch (err) { /* mid-transfer; the next check gets it */ }
+    }
+    changed.sort((a, b) => b.file.lastModified - a.file.lastModified);
+    let what = "";
+    for (const { name, file, sig } of changed) {
+      let raw = null;
+      try { raw = JSON.parse(await file.text()); } catch (err) { /* not a save, or changed while being read: retried once it changes */ }
+      if (dir !== syncDir) return;
+      syncSeen.set(name, sig);
+      const result = raw && Array.isArray(raw.entries) ? incorporate(raw) : "";
+      if (result && !what) what = `${result} “${name}”`;
+    }
+    if (!what) return;
+    persist();
+    if ($("oneTimeInfoCancelBtn").hidden) renderOneTimeInfo(); // not while start-up info is being edited
+    renderAll();
+    syncNote = `${what} at ${clockTime()}`;
+    renderSync();
+  }
+
+  // Saves this device's file in the folder, if it has changes the folder lacks.
+  async function writeAutosave() {
+    const dir = syncDir;
+    if (syncState !== "on" || !syncMeta.dirty) return;
+    const version = syncMeta.clock[syncMeta.device];
+    const text = JSON.stringify({ ...buildBackup(), savedAt: syncMeta.changedAt, sync: { device: syncMeta.device, clock: syncMeta.clock } }, null, 2);
+    const handle = await dir.getFileHandle(syncMeta.file, { create: true });
+    const out = await handle.createWritable();
+    await out.write(text);
+    await out.close();
+    const file = await handle.getFile();
+    if (dir !== syncDir) return;
+    syncSeen.set(syncMeta.file, `${file.lastModified}:${file.size}`); // our own save isn't news
+    if (syncMeta.clock[syncMeta.device] === version) { // nothing changed while writing
+      syncMeta.dirty = false;
+      storeSyncMeta();
+      setUnsaved(false);
+    }
+    syncNote = `Saved at ${clockTime()}`;
+    renderSync();
+  }
+
+  async function syncPass() {
+    if (syncState !== "on") return;
+    await readFolder(syncDir);
+    await writeAutosave();
+    if (syncNote === SYNC_RETRY_NOTE) { syncNote = ""; renderSync(); }
+  }
+
+  // Folder work runs one step at a time, so saving and checking never overlap.
+  function syncTask(fn) {
+    syncQueue = syncQueue.then(fn).catch(onSyncError);
+  }
+
+  function requestSync() {
+    if (syncState !== "on" || syncQueued) return;
+    syncQueued = true;
+    syncTask(() => { syncQueued = false; return syncPass(); });
+  }
+
+  function scheduleAutosave() {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = syncState === "on" ? setTimeout(flushAutosave, AUTOSAVE_DELAY_MS) : 0;
+  }
+
+  // Saves a pending change now (e.g. when the app is being hidden or closed).
+  function flushAutosave() {
+    if (!autosaveTimer) return;
+    clearTimeout(autosaveTimer);
+    autosaveTimer = 0;
+    syncTask(writeAutosave);
+  }
+
+  function onSyncError(err) {
+    if (syncMeta.dirty) setUnsaved(true);
+    if (syncNote !== SYNC_RETRY_NOTE) console.error("Folder sync failed.", err); // once per outage
+    if (syncState !== "on") return;
+    const name = err && err.name;
+    if (name === "NotAllowedError" || name === "SecurityError") setSyncState("paused");
+    else if (name === "NotFoundError") setSyncState("error", `Couldn't find the sync folder “${syncDir.name}”. It may have been moved or deleted.`);
+    else { syncNote = SYNC_RETRY_NOTE; renderSync(); }
+  }
+
+  function setSyncState(state, message = "") {
+    syncState = state;
+    syncMessage = message;
+    if (state !== "on") { clearTimeout(autosaveTimer); autosaveTimer = 0; } // unsaved changes go once it's back on
+    renderSync();
+  }
+
+  function renderSync() {
+    const folder = syncDir ? `“${syncDir.name}”` : "";
+    const status = !syncSupported ? "Autosave & sync to a folder needs Chrome or Edge, on a computer or Android."
+      : syncState === "on" ? `Autosave & sync on with folder ${folder}${syncNote ? ` · ${syncNote}` : ""}` : "";
+    $("syncBtn").hidden = !syncSupported;
+    $("syncBtn").textContent = syncState === "off" ? "Sync Folder…" : "Stop Syncing";
+    $("syncStatus").textContent = status;
+    $("syncStatus").hidden = !status;
+    $("syncBanner").hidden = syncState !== "paused" && syncState !== "error";
+    $("syncBannerText").textContent = syncState === "paused" ? `Autosave & sync with ${folder} is paused until you allow access again.` : syncMessage;
+    $("syncBannerBtn").textContent = syncState === "paused" ? "Reconnect" : "Choose Folder";
+  }
+
+  async function chooseSyncFolder() {
+    let dir;
+    try {
+      dir = await window.showDirectoryPicker({ id: "weight-sync", mode: "readwrite" });
+    } catch (err) {
+      if (err.name === "AbortError") return; // picker cancelled
+      console.error("Couldn't open that folder.", err);
+      return alert("Couldn't use that folder. Try choosing another one.");
+    }
+    syncDir = dir;
+    syncSeen = new Map();
+    syncNote = "";
+    syncMeta.dirty = true; // so this device's data is in the folder from the start
+    storeSyncMeta();
+    storeSyncFolder(dir).catch(err => console.warn("Couldn't remember the sync folder for next time.", err));
+    setSyncState("on");
+    requestSync();
+  }
+
+  // Browsers ask again for folder access after a restart, and only on a click.
+  async function reconnectSync() {
+    let permission = "denied";
+    try { permission = await syncDir.requestPermission({ mode: "readwrite" }); } catch (err) { console.warn("Folder permission request failed.", err); }
+    if (permission !== "granted") return setSyncState("error", `Access to “${syncDir.name}” wasn't allowed. Choose the folder again to resume autosave & sync.`);
+    setSyncState("on");
+    requestSync();
+  }
+
+  function stopSync() {
+    if (!confirm(`Stop autosave & sync with “${syncDir.name}”? Your data stays on this device, and the files already in that folder are left as they are.`)) return;
+    syncDir = null;
+    syncSeen = new Map();
+    syncNote = "";
+    setSyncState("off");
+    storeSyncFolder(null).catch(err => console.warn("Couldn't forget the sync folder.", err));
+  }
+
+  // Picks up the folder chosen last time: straight away if the browser still
+  // allows access, otherwise once the user reconnects.
+  async function initSync() {
+    renderSync();
+    if (!syncSupported) return;
+    try { syncDir = (await loadSyncFolder()) || null; } catch (err) { console.warn("Couldn't load the sync folder setting.", err); }
+    if (!syncDir) return;
+    let permission = "prompt";
+    try { permission = await syncDir.queryPermission({ mode: "readwrite" }); } catch (err) { /* ask again */ }
+    setSyncState(permission === "granted" ? "on" : "paused");
+    requestSync();
   }
 
   // ==========================================================================
@@ -1303,6 +1633,8 @@
     reader.onerror = () => alert("Couldn't read that file.");
     reader.readAsText(file);
   });
+  $("syncBtn").addEventListener("click", () => (syncState === "off" ? chooseSyncFolder() : stopSync()));
+  $("syncBannerBtn").addEventListener("click", () => (syncState === "paused" ? reconnectSync() : chooseSyncFolder()));
   $("prevPageBtn").addEventListener("click", () => { currentPage--; renderAll(); });
   $("nextPageBtn").addEventListener("click", () => { currentPage++; renderAll(); });
   $("customRate").addEventListener("input", renderAll);
@@ -1410,6 +1742,14 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) rollOverToday(); });
   setInterval(rollOverToday, 60000);
 
+  // The sync folder is checked for other devices' saves every few seconds while
+  // the app is on screen and as soon as it's back in view. A pending autosave is
+  // written straight away when the app is hidden or closed.
+  setInterval(() => { if (!document.hidden) requestSync(); }, SYNC_CHECK_MS);
+  window.addEventListener("focus", requestSync);
+  window.addEventListener("pagehide", flushAutosave);
+  document.addEventListener("visibilitychange", () => (document.hidden ? flushAutosave() : requestSync()));
+
   // ==========================================================================
   // INIT
   // ==========================================================================
@@ -1422,6 +1762,7 @@
   $("appVersionTag").textContent = `v${APP_VERSION}`;
   renderOneTimeInfo();
   renderAll();
+  initSync();
 })();
 </script>
 </body>
