@@ -422,6 +422,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.155", date: "2026-09-26", changes: [
+      "Goal Weights project your weight at the start of each of the next three seasons (from the real equinoxes and solstices) instead of 3, 6 and 12 months out; a season drops off once it starts."
+    ] },
     { version: "4.055", date: "2026-09-26", changes: [
       "A DEV button in the bottom-right corner, beside the version number, turns developer mode on and off without a keyboard (for phones)."
     ] },
@@ -532,7 +535,8 @@
   const hasWeight = e => isNum(e.weight);
   const hasDose = e => isNum(e.doseMg);
   const byDate = (a, b) => a.date.localeCompare(b.date);
-  const mean = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
+  const sum = arr => arr.reduce((s, v) => s + v, 0);
+  const mean = arr => sum(arr) / arr.length;
   const extent = arr => [arr.reduce((a, b) => Math.min(a, b)), arr.reduce((a, b) => Math.max(a, b))];
 
   // Dates are "YYYY-MM-DD" calendar days. Date math runs in UTC so timezones and
@@ -760,6 +764,61 @@
   }
 
   // ==========================================================================
+  // SEASONS
+  // ==========================================================================
+  // Seasons start on the equinoxes and solstices, the astronomical seasons.
+  // Their instants come from Meeus's Astronomical Algorithms (ch. 27), within
+  // a minute or two of a full ephemeris. Same math as Momo's, so the two apps agree.
+  const SEASONS = ["Spring", "Summer", "Fall", "Winter"];
+  const SEASON_BASE = [ // March equinox, June solstice, September equinox, December solstice
+    [2451623.80984, 365242.37404, 0.05169, -0.00411, -0.00057],
+    [2451716.56767, 365241.62603, 0.00325, 0.00888, -0.00030],
+    [2451810.21715, 365242.01767, -0.11575, 0.00337, 0.00078],
+    [2451900.05952, 365242.74049, -0.06223, -0.00823, 0.00032]
+  ];
+  const SEASON_TERMS = [ // periodic corrections: amplitude, phase, speed
+    [485, 324.96, 1934.136], [203, 337.23, 32964.467], [199, 342.08, 20.186], [182, 27.85, 445267.112],
+    [156, 73.14, 45036.886], [136, 171.52, 22518.443], [77, 222.54, 65928.934], [74, 296.72, 3034.906],
+    [70, 243.58, 9037.513], [58, 119.81, 33718.147], [52, 297.17, 150.678], [50, 21.02, 2281.226],
+    [45, 247.54, 29929.562], [44, 325.15, 31555.956], [29, 60.93, 4443.417], [18, 155.12, 67555.328],
+    [17, 288.79, 4562.452], [16, 198.04, 62894.029], [14, 199.76, 31436.921], [12, 95.39, 14577.848],
+    [12, 287.11, 31931.756], [12, 320.81, 34777.259], [9, 227.73, 1222.114], [8, 15.45, 16859.074]
+  ];
+
+  // The instant a season starts in a year (0 spring … 3 winter), in ms since
+  // 1970 UTC. The formulas give a Julian day on astronomers' steady clock,
+  // which runs ahead of the slowing Earth: 69 s now, more each century.
+  function seasonMs(year, s) {
+    const deg = Math.PI / 180, Y = (year - 2000) / 1000, [a, b, c, d, e] = SEASON_BASE[s];
+    const jde0 = a + Y * (b + Y * (c + Y * (d + Y * e)));
+    const T = (jde0 - 2451545) / 36525, W = (35999.373 * T - 2.47) * deg;
+    const S = sum(SEASON_TERMS.map(([A, B, C]) => A * Math.cos((B + C * T) * deg)));
+    const jde = jde0 + 0.00001 * S / (1 + 0.0334 * Math.cos(W) + 0.0007 * Math.cos(2 * W));
+    return (jde - 2440587.5) * DAY_MS - (69 + 32 * ((year - 2026) / 100) ** 2) * 1000;
+  }
+
+  // The day a season starts in North America: the date of its equinox or
+  // solstice on this device's clock when that's on North American time
+  // (Hawaii to Newfoundland), else on Eastern time (EDT, or EST in December).
+  function seasonStart(year, s) {
+    const ms = seasonMs(year, s), behind = new Date(ms).getTimezoneOffset(); // minutes behind UTC
+    return msDate(ms - (behind >= 150 && behind <= 600 ? behind : s === 3 ? 300 : 240) * 60000);
+  }
+
+  // The next n seasons to start after today, soonest first, as { label, date }.
+  // The season under way is left out until the next one starts.
+  function nextSeasons(n) {
+    const today = todayStr(), next = [];
+    for (let year = +today.slice(0, 4); next.length < n; year++) {
+      SEASONS.forEach((label, s) => {
+        const date = seasonStart(year, s);
+        if (date > today && next.length < n) next.push({ label, date });
+      });
+    }
+    return next;
+  }
+
+  // ==========================================================================
   // RENDERING
   // ==========================================================================
   function renderAll() {
@@ -851,13 +910,14 @@
       ? `Using the fitted trend from the ${trendWindow === "all" ? "all-time" : trendWindow + "d"} window (set above in Current Trend).`
       : `Using the custom weekly rate above, applied toward your goal to ${dir} weight.`;
 
-    // Projected weight 1/3/6/12 months out at the selected rate.
-    $("futureWeightGrid").innerHTML = [1, 3, 6, 12].map(months => {
-      const weeks = Math.round(months * 4.345);
-      const v = last.weight * Math.pow(1 - rate, weeks);
+    // Projected weight at the selected rate a month (4 weeks) out, then at the
+    // start of each of the next three seasons.
+    const horizons = [{ label: "1 mo", date: addDays(last.date, 28) }, ...nextSeasons(3)];
+    $("futureWeightGrid").innerHTML = horizons.map(({ label, date }) => {
+      const v = last.weight * Math.pow(1 - rate, daysBetween(last.date, date) / 7);
       return `<div class="stat">
         <div class="val">${isPos(v) ? `${v.toFixed(1)} ${unit}` : "&mdash;"}</div>
-        <div class="lbl">${months} mo${isPos(v) ? ` &bull; ${fmtDateShort(addDays(last.date, weeks * 7))}` : ""}</div>
+        <div class="lbl">${label}${isPos(v) ? ` &bull; ${fmtDateShort(date)}` : ""}</div>
       </div>`;
     }).join("");
 
