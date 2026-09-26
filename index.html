@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bosco — Weight Tracker &amp; Projections</title>
+<!-- Favicon: the "bear-face" icon from Lucide Lab (ISC license), in the accent blue so it shows on light and dark tabs. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 7 .5.5'/><path d='m18 7-.5.5'/><path d='M20.8 4.2c-1.6-1.6-4.1-1.6-5.7 0l-1 1a13.6 13.6 0 0 0-4.2 0l-1-1a4 4 0 0 0-5.8 5.55A7 7 0 0 0 2 13.5C2 18.2 6.5 22 12 22s10-3.8 10-8.5a7 7 0 0 0-1.1-3.8c1.5-1.6 1.5-4-.1-5.5'/><path d='M10 12v-.5'/><path d='M14 12v-.5'/><path d='M14 16h-4'/><path d='M12 16v2'/></svg>">
 <style>
   :root {
     --bg: #f4f5f7; --panel: #ffffff; --border: #dcdfe4; --text: #1f2430; --muted: #6b7280;
@@ -439,6 +441,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.276", date: "2026-09-26", changes: [
+      "Added a bear-face tab icon (from Lucide) so Bosco is easy to spot among browser tabs."
+    ] },
     { version: "4.266", date: "2026-09-26", changes: [
       "Upcoming doses now lead with the day of the week, with the date and amount below (the year only shows when it isn't this year)."
     ] },
