@@ -261,7 +261,7 @@
         <div class="row" id="vialKnownWrap" hidden>
           <div>
             <label for="vialConcInput">Concentration, mg/mL</label>
-            <input type="number" id="vialConcInput" step="1" min="1" placeholder="e.g. 20">
+            <input type="number" id="vialConcInput" step="0.001" min="0" placeholder="e.g. 20">
           </div>
         </div>
         <div class="note" id="vialCalcNote" hidden></div>
@@ -519,6 +519,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.387", date: "2026-09-26", changes: [
+      "A vial's known concentration can now be entered with up to three decimal places (e.g. 16.667 mg/mL), and concentrations show to that precision."
+    ] },
     { version: "4.377", date: "2026-09-26", changes: [
       "Setup now asks for your days between doses and typical dose, and shows the weekly equivalent.",
       "Setup can hold one active vial (its mg/mL, or its mg and the BAC water it was mixed with), and upcoming doses show the units to draw on a U-100 syringe."
@@ -701,7 +704,7 @@
   const isDoseInterval = d => Number.isInteger(d) && d >= 1 && d <= MAX_DOSE_INTERVAL_DAYS;
   // Rounded for display, without trailing zeros: 5.8333 -> "5.83", 20.0 -> "20".
   const fmtNum = (v, places) => String(+v.toFixed(places));
-  const fmtConc = mgPerMl => `${fmtNum(mgPerMl, 2)} mg/mL`;
+  const fmtConc = mgPerMl => `${fmtNum(mgPerMl, 3)} mg/mL`; // as precise as it can be entered
   // A dose drawn from a vial, in U-100 insulin syringe units (100 units = 1 mL).
   const fmtUnits = (mg, mgPerMl) => `${fmtNum(mg / mgPerMl * 100, 1)} units`;
 
@@ -1264,8 +1267,9 @@
     if (vialMode === "known") {
       const mgPerMl = readNumber("vialConcInput");
       if (mgPerMl === null) return null;
-      return Number.isInteger(mgPerMl) && mgPerMl > 0 ? { mgPerMl, vialMg: null, bacMl: null }
-        : invalid("Enter the concentration as a whole number of mg per mL.");
+      // Positive, with no more than three decimal places (e.g. 16.667).
+      return isPos(mgPerMl) && mgPerMl === +mgPerMl.toFixed(3) ? { mgPerMl, vialMg: null, bacMl: null }
+        : invalid("Enter the concentration in mg per mL, with up to three decimal places.");
     }
     const vialMg = readNumber("vialMgInput"), bacMl = bacWaterMl();
     if (vialMg === null) return null;
