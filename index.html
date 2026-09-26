@@ -96,6 +96,8 @@
   .stat .val { font-size: 1.15em; font-weight: 700; }
   .stat .lbl { font-size: .75em; color: var(--muted); margin-top: 2px; }
   #statsSection .stat { min-width: 230px; } /* room for a full row of window pills */
+  #upcomingDosesGrid .stat { min-width: 140px; } /* room for "Wednesday" beside the remove button */
+  #upcomingDosesGrid .lbl span { white-space: nowrap; } /* a date or amount never splits across lines */
   .window-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
   .subtle-remove { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; padding: 0; line-height: 14px; text-align: center; border-radius: 50%; background: transparent; color: var(--muted); font-size: 13px; opacity: .55; transition: opacity .2s, background-color .2s, color .2s; }
   .subtle-remove:hover { opacity: 1; background: var(--border); color: var(--bad); }
@@ -437,6 +439,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.266", date: "2026-09-26", changes: [
+      "Upcoming doses now lead with the day of the week, with the date and amount below (the year only shows when it isn't this year)."
+    ] },
     { version: "4.256", date: "2026-09-26", changes: [
       "The start-up medication question no longer spills out of its box: its choices get a line of their own, two per row on phones."
     ] },
@@ -572,8 +577,9 @@
   const fmtDate = (d, opts = { year: "numeric", month: "short", day: "numeric" }) =>
     new Date(dateMs(d)).toLocaleDateString(undefined, { ...opts, timeZone: "UTC" });
   const fmtDateShort = d => fmtDate(d, { month: "short", day: "numeric" });
-  // Exported image: show the year only when it isn't this year.
-  const fmtDateExport = d => (d.slice(0, 4) === todayStr().slice(0, 4) ? fmtDateShort(d) : fmtDate(d));
+  // Exported image and dose cards: show the year only when it isn't this year.
+  const fmtDateBrief = d => (d.slice(0, 4) === todayStr().slice(0, 4) ? fmtDateShort(d) : fmtDate(d));
+  const fmtWeekday = d => fmtDate(d, { weekday: "long" });
   // First/middle/last dates for a chart's x-axis (fewer on very short spans).
   const axisDates = (first, totalDays) => [...new Set([0, 0.5, 1].map(f => addDays(first, Math.round(totalDays * f))))];
   // A chart's weight axis: the data padded by padFrac each side, but at least 4 units
@@ -924,10 +930,11 @@
     const last = past.slice(-PAGE_SIZE).some(hasDose) ? null : past.filter(hasDose).pop();
     $("upcomingDosesSection").hidden = !upcoming.length && !last;
     $("upcomingDosesGrid").innerHTML =
-      (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken${otherMedNote(last)} &middot; ${fmtDate(last.date)}</div></div>` : "") +
+      (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken${otherMedNote(last)} &middot; <span>${fmtDateBrief(last.date)}</span></div></div>` : "") +
+      // Upcoming doses lead with the weekday, the day you dose on.
       upcoming.map(e => `<div class="stat">
         <button class="subtle-remove" data-dose-date="${e.date}" title="Remove this dose" aria-label="Remove upcoming dose">&times;</button>
-        <div class="val">${e.doseMg} mg</div><div class="lbl">${fmtDate(e.date)}${otherMedNote(e)}</div>
+        <div class="val">${fmtWeekday(e.date)}</div><div class="lbl"><span>${fmtDateBrief(e.date)}</span> &middot; <span>${e.doseMg} mg</span>${otherMedNote(e)}</div>
       </div>`).join("");
   }
 
@@ -1133,7 +1140,7 @@
       ctx.setLineDash([]);
       text(`${Math.round(v)} ${unit}`, chartLeft - 16, cy(v) + 7, "400 22px", MUTED, "right");
     });
-    axisDates(first, span).forEach(d => text(fmtDateExport(d), cx(d), chartBottom + 36, "400 22px", MUTED, "center"));
+    axisDates(first, span).forEach(d => text(fmtDateBrief(d), cx(d), chartBottom + 36, "400 22px", MUTED, "center"));
 
     const pts = w.map(e => ({ x: cx(e.date), y: cy(e.weight) }));
     ctx.beginPath();
@@ -1186,12 +1193,12 @@
       ctx.fillStyle = bg;
       ctx.fill();
       text(label, tableLeft + 276, mid + 7, "600 22px", fg);
-      text(s.date ? fmtDateExport(s.date) : "—", tableRight, mid + 9, "500 26px", MUTED, "right");
+      text(s.date ? fmtDateBrief(s.date) : "—", tableRight, mid + 9, "500 26px", MUTED, "right");
       if (i < list.length - 1) hLine(tableLeft, tableRight, rowY + rowH);
       rowY += rowH;
     });
 
-    const weightNote = `Current weight: ${last.weight.toFixed(1)} ${unit} as of ${fmtDateExport(last.date)}`;
+    const weightNote = `Current weight: ${last.weight.toFixed(1)} ${unit} as of ${fmtDateBrief(last.date)}`;
     const doses = medicationEnabled() ? Object.entries(cumulativeDoseMg()) : [];
     const oneLine = [weightNote, ...doses.map(([id, mg]) => `${medLabel(id)} cumulative dosage: ${mg} mg`)].join(" | ");
     ctx.font = `500 22px ${FONT}`;
