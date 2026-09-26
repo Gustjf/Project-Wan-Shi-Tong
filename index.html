@@ -445,22 +445,16 @@
   </div>
 </div>
 
-<!-- Asks about a scheduled dose once it's due; nothing is logged until it's confirmed. -->
+<!-- Asks about a scheduled dose once it's due; nothing is logged until it's confirmed,
+     and then just as scheduled (its day, the typical dose), with nothing to edit. -->
 <div class="modal-overlay" id="doseOverlay">
   <div class="modal" role="dialog" aria-labelledby="doseModalTitle">
     <h3 id="doseModalTitle">Did you take your dose?</h3>
     <p class="modal-hint" id="doseModalText"></p>
-    <div class="row">
-      <div class="date-cell">
-        <label for="doseTakenDate">Date taken</label>
-        <input type="date" id="doseTakenDate">
-      </div>
-      <div>
-        <label for="doseTakenMg">Dose, mg</label>
-        <input type="number" id="doseTakenMg" step="any" min="0">
-      </div>
+    <div class="stat">
+      <div class="val" id="doseModalMg"></div>
+      <div class="lbl" id="doseModalUnits" hidden></div>
     </div>
-    <div class="note" id="doseUnitsNote" hidden></div>
     <div class="actions">
       <button id="doseLogBtn">Log dose</button>
       <button class="secondary" id="doseSnoozeBtn">Not yet</button>
@@ -556,6 +550,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "5.407", date: "2026-09-26", changes: [
+      "The dose pop-up is now a simple confirmation with nothing to edit: it logs the scheduled day and your typical dose from setup, which scheduling now needs."
+    ] },
     { version: "5.397", date: "2026-09-26", changes: [
       "The dose pop-up's Skip is now Postpone to tomorrow, which moves that dose to tomorrow and the doses after it along with it."
     ] },
@@ -759,7 +756,6 @@
     const units = mg / mgPerMl * 100, rounded = fmtNum(Math.round(units * 2) / 2, 1), exact = fmtNum(units, 2);
     return `${rounded} units${exact === rounded ? "" : ` (${exact})`}`;
   }
-  const syringeNote = (mg, vial) => `${mg} mg = <strong>${fmtUnits(mg, vial.mgPerMl)}</strong> on a U&#8209;100 syringe`; // "U-100" never splits
 
   // ==========================================================================
   // STORAGE
@@ -1127,13 +1123,13 @@
     const units = mg => (vial ? ` &middot; <span>${fmtUnits(mg, vial.mgPerMl)}</span>` : "");
     // A plan with no dose logged yet has nothing to count from.
     const plan = medicationEnabled() && planFor(currentMedication());
-    const waiting = !!(plan && plan.intervalDays) && !schedule.length;
+    const waiting = !!(plan && plan.intervalDays && plan.doseMg) && !schedule.length;
     $("upcomingDosesSection").hidden = !schedule.length && !last && !waiting;
     $("upcomingDosesGrid").innerHTML =
       (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken${otherMedNote(last)} &middot; <span>${fmtDateBrief(last.date)}</span></div></div>` : "") +
       // Upcoming doses lead with the weekday, the day you dose on. Due ones wait to be confirmed.
       schedule.map(d => `<div class="stat${d.due ? " due" : ""}">
-        <div class="val">${fmtWeekday(d.date)}</div><div class="lbl"><span>${fmtDateBrief(d.date)}</span>${d.doseMg ? ` &middot; <span>${d.doseMg} mg</span>${units(d.doseMg)}` : ""}</div>
+        <div class="val">${fmtWeekday(d.date)}</div><div class="lbl"><span>${fmtDateBrief(d.date)}</span> &middot; <span>${d.doseMg} mg</span>${units(d.doseMg)}</div>
         ${d.due ? `<button class="small" data-confirm-dose="${d.date}">Confirm dose</button>` : ""}
       </div>`).join("") +
       (waiting ? `<div class="empty-msg">Log a dose above, and your next three will be scheduled from it.</div>` : "");
@@ -1311,7 +1307,7 @@
     const vial = vialEditing ? enteredVial(true) : vialFor(formMedication());
     const notes = [];
     if (vial && vialEditing && vialMode === "mix") notes.push(`Concentration: <strong>${fmtConc(vial.mgPerMl)}</strong>`);
-    if (vial && isPos(dose)) notes.push(syringeNote(dose, vial));
+    if (vial && isPos(dose)) notes.push(`${dose} mg = <strong>${fmtUnits(dose, vial.mgPerMl)}</strong> on a U&#8209;100 syringe`); // "U-100" never splits
     // Under the saved vial, or inside the calculator while it's open.
     show("vialUnitsNote", notes.join(" &middot; "));
     show("vialCalcNote", notes.join(" &middot; "));
@@ -1377,9 +1373,10 @@
   // Upcoming doses aren't stored: they're worked out from the current
   // medication's dosing plan whenever they're shown, so any change to the plan
   // moves them. One falls every intervalDays after the last dose taken, or from
-  // the day a dose was postponed to. None is logged until confirmed, from the
-  // pop-up once it's due or by adding it in Add Entry. A due dose waits to be
-  // confirmed until it's three intervals old; after that it counts as missed.
+  // the day a dose was postponed to, each the typical dose. None is logged until
+  // confirmed: from the pop-up once it's due (just as scheduled), or by adding it
+  // in Add Entry. A due dose waits to be confirmed until it's three intervals
+  // old; after that it counts as missed.
 
   // When a dose comes due: its day at the usual dose time (the start of the day
   // without one), on this device's clock.
@@ -1389,10 +1386,11 @@
   }
 
   // The next three doses as { date, doseMg, due, after }, `after` being the last
-  // dose taken. None without days between doses, or until a dose is logged.
+  // dose taken. None without days between doses and a typical dose, or until a
+  // dose is logged.
   function doseSchedule() {
     const plan = medicationEnabled() ? planFor(currentMedication()) : null;
-    if (!plan || !plan.intervalDays) return [];
+    if (!plan || !plan.intervalDays || !plan.doseMg) return [];
     const today = todayStr(), every = plan.intervalDays, now = Date.now();
     const after = entries.filter(e => hasDose(e) && e.date <= today).map(e => e.date).pop();
     if (!after) return [];
@@ -1416,14 +1414,12 @@
   }
 
   function openDoseModal(dose) {
-    const med = currentMedication(), time = planFor(med).doseTime;
+    const med = currentMedication(), time = planFor(med).doseTime, vial = activeVial();
     doseAsking = dose;
     $("doseModalText").textContent = `Your ${medLabel(med)} dose was due ${fmtWeekday(dose.date)}, ${fmtDateBrief(dose.date)}${time ? ` at ${fmtTime(time)}` : ""}. It goes in your log once you confirm it.`;
-    $("doseTakenDate").value = dose.date;
-    $("doseTakenDate").min = addDays(dose.after, 1);
-    $("doseTakenDate").max = todayStr();
-    $("doseTakenMg").value = dose.doseMg || "";
-    updateDoseUnitsNote();
+    $("doseModalMg").textContent = `${dose.doseMg} mg`;
+    $("doseModalUnits").innerHTML = vial ? `${fmtUnits(dose.doseMg, vial.mgPerMl)} on a U&#8209;100 syringe` : "";
+    $("doseModalUnits").hidden = !vial;
     $("doseOverlay").classList.add("open");
   }
 
@@ -1432,22 +1428,10 @@
     $("doseOverlay").classList.remove("open");
   }
 
-  // The dose entered in the pop-up, in syringe units from the active vial.
-  function updateDoseUnitsNote() {
-    const vial = activeVial(), mg = readNumber("doseTakenMg"), note = $("doseUnitsNote");
-    note.innerHTML = vial && isPos(mg) ? syringeNote(mg, vial) : "";
-    note.hidden = !note.innerHTML;
-  }
-
-  // Logs the dose as entered, which moves the schedule on from the day it was taken.
+  // Logs the dose just as scheduled, which moves the schedule on from its day.
   function confirmDose() {
     if (!doseAsking) return;
-    const date = $("doseTakenDate").value, doseMg = readNumber("doseTakenMg");
-    if (!isDate(date) || date <= doseAsking.after || date > todayStr()) {
-      return alert(`Enter the day you took this dose: after ${fmtDate(doseAsking.after)}, and not in the future.`);
-    }
-    if (!isPos(doseMg)) return alert("Please enter the dose you took, in mg.");
-    const existing = entries.find(e => e.date === date);
+    const { date, doseMg } = doseAsking, existing = entries.find(e => e.date === date);
     if (existing) {
       Object.assign(existing, { doseMg, medication: currentMedication() });
     } else {
@@ -2251,7 +2235,6 @@
   $("doseSnoozeBtn").addEventListener("click", snoozeDose);
   $("dosePostponeBtn").addEventListener("click", postponeDose);
   $("doseOverlay").addEventListener("click", e => { if (e.target.id === "doseOverlay") snoozeDose(); });
-  $("doseTakenMg").addEventListener("input", updateDoseUnitsNote);
   onButton($("goalsBody"), "button[data-goal]", btn => {
     goals = goals.filter(g => g !== parseFloat(btn.dataset.goal));
     save();
@@ -2320,7 +2303,7 @@
   });
 
   // Enter in an input submits its form row; Ctrl+9 toggles developer mode.
-  const ENTER_SUBMITS = { dateInput: addEntry, weightInput: addEntry, doseInput: addEntry, goalInput: addGoal, doseTakenDate: confirmDose, doseTakenMg: confirmDose };
+  const ENTER_SUBMITS = { dateInput: addEntry, weightInput: addEntry, doseInput: addEntry, goalInput: addGoal };
   document.addEventListener("keydown", e => {
     if (e.ctrlKey && (e.key === "9" || e.code === "Digit9")) {
       e.preventDefault();
