@@ -198,6 +198,7 @@
   .modal { position: relative; width: 100%; max-width: 440px; max-height: 85vh; overflow-y: auto; padding: 16px 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 30px rgba(0, 0, 0, .3); }
   .modal h3 { margin: 0 0 6px; font-size: 1.05em; }
   .modal-hint { font-size: .82em; color: var(--muted); margin: 0 0 10px; line-height: 1.4; }
+  .modal .actions { display: flex; flex-wrap: wrap; gap: 8px; } /* buttons that wrap on phones keep their spacing */
 </style>
 </head>
 <body>
@@ -463,7 +464,7 @@
     <div class="actions">
       <button id="doseLogBtn">Log dose</button>
       <button class="secondary" id="doseSnoozeBtn">Not yet</button>
-      <button class="secondary" id="doseSkipBtn">Skip dose</button>
+      <button class="secondary" id="dosePostponeBtn">Postpone to tomorrow</button>
     </div>
   </div>
 </div>
@@ -555,6 +556,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "5.397", date: "2026-09-26", changes: [
+      "The dose pop-up's Skip is now Postpone to tomorrow, which moves that dose to tomorrow and the doses after it along with it."
+    ] },
     { version: "5.387", date: "2026-09-26", changes: [
       "Your next three doses are now scheduled automatically, counting from your last dose, and update whenever your dosing plan changes.",
       "Scheduled doses are only logged once confirmed: a pop-up asks after your usual dose time (new in setup), or log the dose yourself in Add Entry.",
@@ -859,8 +863,10 @@
       medication: p.medication,
       intervalDays: isDoseInterval(p.intervalDays) ? p.intervalDays : null,
       doseMg: isPos(p.doseMg) ? p.doseMg : null,
-      doseTime: isTime(p.doseTime) ? p.doseTime : null,          // a dose is asked about from then on its day
-      skippedDate: isDate(p.skippedDate) ? p.skippedDate : null, // the latest scheduled dose skipped
+      doseTime: isTime(p.doseTime) ? p.doseTime : null, // a dose is asked about from then on its day
+      // The next dose moved to another day (to), until a dose is logged after
+      // the last one taken when it was moved (after).
+      postponed: p.postponed && isDate(p.postponed.after) && isDate(p.postponed.to) ? { after: p.postponed.after, to: p.postponed.to } : null,
       savedAt: String(p.savedAt || "")
     };
   }
@@ -1370,10 +1376,10 @@
   // ==========================================================================
   // Upcoming doses aren't stored: they're worked out from the current
   // medication's dosing plan whenever they're shown, so any change to the plan
-  // moves them. One falls every intervalDays after the last dose taken (or
-  // skipped). None is logged until confirmed, from the pop-up once it's due or
-  // by adding it in Add Entry. A due dose waits to be confirmed until it's three
-  // intervals old; after that it counts as missed.
+  // moves them. One falls every intervalDays after the last dose taken, or from
+  // the day a dose was postponed to. None is logged until confirmed, from the
+  // pop-up once it's due or by adding it in Add Entry. A due dose waits to be
+  // confirmed until it's three intervals old; after that it counts as missed.
 
   // When a dose comes due: its day at the usual dose time (the start of the day
   // without one), on this device's clock.
@@ -1382,18 +1388,19 @@
     return new Date(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10), +h, +m).getTime();
   }
 
-  // The next three doses as { date, doseMg, due, after }, `after` being the day
-  // they count from. None without days between doses, or until a dose is logged.
+  // The next three doses as { date, doseMg, due, after }, `after` being the last
+  // dose taken. None without days between doses, or until a dose is logged.
   function doseSchedule() {
     const plan = medicationEnabled() ? planFor(currentMedication()) : null;
     if (!plan || !plan.intervalDays) return [];
     const today = todayStr(), every = plan.intervalDays, now = Date.now();
-    const lastTaken = entries.filter(e => hasDose(e) && e.date <= today).map(e => e.date).pop() || "";
-    const after = [lastTaken, plan.skippedDate || ""].sort().pop();
+    const after = entries.filter(e => hasDose(e) && e.date <= today).map(e => e.date).pop();
     if (!after) return [];
-    const first = Math.max(1, Math.floor(daysBetween(after, today) / every) - MAX_UPCOMING_DOSES + 1); // past the missed ones
+    // A postponed dose keeps its new day until a dose is logged after `after`.
+    const next = plan.postponed && after <= plan.postponed.after ? plan.postponed.to : addDays(after, every);
+    const missed = Math.max(0, Math.floor(daysBetween(next, today) / every) - MAX_UPCOMING_DOSES + 1);
     return Array.from({ length: MAX_UPCOMING_DOSES }, (_, i) => {
-      const date = addDays(after, (first + i) * every);
+      const date = addDays(next, (missed + i) * every);
       return { date, doseMg: plan.doseMg, due: now >= dueAt(date, plan.doseTime), after };
     });
   }
@@ -1453,10 +1460,11 @@
     renderAll();
   }
 
-  // Nothing is logged; the schedule moves on from the skipped day.
-  function skipDose() {
+  // Moves the dose to tomorrow, and the doses after it along with it; nothing is logged.
+  function postponeDose() {
     if (!doseAsking) return;
-    profile.dosePlan = { ...planFor(currentMedication()), skippedDate: doseAsking.date, savedAt: new Date().toISOString() };
+    const postponed = { after: doseAsking.after, to: addDays(todayStr(), 1) };
+    profile.dosePlan = { ...planFor(currentMedication()), postponed, savedAt: new Date().toISOString() };
     closeDoseModal();
     save();
     renderAll();
@@ -2241,7 +2249,7 @@
   });
   $("doseLogBtn").addEventListener("click", confirmDose);
   $("doseSnoozeBtn").addEventListener("click", snoozeDose);
-  $("doseSkipBtn").addEventListener("click", skipDose);
+  $("dosePostponeBtn").addEventListener("click", postponeDose);
   $("doseOverlay").addEventListener("click", e => { if (e.target.id === "doseOverlay") snoozeDose(); });
   $("doseTakenMg").addEventListener("input", updateDoseUnitsNote);
   onButton($("goalsBody"), "button[data-goal]", btn => {
@@ -2268,7 +2276,7 @@
     if (dosingAsking) profile.dosingAsked = DOSING_QUESTIONS_VERSION;
     const oldPlan = planFor(med) || {};
     if (plan && Object.keys(plan).some(k => plan[k] !== (oldPlan[k] ?? null))) {
-      profile.dosePlan = { medication: med, ...plan, skippedDate: oldPlan.skippedDate || null, savedAt: new Date().toISOString() };
+      profile.dosePlan = { medication: med, ...plan, postponed: oldPlan.postponed || null, savedAt: new Date().toISOString() };
     }
     if (vial) storeVial(vial, med); // its warning came when the calculator was opened
     unit = profile.unit || "lb";
