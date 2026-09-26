@@ -80,6 +80,11 @@
   .mode-btn:hover:not(.active) { background: var(--border); }
   .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
   .mode-btn.active:hover { background: var(--accent-dark); }
+  /* Start-up choices with more than two options: a line of their own, all
+     options across it, or two per row on narrow screens. */
+  .row > .full-row { flex-basis: 100%; }
+  .mode-toggle.many { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+  @media (max-width: 600px) { .mode-toggle.many { grid-auto-flow: row; grid-template-columns: 1fr 1fr; } }
 
   /* --- Stats, tables, badges --- */
   table { width: 100%; border-collapse: collapse; font-size: .9em; }
@@ -432,6 +437,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.256", date: "2026-09-26", changes: [
+      "The start-up medication question no longer spills out of its box: its choices get a line of their own, two per row on phones."
+    ] },
     { version: "4.255", date: "2026-09-26", changes: [
       "Dose tracking now supports Semaglutide and Retatrutide as well as Tirzepatide: the start-up question asks which one you take, each dose remembers its medication (so switching keeps your history accurate), and older backups and settings carry over as Tirzepatide."
     ] },
@@ -1028,7 +1036,8 @@
       // Choices render as a button toggle; the pick is kept in data-value.
       const options = f.type === "boolean" ? [[true, "Yes"], [false, "No"]] : f.options.map(o => (Array.isArray(o) ? o : [o, o]));
       const current = options.some(([v]) => v === profile[f.key]) ? profile[f.key] : f.default;
-      return `<div><label>${f.label}</label><div class="mode-toggle" id="${id}" data-value="${current}">${
+      const many = options.length > 2; // too many to share a line with other questions
+      return `<div${many ? ' class="full-row"' : ""}><label>${f.label}</label><div class="mode-toggle${many ? " many" : ""}" id="${id}" data-value="${current}">${
         options.map(([v, text]) => `<button type="button" class="mode-btn${v === current ? " active" : ""}" data-value="${v}">${text}</button>`).join("")
       }</div></div>`;
     }).join("");
