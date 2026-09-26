@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weight Tracker &amp; Projection Calculator</title>
+<title>Bosco — Weight Tracker &amp; Projections</title>
 <style>
   :root {
     --bg: #f4f5f7; --panel: #ffffff; --border: #dcdfe4; --text: #1f2430; --muted: #6b7280;
@@ -173,8 +173,8 @@
 <div class="app">
   <div class="header">
     <div>
-      <h1 id="appTitle">Weight Tracker &amp; Projections</h1>
-      <div class="subtitle">Runs 100% locally. Private &amp; offline.</div>
+      <h1>Bosco</h1>
+      <div class="subtitle"><span id="appTagline">A weight tracker with projections.</span> Runs 100% locally, private &amp; offline.</div>
     </div>
     <button class="theme-toggle" id="themeToggle">🌓 Theme</button>
   </div>
@@ -319,7 +319,7 @@
   </section>
 
   <footer>
-    Weight Tracker &middot; Offline single-file HTML5 app &middot; <a href="#" id="reportBugLink">Report a bug</a>
+    Bosco &middot; Offline single-file HTML5 app &middot; <a href="#" id="reportBugLink">Report a bug</a>
   </footer>
 </div>
 
@@ -418,6 +418,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.045", date: "2026-09-26", changes: [
+      "The app is now called Bosco."
+    ] },
     { version: "4.035", date: "2026-09-25", changes: [
       "Added autosave & sync to a folder you choose (e.g. a Syncthing folder): changes save there automatically, the newest save loads on start, and other devices' changes load in while the app is open.",
       "Changes made on two devices while out of sync are combined instead of one overwriting the other."
@@ -571,7 +574,7 @@
       localStorage.setItem(key, value);
     } catch (e) {
       console.error("Couldn't save to local storage.", e);
-      if (!storageWarned) alert("This browser isn't letting the app save your data, so it will be lost when the page closes. Use Export JSON to keep a copy.");
+      if (!storageWarned) alert("This browser isn't letting Bosco save your data, so it will be lost when the page closes. Use Export JSON to keep a copy.");
       storageWarned = true;
     }
   }
@@ -755,7 +758,7 @@
   function renderAll() {
     const m = model();
     document.body.classList.toggle("no-tirz", !tirzepatideEnabled());
-    $("appTitle").textContent = profile.name ? `${profile.name}'s Weight Tracker & Projections` : "Weight Tracker & Projections";
+    $("appTagline").textContent = profile.name ? `${profile.name}'s weight tracker with projections.` : "A weight tracker with projections.";
     $("weightInputLabel").textContent = `Weight, ${unit}`;
     $("weightInput").placeholder = unit === "kg" ? "e.g. 84.1" : "e.g. 185.4";
     $("goalInput").placeholder = unit === "kg" ? "e.g. 68" : "e.g. 150";
@@ -1083,7 +1086,7 @@
   async function exportGoalsImage() {
     const m = model();
     if (!m.w.length) return alert("Add at least one weigh-in before exporting your progress.");
-    const filename = `weight-progress-${todayStr()}.png`;
+    const filename = `bosco-progress-${todayStr()}.png`;
     // Ask where to save while the click still counts as user activation. Browsers
     // without a save picker (Firefox, Safari) fall back to a normal download.
     let handle = null;
@@ -1115,7 +1118,7 @@
   // needed to diagnose it. Leaves out every weight, dose, and date.
   function buildBugReportText(description) {
     return [
-      "# Bug Report — Weight Tracker & Projections", "",
+      "# Bug Report — Bosco", "",
       `**Reported:** ${new Date().toISOString()}`,
       `**App Version:** ${APP_VERSION}`,
       `**Data Schema Version:** ${DATA_SCHEMA_VERSION}`, "",
@@ -1240,7 +1243,7 @@
   }
 
   function exportBackup() {
-    downloadBlob(new Blob([JSON.stringify(buildBackup(), null, 2)], { type: "application/json" }), `weight-backup-${todayStr()}.json`);
+    downloadBlob(new Blob([JSON.stringify(buildBackup(), null, 2)], { type: "application/json" }), `bosco-backup-${todayStr()}.json`);
     setUnsaved(false);
   }
 
@@ -1266,7 +1269,7 @@
     const clean = normalizeBackup(raw, backupUnit || unit);
     if (!clean.entries.length) return alert("Invalid backup file: no usable entries found.");
     if (clean.schemaVersion > DATA_SCHEMA_VERSION) {
-      alert("Heads up: this backup was made by a newer version of the app. Importing it anyway, but some data may not carry over.");
+      alert("Heads up: this backup was made by a newer version of Bosco. Importing it anyway, but some data may not carry over.");
     }
     const count = n => `${n} ${n === 1 ? "entry" : "entries"}`;
     if (entries.length && !confirm(`Replace your ${count(entries.length)} and goals with the ${count(clean.entries.length)} in this backup? This can't be undone.`)) return;
@@ -1707,7 +1710,7 @@
   });
   $("devDownloadBugReportsBtn").addEventListener("click", () => {
     if (!bugReports.length) return alert("No bug reports logged yet.");
-    downloadBlob(new Blob([combinedBugReports()], { type: "text/markdown" }), `bug-reports-${todayStr()}.md`);
+    downloadBlob(new Blob([combinedBugReports()], { type: "text/markdown" }), `bosco-bug-reports-${todayStr()}.md`);
   });
   $("devClearBugReportsBtn").addEventListener("click", () => {
     if (!bugReports.length || !confirm(`Clear all ${bugReports.length} logged bug report(s)? This can't be undone.`)) return;
