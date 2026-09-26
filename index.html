@@ -20,7 +20,7 @@
 
   /* --- Layout --- */
   * { box-sizing: border-box; }
-  [hidden], .no-tirz .tirz { display: none !important; }
+  [hidden], .no-med .med { display: none !important; }
   body { margin: 0; padding: 16px; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); transition: background-color .2s, color .2s; }
   .app { max-width: 780px; margin: 0 auto; }
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
@@ -206,16 +206,16 @@
         <label for="weightInput" id="weightInputLabel">Weight, lb</label>
         <input type="number" id="weightInput" step="0.1" min="0" placeholder="e.g. 185.4">
       </div>
-      <div class="tirz">
-        <label for="doseInput">Tirzepatide, mg</label>
-        <input type="number" id="doseInput" step="0.25" min="0" placeholder="e.g. 5">
+      <div class="med">
+        <label for="doseInput" id="doseInputLabel">Tirzepatide, mg</label>
+        <input type="number" id="doseInput" step="any" min="0" placeholder="e.g. 5">
       </div>
       <div class="btn-cell"><button id="addBtn">Add Entry</button></div>
     </div>
   </section>
 
-  <section id="upcomingDosesSection" class="tirz" hidden>
-    <h2>Upcoming Tirzepatide Doses</h2>
+  <section id="upcomingDosesSection" class="med" hidden>
+    <h2 id="upcomingDosesTitle">Upcoming Tirzepatide Doses</h2>
     <div class="stat-grid" id="upcomingDosesGrid"></div>
   </section>
 
@@ -250,7 +250,7 @@
     <div id="historyEmpty" class="empty-msg">No entries yet. Add your first weigh-in above.</div>
     <div id="historyWrap" hidden>
       <table>
-        <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th class="tirz">Tirzepatide Dose</th><th></th></tr></thead>
+        <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th class="med" id="doseColumnHead">Tirzepatide Dose</th><th></th></tr></thead>
         <tbody id="historyBody"></tbody>
       </table>
       <div class="pagination">
@@ -383,18 +383,28 @@
   const SYNC_CHECK_MS = 5000;    // how often the sync folder is checked for other devices' saves
   const AUTOSAVE_DELAY_MS = 400; // quick edits in a row are saved to the folder once
   // Backup file format. Bump only when the shape changes in a way import has
-  // to migrate. v2: entries gained doseMg.
-  const DATA_SCHEMA_VERSION = 2;
+  // to migrate. v2: entries gained doseMg. v3: entries gained medication (a
+  // dose without one is Tirzepatide, the only medication older versions had).
+  const DATA_SCHEMA_VERSION = 3;
+
+  // GLP-1 medications a dose can be for. Add more here; ids are what backups store.
+  const MEDICATIONS = {
+    tirzepatide: { label: "Tirzepatide", example: "5" },
+    semaglutide: { label: "Semaglutide", example: "0.5" },
+    retatrutide: { label: "Retatrutide", example: "4" }
+  };
+  const LEGACY_MEDICATION = "tirzepatide";
 
   // Start-up questions. Required ones show until answered; optional ones until
   // asked once. Add more here without touching the surrounding logic.
   const ONE_TIME_FIELDS = [
     { key: "name", label: "Your name", type: "text", placeholder: "e.g. Jordan" },
     { key: "unit", label: "Units", type: "select", options: ["lb", "kg"], default: "lb" },
-    { key: "usesTirzepatide", label: "Do you take Tirzepatide?", type: "boolean", optional: true, default: true }
+    { key: "medication", label: "Which GLP-1 medication do you take?", type: "select", optional: true, default: "tirzepatide",
+      options: [...Object.entries(MEDICATIONS).map(([id, m]) => [id, m.label]), ["none", "None"]] }
   ];
 
-  let entries = [];        // { date: "YYYY-MM-DD", weight: number|null, doseMg: number|null }, one per date, sorted
+  let entries = [];        // { date: "YYYY-MM-DD", weight: number|null, doseMg: number|null, medication: id|null }, one per date, sorted
   let goals = [];          // goal weights, sorted high to low
   let profile = {};        // start-up answers
   let unit = "lb";         // the whole app uses one unit at a time: profile.unit, or lb until chosen
@@ -422,6 +432,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.255", date: "2026-09-26", changes: [
+      "Dose tracking now supports Semaglutide and Retatrutide as well as Tirzepatide: the start-up question asks which one you take, each dose remembers its medication (so switching keeps your history accurate), and older backups and settings carry over as Tirzepatide."
+    ] },
     { version: "4.155", date: "2026-09-26", changes: [
       "Goal Weights project your weight at the start of each of the next three seasons (from the real equinoxes and solstices) instead of 3, 6 and 12 months out; a season drops off once it starts."
     ] },
@@ -569,7 +582,12 @@
     return Math.round((to === "kg" ? v / LB_PER_KG : v * LB_PER_KG) * 10) / 10;
   }
 
-  const tirzepatideEnabled = () => profile.usesTirzepatide !== false;
+  // The medication new doses are for: the start-up answer, Tirzepatide until answered.
+  const currentMedication = () => (profile.medication === "none" || MEDICATIONS[profile.medication] ? profile.medication : LEGACY_MEDICATION);
+  const medicationEnabled = () => currentMedication() !== "none";
+  const medLabel = id => (MEDICATIONS[id] ? MEDICATIONS[id].label : id);
+  // Names a dose's medication only when it isn't the current one.
+  const otherMedNote = e => (e.medication !== currentMedication() ? ` (${medLabel(e.medication)})` : "");
 
   // ==========================================================================
   // STORAGE
@@ -643,7 +661,10 @@
       if (!e || !isDate(e.date)) return;
       const weight = pos(convertWeight(pos(e.weight), from, targetUnit));
       const doseMg = pos(e.doseMg);
-      if (weight !== null || doseMg !== null) days.set(e.date, { date: e.date, weight, doseMg });
+      // Unknown but plain ids (from a newer version) are kept as they are.
+      const med = typeof e.medication === "string" ? e.medication.trim().toLowerCase() : "";
+      const medication = doseMg === null ? null : /^[a-z0-9 -]{1,40}$/.test(med) ? med : LEGACY_MEDICATION;
+      if (weight !== null || doseMg !== null) days.set(e.date, { date: e.date, weight, doseMg, medication });
     });
     const goalList = Array.isArray(raw.goals)
       ? raw.goals.filter(isPos).map(g => convertWeight(g, from, targetUnit))
@@ -652,7 +673,8 @@
       schemaVersion: isNum(raw.schemaVersion) ? raw.schemaVersion : 0,
       entries: [...days.values()].sort(byDate),
       goals: [...new Set(goalList.filter(isPos))].sort((a, b) => b - a),
-      name: typeof raw.name === "string" ? raw.name.trim() : ""
+      name: typeof raw.name === "string" ? raw.name.trim() : "",
+      medication: MEDICATIONS[raw.medication] ? raw.medication : ""
     };
   }
 
@@ -662,6 +684,14 @@
     if (typeof profile.name !== "string") profile.name = "";
     if (profile.unit !== "kg" && profile.unit !== "lb") profile.unit = ""; // not answered yet
     unit = profile.unit || "lb";
+    // Older versions only asked "Do you take Tirzepatide?"; carry that answer over.
+    if ("usesTirzepatide" in profile) {
+      if (!profile.medication) profile.medication = profile.usesTirzepatide === false ? "none" : LEGACY_MEDICATION;
+      if (profile.usesTirzepatideAsked) profile.medicationAsked = true;
+      delete profile.usesTirzepatide;
+      delete profile.usesTirzepatideAsked;
+      storageSet(KEYS.profile, JSON.stringify(profile));
+    }
 
     // Saved data goes through the same cleanup as imports, so damaged storage
     // can't break the app; write it back if anything had to change.
@@ -757,10 +787,12 @@
     return { status: "projected", weeks, date: addDays(last.date, Math.round(weeks * 7)) };
   }
 
+  // Doses taken so far, totalled per medication: { medicationId: mg }.
   function cumulativeDoseMg() {
-    const today = todayStr();
-    const total = entries.filter(e => hasDose(e) && e.date <= today).reduce((s, e) => s + e.doseMg, 0);
-    return Math.round(total * 100) / 100;
+    const today = todayStr(), totals = {};
+    entries.filter(e => hasDose(e) && e.date <= today).forEach(e => { totals[e.medication] = (totals[e.medication] || 0) + e.doseMg; });
+    Object.keys(totals).forEach(k => { totals[k] = Math.round(totals[k] * 100) / 100; });
+    return totals;
   }
 
   // ==========================================================================
@@ -823,7 +855,14 @@
   // ==========================================================================
   function renderAll() {
     const m = model();
-    document.body.classList.toggle("no-tirz", !tirzepatideEnabled());
+    document.body.classList.toggle("no-med", !medicationEnabled());
+    if (medicationEnabled()) {
+      const med = MEDICATIONS[currentMedication()];
+      $("doseInputLabel").textContent = `${med.label}, mg`;
+      $("doseInput").placeholder = `e.g. ${med.example}`;
+      $("upcomingDosesTitle").textContent = `Upcoming ${med.label} Doses`;
+      $("doseColumnHead").textContent = `${med.label} Dose`;
+    }
     $("appTagline").textContent = profile.name ? `${profile.name}'s weight tracker with projections.` : "A weight tracker with projections.";
     $("weightInputLabel").textContent = `Weight, ${unit}`;
     $("weightInput").placeholder = unit === "kg" ? "e.g. 84.1" : "e.g. 185.4";
@@ -841,7 +880,7 @@
     const today = todayStr();
     // Dose-only days are listed only while dose tracking is on, and future ones
     // under Upcoming Doses instead.
-    const visible = entries.filter(e => hasWeight(e) || (tirzepatideEnabled() && e.date <= today)).reverse();
+    const visible = entries.filter(e => hasWeight(e) || (medicationEnabled() && e.date <= today)).reverse();
     $("historyWrap").hidden = !visible.length;
     $("historyEmpty").hidden = visible.length > 0;
     $("trackedSpanNote").textContent = w.length < 2 ? "" :
@@ -859,7 +898,7 @@
         <td>${fmtDate(e.date)}</td>
         <td>${hasWeight(e) ? `${e.weight.toFixed(1)} ${unit}` : "&mdash;"}</td>
         <td class="${cls}">${change === null ? "&mdash;" : `${change > 0 ? "+" : ""}${change.toFixed(1)} ${unit}`}</td>
-        <td class="tirz">${hasDose(e) ? `${e.doseMg} mg` : "&mdash;"}</td>
+        <td class="med">${hasDose(e) ? `${e.doseMg} mg${otherMedNote(e)}` : "&mdash;"}</td>
         <td><button class="danger" data-date="${e.date}">Delete</button></td>
       </tr>`;
     }).join("");
@@ -877,10 +916,10 @@
     const last = past.slice(-PAGE_SIZE).some(hasDose) ? null : past.filter(hasDose).pop();
     $("upcomingDosesSection").hidden = !upcoming.length && !last;
     $("upcomingDosesGrid").innerHTML =
-      (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken &middot; ${fmtDate(last.date)}</div></div>` : "") +
+      (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken${otherMedNote(last)} &middot; ${fmtDate(last.date)}</div></div>` : "") +
       upcoming.map(e => `<div class="stat">
         <button class="subtle-remove" data-dose-date="${e.date}" title="Remove this dose" aria-label="Remove upcoming dose">&times;</button>
-        <div class="val">${e.doseMg} mg</div><div class="lbl">${fmtDate(e.date)}</div>
+        <div class="val">${e.doseMg} mg</div><div class="lbl">${fmtDate(e.date)}${otherMedNote(e)}</div>
       </div>`).join("");
   }
 
@@ -987,7 +1026,7 @@
       const id = "oneTimeInput_" + f.key;
       if (f.type === "text") return `<div><label for="${id}">${f.label}</label><input type="text" id="${id}" placeholder="${f.placeholder}"></div>`;
       // Choices render as a button toggle; the pick is kept in data-value.
-      const options = f.type === "boolean" ? [[true, "Yes"], [false, "No"]] : f.options.map(o => [o, o]);
+      const options = f.type === "boolean" ? [[true, "Yes"], [false, "No"]] : f.options.map(o => (Array.isArray(o) ? o : [o, o]));
       const current = options.some(([v]) => v === profile[f.key]) ? profile[f.key] : f.default;
       return `<div><label>${f.label}</label><div class="mode-toggle" id="${id}" data-value="${current}">${
         options.map(([v, text]) => `<button type="button" class="mode-btn${v === current ? " active" : ""}" data-value="${v}">${text}</button>`).join("")
@@ -1143,10 +1182,17 @@
       rowY += rowH;
     });
 
-    let footer = `Current weight: ${last.weight.toFixed(1)} ${unit} as of ${fmtDateExport(last.date)}`;
-    const dose = cumulativeDoseMg();
-    if (tirzepatideEnabled() && dose > 0) footer += ` | Tirzepatide cumulative dosage: ${dose} mg`;
-    text(footer, W / 2, cardBottom + cardToFooterGap, "500 22px", "#94a3b8", "center");
+    const weightNote = `Current weight: ${last.weight.toFixed(1)} ${unit} as of ${fmtDateExport(last.date)}`;
+    const doses = medicationEnabled() ? Object.entries(cumulativeDoseMg()) : [];
+    const oneLine = [weightNote, ...doses.map(([id, mg]) => `${medLabel(id)} cumulative dosage: ${mg} mg`)].join(" | ");
+    ctx.font = `500 22px ${FONT}`;
+    // One line when it fits; otherwise weight above, shorter dose totals below.
+    if (ctx.measureText(oneLine).width <= W - PAD_X * 2) {
+      text(oneLine, W / 2, cardBottom + cardToFooterGap, "500 22px", "#94a3b8", "center");
+    } else {
+      text(weightNote, W / 2, cardBottom + cardToFooterGap - 14, "500 22px", "#94a3b8", "center");
+      text(doses.map(([id, mg]) => `${medLabel(id)} total: ${mg} mg`).join(" | "), W / 2, cardBottom + cardToFooterGap + 16, "500 22px", "#94a3b8", "center");
+    }
     return canvas;
   }
 
@@ -1199,7 +1245,7 @@
       `- Online: ${navigator.onLine}`, "",
       "## App State",
       `- Unit: ${unit}`,
-      `- Tirzepatide tracking enabled: ${tirzepatideEnabled()}`,
+      `- GLP-1 medication: ${currentMedication()}`,
       `- Entry count: ${entries.length}`,
       `- Goal count: ${goals.length}`,
       `- Rate mode: ${rateMode}`,
@@ -1304,9 +1350,10 @@
       appVersion: APP_VERSION,
       unit,
       name: profile.name,
+      medication: currentMedication(),
       entries,
       goals,
-      cumulativeTirzepatideDoseMg: cumulativeDoseMg() // derived total for reference; not read on import
+      cumulativeDoseMgByMedication: cumulativeDoseMg() // derived totals for reference; not read on import
     };
   }
 
@@ -1322,8 +1369,12 @@
     entries = clean.entries;
     goals = clean.goals;
     if (clean.name) profile.name = clean.name; // older backups have no name; keep ours
-    // Dose entries prove Tirzepatide is in use, so that start-up question is answered.
-    if (entries.some(hasDose)) Object.assign(profile, { usesTirzepatide: true, usesTirzepatideAsked: true });
+    // Dose entries prove a medication is in use, so that start-up question is
+    // answered (with the backup's own answer, else its latest dose's medication).
+    const lastDose = entries.filter(hasDose).pop();
+    if (lastDose && (!profile.medicationAsked || !medicationEnabled())) {
+      Object.assign(profile, { medication: clean.medication || lastDose.medication, medicationAsked: true });
+    }
   }
 
   // Replaces all entries and goals with the backup's, after validating it first
@@ -1409,7 +1460,8 @@
     const days = new Map(older.entries.map(e => [e.date, e]));
     newer.entries.forEach(e => {
       const o = days.get(e.date) || {};
-      days.set(e.date, { date: e.date, weight: e.weight ?? o.weight ?? null, doseMg: e.doseMg ?? o.doseMg ?? null });
+      const d = isNum(e.doseMg) ? e : o; // a dose and its medication travel together
+      days.set(e.date, { date: e.date, weight: e.weight ?? o.weight ?? null, doseMg: d.doseMg ?? null, medication: d.medication ?? null });
     });
     return {
       entries: [...days.values()].sort(byDate),
@@ -1623,12 +1675,12 @@
   function addEntry() {
     const date = $("dateInput").value;
     const weight = readNumber("weightInput");
-    const dose = tirzepatideEnabled() ? readNumber("doseInput") : null;
+    const dose = medicationEnabled() ? readNumber("doseInput") : null;
     const today = todayStr();
     if (!isDate(date)) return alert("Please enter a date.");
     if (weight !== null && !isPos(weight)) return alert("Please enter a valid positive weight, or leave it blank.");
     if (dose !== null && !isPos(dose)) return alert("Please enter a valid positive dose, or leave it blank.");
-    if (weight === null && dose === null) return alert(tirzepatideEnabled() ? "Enter a weight or dose." : "Enter a weight.");
+    if (weight === null && dose === null) return alert(medicationEnabled() ? "Enter a weight or dose." : "Enter a weight.");
     if (weight !== null && date > today) return alert("Weigh-ins can't be dated in the future.");
     const existing = entries.find(e => e.date === date);
     // At most 3 scheduled doses; changing an already-scheduled dose is always fine.
@@ -1642,9 +1694,9 @@
     if (existing) {
       // Only overwrite what was entered, so a later dose keeps that day's weigh-in.
       if (weight !== null) existing.weight = weight;
-      if (dose !== null) existing.doseMg = dose;
+      if (dose !== null) Object.assign(existing, { doseMg: dose, medication: currentMedication() });
     } else {
-      entries.push({ date, weight, doseMg: dose });
+      entries.push({ date, weight, doseMg: dose, medication: dose === null ? null : currentMedication() });
       entries.sort(byDate);
     }
     save();
@@ -1728,7 +1780,7 @@
   onButton($("upcomingDosesGrid"), "button[data-dose-date]", btn => {
     const entry = entries.find(e => e.date === btn.dataset.doseDate);
     if (!entry) return;
-    entry.doseMg = null;
+    Object.assign(entry, { doseMg: null, medication: null });
     if (!hasWeight(entry)) entries = entries.filter(e => e !== entry);
     save();
     renderAll();
