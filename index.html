@@ -51,9 +51,9 @@
   .app-version-tag { font-size: .68em; color: var(--muted); opacity: .4; pointer-events: none; user-select: none; }
 
   /* --- Inputs --- */
-  input[type=date], input[type=number], input[type=text], textarea { width: 100%; padding: 7px 8px; border: 1px solid var(--border); border-radius: 5px; font-size: .95em; background: var(--panel); color: var(--text); transition: border-color .2s, box-shadow .2s; }
-  input[type=date]:focus, input[type=number]:focus, input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
-  [data-theme="dark"] input[type=date] { color-scheme: dark; } /* light calendar icon and picker */
+  input[type=date], input[type=time], input[type=number], input[type=text], textarea { width: 100%; padding: 7px 8px; border: 1px solid var(--border); border-radius: 5px; font-size: .95em; background: var(--panel); color: var(--text); transition: border-color .2s, box-shadow .2s; }
+  input[type=date]:focus, input[type=time]:focus, input[type=number]:focus, input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
+  [data-theme="dark"] input[type=date], [data-theme="dark"] input[type=time] { color-scheme: dark; } /* light calendar/clock icon and picker */
   input[type=number] { -moz-appearance: textfield; appearance: textfield; }
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   textarea { padding: 8px; font-family: inherit; font-size: .9em; resize: vertical; min-height: 90px; }
@@ -101,11 +101,11 @@
   .stat .val { font-size: 1.15em; font-weight: 700; }
   .stat .lbl { font-size: .75em; color: var(--muted); margin-top: 2px; }
   #statsSection .stat { min-width: 230px; } /* room for a full row of window pills */
-  #upcomingDosesGrid .stat { min-width: 140px; } /* room for "Wednesday" beside the remove button */
+  #upcomingDosesGrid .stat { min-width: 140px; } /* room for "Wednesday" */
   #upcomingDosesGrid .lbl span { white-space: nowrap; } /* a date or amount never splits across lines */
+  #upcomingDosesGrid .stat.due { background: var(--unsaved-bg); border-color: var(--unsaved-border); } /* waiting to be confirmed */
+  #upcomingDosesGrid .stat.due button { margin-top: 8px; }
   .window-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-  .subtle-remove { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; padding: 0; line-height: 14px; text-align: center; border-radius: 50%; background: transparent; color: var(--muted); font-size: 13px; opacity: .55; transition: opacity .2s, background-color .2s, color .2s; }
-  .subtle-remove:hover { opacity: 1; background: var(--border); color: var(--bad); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .78em; font-weight: 600; }
   /* Pills on a fixed light background keep their dark text in both themes (as in the exported image). */
   .badge.reached { background: #dcfce7; color: #16a34a; }
@@ -190,12 +190,14 @@
   .changelog-date { color: var(--muted); font-size: .78em; margin-left: 6px; }
   .dev-close { position: absolute; top: 8px; right: 10px; padding: 0; background: none; color: var(--muted); font-size: 1em; }
   .dev-close:hover { background: none; color: var(--text); }
-  .bugreport-overlay { display: none; position: fixed; inset: 0; z-index: 10000; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, .5); }
-  .bugreport-overlay.open { display: flex; }
-  .bugreport-modal { position: relative; width: 100%; max-width: 440px; max-height: 85vh; overflow-y: auto; padding: 16px 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 30px rgba(0, 0, 0, .3); }
-  .bugreport-modal h3 { margin: 0 0 6px; font-size: 1.05em; }
-  .bugreport-hint { font-size: .82em; color: var(--muted); margin: 0 0 10px; line-height: 1.4; }
   .bugreport-status { font-size: .82em; margin-top: 8px; min-height: 1.2em; }
+
+  /* --- Pop-ups (bug report, dose confirmation) --- */
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 10000; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, .5); }
+  .modal-overlay.open { display: flex; }
+  .modal { position: relative; width: 100%; max-width: 440px; max-height: 85vh; overflow-y: auto; padding: 16px 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 30px rgba(0, 0, 0, .3); }
+  .modal h3 { margin: 0 0 6px; font-size: 1.05em; }
+  .modal-hint { font-size: .82em; color: var(--muted); margin: 0 0 10px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -227,6 +229,10 @@
         <div>
           <label for="typicalDoseInput">Typical dose, mg</label>
           <input type="number" id="typicalDoseInput" step="any" min="0">
+        </div>
+        <div>
+          <label for="doseTimeInput">Usual dose time</label>
+          <input type="time" id="doseTimeInput">
         </div>
       </div>
       <div class="note" id="weeklyDoseNote" hidden></div>
@@ -427,14 +433,38 @@
   <div id="devChangelog"></div>
 </div>
 
-<div class="bugreport-overlay" id="bugReportOverlay">
-  <div class="bugreport-modal">
+<div class="modal-overlay" id="bugReportOverlay">
+  <div class="modal">
     <button class="dev-close" id="bugReportClose" aria-label="Close">&times;</button>
     <h3>Report a Bug</h3>
-    <p class="bugreport-hint">Describe what happened and what you expected, then Submit. That saves the report locally (with environment, app state, and recent console activity &mdash; no personal data) and copies it to your clipboard. Saved reports are managed from Developer Mode.</p>
+    <p class="modal-hint">Describe what happened and what you expected, then Submit. That saves the report locally (with environment, app state, and recent console activity &mdash; no personal data) and copies it to your clipboard. Saved reports are managed from Developer Mode.</p>
     <textarea id="bugReportText" rows="5" placeholder="What went wrong? What did you expect to happen?"></textarea>
     <div class="actions"><button id="bugReportSubmitBtn">Submit Report</button></div>
     <div class="bugreport-status" id="bugReportStatus"></div>
+  </div>
+</div>
+
+<!-- Asks about a scheduled dose once it's due; nothing is logged until it's confirmed. -->
+<div class="modal-overlay" id="doseOverlay">
+  <div class="modal" role="dialog" aria-labelledby="doseModalTitle">
+    <h3 id="doseModalTitle">Did you take your dose?</h3>
+    <p class="modal-hint" id="doseModalText"></p>
+    <div class="row">
+      <div class="date-cell">
+        <label for="doseTakenDate">Date taken</label>
+        <input type="date" id="doseTakenDate">
+      </div>
+      <div>
+        <label for="doseTakenMg">Dose, mg</label>
+        <input type="number" id="doseTakenMg" step="any" min="0">
+      </div>
+    </div>
+    <div class="note" id="doseUnitsNote" hidden></div>
+    <div class="actions">
+      <button id="doseLogBtn">Log dose</button>
+      <button class="secondary" id="doseSnoozeBtn">Not yet</button>
+      <button class="secondary" id="doseSkipBtn">Skip dose</button>
+    </div>
   </div>
 </div>
 
@@ -451,7 +481,8 @@
     profile: "weightTrackerProfile_v1",
     theme: "weightTrackerTheme_v1",
     bugReports: "weightTrackerBugReports_v1",
-    sync: "weightTrackerSync_v1"
+    sync: "weightTrackerSync_v1",
+    doseSnooze: "weightTrackerDoseSnooze_v1" // this device's "Not yet" on a due dose
   };
   // Storage left behind by removed features; cleared on load.
   const LEGACY_KEYS = ["weightTrackerCalories_v1"];
@@ -460,16 +491,20 @@
   const PAGE_SIZE = 7;
   const MAX_UPCOMING_DOSES = 3;
   const MAX_DOSE_INTERVAL_DAYS = 14; // days between doses: a whole number from 1
+  const DOSE_SNOOZE_MS = 3600000;    // "Not yet" asks about a due dose again an hour later
+  // Bumped when a dosing question is added, so start-up info asks once more. 2: usual dose time.
+  const DOSING_QUESTIONS_VERSION = 2;
   const BAC_ML_RANGE = [1, 3];       // BAC water a vial can be mixed with, as on its slider
   const MAX_ETA_WEEKS = 5200; // ~100 years; anything slower counts as a flat rate
   const BUG_REPORTS_MAX = 20;
   const DEBUG_LOG_MAX = 40;
   const SYNC_CHECK_MS = 5000;    // how often the sync folder is checked for other devices' saves
   const AUTOSAVE_DELAY_MS = 400; // quick edits in a row are saved to the folder once
-  // Backup file format. Bump only when the shape changes in a way import has
-  // to migrate. v2: entries gained doseMg. v3: entries gained medication (a
-  // dose without one is Tirzepatide, the only medication older versions had).
-  const DATA_SCHEMA_VERSION = 3;
+  // Backup file format. Bump only when import has to migrate the data. v2:
+  // entries gained doseMg. v3: entries gained medication (a dose without one is
+  // Tirzepatide, the only medication older versions had). v4: doses are logged
+  // only once taken (before, a dose dated ahead was an upcoming one).
+  const DATA_SCHEMA_VERSION = 4;
 
   // GLP-1 medications a dose can be for. Add more here; ids are what backups store.
   const MEDICATIONS = {
@@ -503,6 +538,7 @@
   let dosingAsking = false;  // start-up info is showing the dosing plan & vial
   let vialEditing = false;   // the vial calculator is open
   let vialMode = "mix";      // "mix" (vial mg + BAC water) | "known" (mg/mL)
+  let doseAsking = null;     // the scheduled dose the confirmation pop-up is open for
 
   // Folder autosave & sync (see that section below).
   const syncSupported = typeof window.showDirectoryPicker === "function";
@@ -519,6 +555,12 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "5.387", date: "2026-09-26", changes: [
+      "Your next three doses are now scheduled automatically, counting from your last dose, and update whenever your dosing plan changes.",
+      "Scheduled doses are only logged once confirmed: a pop-up asks after your usual dose time (new in setup), or log the dose yourself in Add Entry.",
+      "Doses can't be added for future dates anymore; ones added that way before are cleared in favor of the schedule.",
+      "Syringe units are rounded to the nearest half unit, with the exact amount in parentheses when it differs."
+    ] },
     { version: "4.387", date: "2026-09-26", changes: [
       "A vial's known concentration can now be entered with up to three decimal places (e.g. 16.667 mg/mL), and concentrations show to that precision."
     ] },
@@ -674,6 +716,8 @@
   // Exported image and dose cards: show the year only when it isn't this year.
   const fmtDateBrief = d => (d.slice(0, 4) === todayStr().slice(0, 4) ? fmtDateShort(d) : fmtDate(d));
   const fmtWeekday = d => fmtDate(d, { weekday: "long" });
+  const isTime = t => typeof t === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(t); // "HH:MM", 24-hour
+  const fmtTime = t => new Date(2000, 0, 1, +t.slice(0, 2), +t.slice(3)).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   // First/middle/last dates for a chart's x-axis (fewer on very short spans).
   const axisDates = (first, totalDays) => [...new Set([0, 0.5, 1].map(f => addDays(first, Math.round(totalDays * f))))];
   // A chart's weight axis: the data padded by padFrac each side, but at least 4 units
@@ -705,8 +749,13 @@
   // Rounded for display, without trailing zeros: 5.8333 -> "5.83", 20.0 -> "20".
   const fmtNum = (v, places) => String(+v.toFixed(places));
   const fmtConc = mgPerMl => `${fmtNum(mgPerMl, 3)} mg/mL`; // as precise as it can be entered
-  // A dose drawn from a vial, in U-100 insulin syringe units (100 units = 1 mL).
-  const fmtUnits = (mg, mgPerMl) => `${fmtNum(mg / mgPerMl * 100, 1)} units`;
+  // A dose drawn from a vial, in U-100 insulin syringe units (100 units = 1 mL):
+  // to the nearest half unit, then the exact amount when that differs, "12.5 units (12.36)".
+  function fmtUnits(mg, mgPerMl) {
+    const units = mg / mgPerMl * 100, rounded = fmtNum(Math.round(units * 2) / 2, 1), exact = fmtNum(units, 2);
+    return `${rounded} units${exact === rounded ? "" : ` (${exact})`}`;
+  }
+  const syringeNote = (mg, vial) => `${mg} mg = <strong>${fmtUnits(mg, vial.mgPerMl)}</strong> on a U&#8209;100 syringe`; // "U-100" never splits
 
   // ==========================================================================
   // STORAGE
@@ -769,17 +818,20 @@
    * Cleans backup (or saved) data from any app version into the current shape,
    * converting weights from the data's unit (lb when missing, the only unit
    * older backups had) into targetUnit. Rows with an invalid date, or without a
-   * valid weight or dose, are dropped — as are fields from removed features.
+   * valid weight or dose, are dropped — as are fields from removed features,
+   * and (before v4) doses still ahead of today, which were never taken.
    * On duplicate dates the last row wins. Missing goals fall back to defaults.
    */
   function normalizeBackup(raw, targetUnit) {
     const from = raw.unit === "kg" ? "kg" : "lb";
     const pos = v => (isPos(v) ? v : null);
+    const schemaVersion = isNum(raw.schemaVersion) ? raw.schemaVersion : 0, today = todayStr();
+    const wasUpcoming = e => schemaVersion < 4 && e.date > today;
     const days = new Map();
     (Array.isArray(raw.entries) ? raw.entries : []).forEach(e => {
       if (!e || !isDate(e.date)) return;
       const weight = pos(convertWeight(pos(e.weight), from, targetUnit));
-      const doseMg = pos(e.doseMg);
+      const doseMg = wasUpcoming(e) ? null : pos(e.doseMg);
       // Unknown but plain ids (from a newer version) are kept as they are.
       const med = typeof e.medication === "string" ? e.medication.trim().toLowerCase() : "";
       const medication = doseMg === null ? null : /^[a-z0-9 -]{1,40}$/.test(med) ? med : LEGACY_MEDICATION;
@@ -789,7 +841,7 @@
       ? raw.goals.filter(isPos).map(g => convertWeight(g, from, targetUnit))
       : DEFAULT_GOALS.map(g => convertWeight(g, "lb", targetUnit));
     return {
-      schemaVersion: isNum(raw.schemaVersion) ? raw.schemaVersion : 0,
+      schemaVersion,
       entries: [...days.values()].sort(byDate),
       goals: [...new Set(goalList.filter(isPos))].sort((a, b) => b - a),
       name: typeof raw.name === "string" ? raw.name.trim() : "",
@@ -807,6 +859,8 @@
       medication: p.medication,
       intervalDays: isDoseInterval(p.intervalDays) ? p.intervalDays : null,
       doseMg: isPos(p.doseMg) ? p.doseMg : null,
+      doseTime: isTime(p.doseTime) ? p.doseTime : null,          // a dose is asked about from then on its day
+      skippedDate: isDate(p.skippedDate) ? p.skippedDate : null, // the latest scheduled dose skipped
       savedAt: String(p.savedAt || "")
     };
   }
@@ -837,15 +891,20 @@
       storageSet(KEYS.profile, JSON.stringify(profile));
     }
 
-    // Saved data goes through the same cleanup as imports, so damaged storage
-    // can't break the app; write it back if anything had to change.
+    // Saved data goes through the same cleanup as imports (as the schema it was
+    // saved in, noted since v4), so damaged storage can't break the app; write
+    // it back if anything had to change.
     const storedEntries = storageGet(KEYS.entries), storedGoals = storageGet(KEYS.goals);
-    const clean = normalizeBackup({ unit, entries: readJSON(KEYS.entries), goals: readJSON(KEYS.goals) }, unit);
+    const clean = normalizeBackup({ unit, schemaVersion: profile.schemaVersion || 3, entries: readJSON(KEYS.entries), goals: readJSON(KEYS.goals) }, unit);
     entries = clean.entries;
     goals = clean.goals;
     if (storedEntries !== null && (storedEntries !== JSON.stringify(entries) || storedGoals !== JSON.stringify(goals))) {
       storageSet(KEYS.entries, JSON.stringify(entries));
       storageSet(KEYS.goals, JSON.stringify(goals));
+    }
+    if (profile.schemaVersion !== DATA_SCHEMA_VERSION) {
+      profile.schemaVersion = DATA_SCHEMA_VERSION;
+      if (storedEntries !== null) storageSet(KEYS.profile, JSON.stringify(profile)); // else saved with the first entry
     }
     LEGACY_KEYS.forEach(storageRemove);
 
@@ -1022,8 +1081,8 @@
 
   function renderHistory({ w, dir }) {
     const today = todayStr();
-    // Dose-only days are listed only while dose tracking is on, and future ones
-    // under Upcoming Doses instead.
+    // Dose-only days are listed only while dose tracking is on, and never ahead
+    // of today (upcoming doses aren't logged until they're taken).
     const visible = entries.filter(e => hasWeight(e) || (medicationEnabled() && e.date <= today)).reverse();
     $("historyWrap").hidden = !visible.length;
     $("historyEmpty").hidden = visible.length > 0;
@@ -1052,23 +1111,27 @@
   }
 
   function renderUpcomingDoses() {
-    const today = todayStr();
-    const upcoming = entries.filter(e => hasDose(e) && e.date >= today).slice(0, MAX_UPCOMING_DOSES);
+    const today = todayStr(), schedule = doseSchedule();
     const past = entries.filter(e => e.date <= today);
     // History's first page only shows the latest entries; if none of those has
     // a dose, show the last one taken so it's never out of sight.
     const last = past.slice(-PAGE_SIZE).some(hasDose) ? null : past.filter(hasDose).pop();
-    // The units to draw come from the active vial, for doses of its medication.
+    // Scheduled doses are all of the current medication, so drawn from its active vial.
     const vial = activeVial();
-    const units = e => (vial && e.medication === vial.medication ? ` &middot; <span>${fmtUnits(e.doseMg, vial.mgPerMl)}</span>` : "");
-    $("upcomingDosesSection").hidden = !upcoming.length && !last;
+    const units = mg => (vial ? ` &middot; <span>${fmtUnits(mg, vial.mgPerMl)}</span>` : "");
+    // A plan with no dose logged yet has nothing to count from.
+    const plan = medicationEnabled() && planFor(currentMedication());
+    const waiting = !!(plan && plan.intervalDays) && !schedule.length;
+    $("upcomingDosesSection").hidden = !schedule.length && !last && !waiting;
     $("upcomingDosesGrid").innerHTML =
       (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken${otherMedNote(last)} &middot; <span>${fmtDateBrief(last.date)}</span></div></div>` : "") +
-      // Upcoming doses lead with the weekday, the day you dose on.
-      upcoming.map(e => `<div class="stat">
-        <button class="subtle-remove" data-dose-date="${e.date}" title="Remove this dose" aria-label="Remove upcoming dose">&times;</button>
-        <div class="val">${fmtWeekday(e.date)}</div><div class="lbl"><span>${fmtDateBrief(e.date)}</span> &middot; <span>${e.doseMg} mg</span>${units(e)}${otherMedNote(e)}</div>
-      </div>`).join("");
+      // Upcoming doses lead with the weekday, the day you dose on. Due ones wait to be confirmed.
+      schedule.map(d => `<div class="stat${d.due ? " due" : ""}">
+        <div class="val">${fmtWeekday(d.date)}</div><div class="lbl"><span>${fmtDateBrief(d.date)}</span>${d.doseMg ? ` &middot; <span>${d.doseMg} mg</span>${units(d.doseMg)}` : ""}</div>
+        ${d.due ? `<button class="small" data-confirm-dose="${d.date}">Confirm dose</button>` : ""}
+      </div>`).join("") +
+      (waiting ? `<div class="empty-msg">Log a dose above, and your next three will be scheduled from it.</div>` : "");
+    promptDueDose(schedule.find(d => d.due));
   }
 
   function renderStats({ w, trend, dir }) {
@@ -1169,8 +1232,9 @@
   function renderOneTimeInfo(editAll) {
     const fields = ONE_TIME_FIELDS.filter(f => editAll || (f.optional ? !profile[f.key + "Asked"] : !String(profile[f.key] || "").trim()));
     // The dosing plan and vial come after those: asked about once (when a
-    // medication is taken or being picked) and whenever start-up info is edited.
-    dosingAsking = !!editAll || (!profile.dosingAsked && (medicationEnabled() || fields.some(f => f.key === "medication")));
+    // medication is taken or being picked), again when a dosing question is
+    // added, and whenever start-up info is edited.
+    dosingAsking = !!editAll || (profile.dosingAsked !== DOSING_QUESTIONS_VERSION && (medicationEnabled() || fields.some(f => f.key === "medication")));
     $("oneTimeInfoSection").hidden = !fields.length && !dosingAsking;
     $("oneTimeInfoCancelBtn").hidden = !editAll;
     $("oneTimeInfoFields").innerHTML = fields.map(f => {
@@ -1204,6 +1268,7 @@
     $("typicalDoseInput").placeholder = `e.g. ${MEDICATIONS[med].example}`;
     $("doseIntervalInput").value = (plan && plan.intervalDays) || "";
     $("typicalDoseInput").value = (plan && plan.doseMg) || "";
+    $("doseTimeInput").value = (plan && plan.doseTime) || "";
     renderVial();
   }
 
@@ -1240,7 +1305,7 @@
     const vial = vialEditing ? enteredVial(true) : vialFor(formMedication());
     const notes = [];
     if (vial && vialEditing && vialMode === "mix") notes.push(`Concentration: <strong>${fmtConc(vial.mgPerMl)}</strong>`);
-    if (vial && isPos(dose)) notes.push(`${dose} mg = <strong>${fmtUnits(dose, vial.mgPerMl)}</strong> on a U&#8209;100 syringe`); // "U-100" never splits
+    if (vial && isPos(dose)) notes.push(syringeNote(dose, vial));
     // Under the saved vial, or inside the calculator while it's open.
     show("vialUnitsNote", notes.join(" &middot; "));
     show("vialCalcNote", notes.join(" &middot; "));
@@ -1257,7 +1322,11 @@
       alert("Please enter a valid positive typical dose, or leave it blank.");
       return false;
     }
-    return { intervalDays, doseMg };
+    if ($("doseTimeInput").validity.badInput) { // only partly filled in
+      alert("Please finish entering your usual dose time, or leave it blank.");
+      return false;
+    }
+    return { intervalDays, doseMg, doseTime: $("doseTimeInput").value || null };
   }
 
   // The vial in the calculator: null while nothing's entered, false if it isn't
@@ -1294,6 +1363,110 @@
   function storeVial(vial, med) {
     profile.vial = { medication: med, ...vial, savedAt: new Date().toISOString() };
     vialEditing = false;
+  }
+
+  // ==========================================================================
+  // DOSE SCHEDULE & CONFIRMATION
+  // ==========================================================================
+  // Upcoming doses aren't stored: they're worked out from the current
+  // medication's dosing plan whenever they're shown, so any change to the plan
+  // moves them. One falls every intervalDays after the last dose taken (or
+  // skipped). None is logged until confirmed, from the pop-up once it's due or
+  // by adding it in Add Entry. A due dose waits to be confirmed until it's three
+  // intervals old; after that it counts as missed.
+
+  // When a dose comes due: its day at the usual dose time (the start of the day
+  // without one), on this device's clock.
+  function dueAt(date, time) {
+    const [h, m] = (time || "00:00").split(":");
+    return new Date(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10), +h, +m).getTime();
+  }
+
+  // The next three doses as { date, doseMg, due, after }, `after` being the day
+  // they count from. None without days between doses, or until a dose is logged.
+  function doseSchedule() {
+    const plan = medicationEnabled() ? planFor(currentMedication()) : null;
+    if (!plan || !plan.intervalDays) return [];
+    const today = todayStr(), every = plan.intervalDays, now = Date.now();
+    const lastTaken = entries.filter(e => hasDose(e) && e.date <= today).map(e => e.date).pop() || "";
+    const after = [lastTaken, plan.skippedDate || ""].sort().pop();
+    if (!after) return [];
+    const first = Math.max(1, Math.floor(daysBetween(after, today) / every) - MAX_UPCOMING_DOSES + 1); // past the missed ones
+    return Array.from({ length: MAX_UPCOMING_DOSES }, (_, i) => {
+      const date = addDays(after, (first + i) * every);
+      return { date, doseMg: plan.doseMg, due: now >= dueAt(date, plan.doseTime), after };
+    });
+  }
+
+  // Pops up for the first due dose, unless "Not yet" put it off, and closes if
+  // the schedule moves on meanwhile (say the dose was logged on another device).
+  function promptDueDose(dose) {
+    if (doseAsking && (!dose || dose.date !== doseAsking.date)) closeDoseModal();
+    if (!dose || doseAsking || $("bugReportOverlay").classList.contains("open")) return;
+    const snooze = readJSON(KEYS.doseSnooze);
+    if (snooze && snooze.date === dose.date && Date.now() < snooze.until) return;
+    openDoseModal(dose);
+  }
+
+  function openDoseModal(dose) {
+    const med = currentMedication(), time = planFor(med).doseTime;
+    doseAsking = dose;
+    $("doseModalText").textContent = `Your ${medLabel(med)} dose was due ${fmtWeekday(dose.date)}, ${fmtDateBrief(dose.date)}${time ? ` at ${fmtTime(time)}` : ""}. It goes in your log once you confirm it.`;
+    $("doseTakenDate").value = dose.date;
+    $("doseTakenDate").min = addDays(dose.after, 1);
+    $("doseTakenDate").max = todayStr();
+    $("doseTakenMg").value = dose.doseMg || "";
+    updateDoseUnitsNote();
+    $("doseOverlay").classList.add("open");
+  }
+
+  function closeDoseModal() {
+    doseAsking = null;
+    $("doseOverlay").classList.remove("open");
+  }
+
+  // The dose entered in the pop-up, in syringe units from the active vial.
+  function updateDoseUnitsNote() {
+    const vial = activeVial(), mg = readNumber("doseTakenMg"), note = $("doseUnitsNote");
+    note.innerHTML = vial && isPos(mg) ? syringeNote(mg, vial) : "";
+    note.hidden = !note.innerHTML;
+  }
+
+  // Logs the dose as entered, which moves the schedule on from the day it was taken.
+  function confirmDose() {
+    if (!doseAsking) return;
+    const date = $("doseTakenDate").value, doseMg = readNumber("doseTakenMg");
+    if (!isDate(date) || date <= doseAsking.after || date > todayStr()) {
+      return alert(`Enter the day you took this dose: after ${fmtDate(doseAsking.after)}, and not in the future.`);
+    }
+    if (!isPos(doseMg)) return alert("Please enter the dose you took, in mg.");
+    const existing = entries.find(e => e.date === date);
+    if (existing) {
+      Object.assign(existing, { doseMg, medication: currentMedication() });
+    } else {
+      entries.push({ date, weight: null, doseMg, medication: currentMedication() });
+      entries.sort(byDate);
+    }
+    closeDoseModal();
+    save();
+    currentPage = 1;
+    renderAll();
+  }
+
+  // Nothing is logged; the schedule moves on from the skipped day.
+  function skipDose() {
+    if (!doseAsking) return;
+    profile.dosePlan = { ...planFor(currentMedication()), skippedDate: doseAsking.date, savedAt: new Date().toISOString() };
+    closeDoseModal();
+    save();
+    renderAll();
+  }
+
+  // "Not yet" asks again in an hour (on this device).
+  function snoozeDose() {
+    if (!doseAsking) return;
+    storageSet(KEYS.doseSnooze, JSON.stringify({ date: doseAsking.date, until: Date.now() + DOSE_SNOOZE_MS }));
+    closeDoseModal();
   }
 
   // ==========================================================================
@@ -1508,6 +1681,7 @@
       `- Unit: ${unit}`,
       `- GLP-1 medication: ${currentMedication()}`,
       `- Dosing plan / active vial saved: ${planFor(currentMedication()) ? "yes" : "no"} / ${activeVial() ? "yes" : "no"}`,
+      `- Scheduled doses / due: ${doseSchedule().length} / ${doseSchedule().filter(d => d.due).length}`,
       `- Entry count: ${entries.length}`,
       `- Goal count: ${goals.length}`,
       `- Rate mode: ${rateMode}`,
@@ -1954,12 +2128,9 @@
     if (dose !== null && !isPos(dose)) return alert("Please enter a valid positive dose, or leave it blank.");
     if (weight === null && dose === null) return alert(medicationEnabled() ? "Enter a weight or dose." : "Enter a weight.");
     if (weight !== null && date > today) return alert("Weigh-ins can't be dated in the future.");
+    // A dose is logged once taken (confirming it); upcoming ones come from the dosing plan.
+    if (dose !== null && date > today) return alert("Doses can't be dated in the future. Log a dose once you've taken it; upcoming doses are scheduled for you from your dosing plan.");
     const existing = entries.find(e => e.date === date);
-    // At most 3 scheduled doses; changing an already-scheduled dose is always fine.
-    if (dose !== null && date >= today && !(existing && hasDose(existing)) &&
-        entries.filter(e => hasDose(e) && e.date >= today).length >= MAX_UPCOMING_DOSES) {
-      return alert("You can only have 3 upcoming doses scheduled at once. Remove one before adding another.");
-    }
     // Re-adding a date is how a weigh-in gets corrected, but never silently.
     if (weight !== null && existing && hasWeight(existing) && existing.weight !== weight &&
         !confirm(`${fmtDate(date)} already has a weigh-in of ${existing.weight.toFixed(1)} ${unit}. Replace it with ${weight.toFixed(1)} ${unit}?`)) return;
@@ -2064,15 +2235,15 @@
     save();
     renderAll();
   });
-  // Removing an upcoming dose clears just the dose; an entry left empty goes too.
-  onButton($("upcomingDosesGrid"), "button[data-dose-date]", btn => {
-    const entry = entries.find(e => e.date === btn.dataset.doseDate);
-    if (!entry) return;
-    Object.assign(entry, { doseMg: null, medication: null });
-    if (!hasWeight(entry)) entries = entries.filter(e => e !== entry);
-    save();
-    renderAll();
+  onButton($("upcomingDosesGrid"), "button[data-confirm-dose]", btn => {
+    const dose = doseSchedule().find(d => d.date === btn.dataset.confirmDose);
+    if (dose) openDoseModal(dose);
   });
+  $("doseLogBtn").addEventListener("click", confirmDose);
+  $("doseSnoozeBtn").addEventListener("click", snoozeDose);
+  $("doseSkipBtn").addEventListener("click", skipDose);
+  $("doseOverlay").addEventListener("click", e => { if (e.target.id === "doseOverlay") snoozeDose(); });
+  $("doseTakenMg").addEventListener("input", updateDoseUnitsNote);
   onButton($("goalsBody"), "button[data-goal]", btn => {
     goals = goals.filter(g => g !== parseFloat(btn.dataset.goal));
     save();
@@ -2094,16 +2265,16 @@
       profile[f.key] = f.type === "text" ? el.value.trim() : f.type === "boolean" ? el.dataset.value === "true" : el.dataset.value;
       if (f.optional) profile[f.key + "Asked"] = true;
     });
-    if (dosingAsking) profile.dosingAsked = true;
-    const oldPlan = planFor(med) || { intervalDays: null, doseMg: null };
-    if (plan && (plan.intervalDays !== oldPlan.intervalDays || plan.doseMg !== oldPlan.doseMg)) {
-      profile.dosePlan = { medication: med, ...plan, savedAt: new Date().toISOString() };
+    if (dosingAsking) profile.dosingAsked = DOSING_QUESTIONS_VERSION;
+    const oldPlan = planFor(med) || {};
+    if (plan && Object.keys(plan).some(k => plan[k] !== (oldPlan[k] ?? null))) {
+      profile.dosePlan = { medication: med, ...plan, skippedDate: oldPlan.skippedDate || null, savedAt: new Date().toISOString() };
     }
     if (vial) storeVial(vial, med); // its warning came when the calculator was opened
     unit = profile.unit || "lb";
     if (unit !== prevUnit) {
       // Changing units converts every stored weight, so nothing is ever mixed.
-      const converted = normalizeBackup({ unit: prevUnit, entries, goals }, unit);
+      const converted = normalizeBackup({ unit: prevUnit, schemaVersion: DATA_SCHEMA_VERSION, entries, goals }, unit);
       entries = converted.entries;
       goals = converted.goals;
     }
@@ -2141,13 +2312,14 @@
   });
 
   // Enter in an input submits its form row; Ctrl+9 toggles developer mode.
-  const ENTER_SUBMITS = { dateInput: addEntry, weightInput: addEntry, doseInput: addEntry, goalInput: addGoal };
+  const ENTER_SUBMITS = { dateInput: addEntry, weightInput: addEntry, doseInput: addEntry, goalInput: addGoal, doseTakenDate: confirmDose, doseTakenMg: confirmDose };
   document.addEventListener("keydown", e => {
     if (e.ctrlKey && (e.key === "9" || e.code === "Digit9")) {
       e.preventDefault();
       toggleDevMode();
     } else if (e.key === "Escape") {
-      closeBugReportModal();
+      if (doseAsking) snoozeDose();
+      else closeBugReportModal();
     } else if (e.key === "Enter" && ENTER_SUBMITS[e.target.id]) {
       e.preventDefault();
       ENTER_SUBMITS[e.target.id]();
@@ -2163,8 +2335,13 @@
     entryDateDefault = today;
     renderAll();
   }
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) rollOverToday(); });
-  setInterval(rollOverToday, 60000);
+  // Every minute, and whenever the app is back in view: a new day, or a dose coming due.
+  function tick() {
+    rollOverToday();
+    renderUpcomingDoses();
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) tick(); });
+  setInterval(tick, 60000);
 
   // The sync folder is checked for other devices' saves every few seconds while
   // the app is on screen and as soon as it's back in view. A pending autosave is
