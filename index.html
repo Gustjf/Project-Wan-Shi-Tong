@@ -122,24 +122,39 @@
   #futureWeightGrid .stat { text-align: center; }
   #futureWeightGrid .val { font-size: 1em; }
   .goals-table { margin-top: 14px; }
-  /* Custom weekly-rate slider (-2% to +1%, 0.25% steps). Ticks and labels are
-     inset by half the thumb width so they line up with the thumb's center. */
+  /* Sliders: the custom weekly rate (-2% to +1%, 0.25% steps) and the vial's
+     BAC water (1 to 3 mL, 0.1 mL steps). Ticks and labels are inset by half
+     the thumb width so they line up with the thumb's center. */
   .rate-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
   .rate-head label { margin-bottom: 0; }
   .rate-value { flex: 0 0 auto; min-width: 56px; padding: 4px 12px; border-radius: 6px; background: var(--accent); color: #fff; font-size: .9em; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; }
-  #customRate { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 5px; margin: 0; border-radius: 3px; background: var(--border); outline: none; }
-  #customRate::-webkit-slider-thumb { -webkit-appearance: none; box-sizing: border-box; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; }
-  #customRate::-moz-range-thumb { box-sizing: border-box; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; }
-  #customRate::-moz-range-track { height: 5px; border-radius: 3px; background: var(--border); }
-  #customRate:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3); }
-  #customRate:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3); }
+  input[type=range] { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 5px; margin: 0; border-radius: 3px; background: var(--border); outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; box-sizing: border-box; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { box-sizing: border-box; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; }
+  input[type=range]::-moz-range-track { height: 5px; border-radius: 3px; background: var(--border); }
+  input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3); }
+  input[type=range]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgba(37, 99, 235, .3); }
   .rate-ticks { position: relative; height: 6px; margin: 10px 8.5px 0; background: linear-gradient(90deg, var(--border) 1px, transparent 1px) 0 0 / calc((100% - 1px) / 12) 100% repeat-x; }
   .rate-ticks::after { content: ""; position: absolute; left: calc((100% - 1px) * 2 / 3); top: -1.5px; width: 1px; height: 9px; background: var(--muted); }
+  .bac-ticks { background-size: calc((100% - 1px) / 4) 100%; } /* a tick every 0.5 mL */
+  .bac-ticks::after { content: none; }
   .rate-labels { position: relative; height: 14px; margin: 4px 8.5px 0; font-size: .72em; color: var(--muted); }
   .rate-labels span { position: absolute; top: 0; white-space: nowrap; }
   .rate-labels .rl-min { left: 0; }
   .rate-labels .rl-zero { left: calc((100% - 1px) * 2 / 3); transform: translateX(-50%); }
+  .rate-labels .rl-mid { left: calc((100% - 1px) / 2); transform: translateX(-50%); }
   .rate-labels .rl-max { right: 0; }
+
+  /* --- Start-up dosing plan & active vial --- */
+  .dosing { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+  #oneTimeInfoFields:empty { display: none; }
+  #oneTimeInfoFields:empty + .dosing { margin-top: 8px; padding-top: 0; border-top: none; } /* only the dosing is being asked */
+  .dosing > .row, .dosing .window-pills { margin-top: 0; }
+  .vial-head { margin-top: 14px; }
+  .vial-line { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; font-size: .9em; }
+  .vial-line .muted { color: var(--muted); }
+  .vial-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .bac-head { margin-top: 12px; }
 
   /* --- Chart --- */
   #chartSvg { display: block; width: 100%; height: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; }
@@ -201,6 +216,61 @@
   <section id="oneTimeInfoSection" hidden>
     <h2>Get Started</h2>
     <div class="row" id="oneTimeInfoFields"></div>
+    <!-- Dosing plan and the one active vial, for the medication picked above (or already chosen). -->
+    <div class="dosing" id="dosingBox" hidden>
+      <div class="subhead" id="dosingTitle">Dosing</div>
+      <div class="row">
+        <div>
+          <label for="doseIntervalInput">Days between doses</label>
+          <input type="number" id="doseIntervalInput" step="1" min="1" max="14" placeholder="1–14">
+        </div>
+        <div>
+          <label for="typicalDoseInput">Typical dose, mg</label>
+          <input type="number" id="typicalDoseInput" step="any" min="0">
+        </div>
+      </div>
+      <div class="note" id="weeklyDoseNote" hidden></div>
+      <div class="subhead vial-head">Active vial</div>
+      <div id="vialSummary">
+        <div class="vial-line">
+          <span id="vialSummaryText"></span>
+          <button type="button" class="secondary small" id="changeVialBtn">Add vial</button>
+        </div>
+        <div class="note" id="vialUnitsNote" hidden></div>
+      </div>
+      <div class="vial-card" id="vialEditor" hidden>
+        <div class="window-pills" id="vialModeToggle">
+          <button type="button" class="pill active" data-vial-mode="mix">Vial mg + BAC water</button>
+          <button type="button" class="pill" data-vial-mode="known">Known mg/mL</button>
+        </div>
+        <div id="vialMixWrap">
+          <div class="row">
+            <div>
+              <label for="vialMgInput">Vial total, mg</label>
+              <input type="number" id="vialMgInput" step="any" min="0" placeholder="e.g. 30">
+            </div>
+          </div>
+          <div class="rate-head bac-head">
+            <label for="bacMlInput">BAC water added</label>
+            <span class="rate-value" id="bacMlValue">2 mL</span>
+          </div>
+          <input type="range" id="bacMlInput" step="0.1" min="1" max="3" value="2" autocomplete="off">
+          <div class="rate-ticks bac-ticks" aria-hidden="true"></div>
+          <div class="rate-labels"><span class="rl-min">1 mL</span><span class="rl-mid">2 mL</span><span class="rl-max">3 mL</span></div>
+        </div>
+        <div class="row" id="vialKnownWrap" hidden>
+          <div>
+            <label for="vialConcInput">Concentration, mg/mL</label>
+            <input type="number" id="vialConcInput" step="1" min="1" placeholder="e.g. 20">
+          </div>
+        </div>
+        <div class="note" id="vialCalcNote" hidden></div>
+        <div class="actions">
+          <button type="button" id="saveVialBtn">Save as active vial</button>
+          <button type="button" class="secondary" id="cancelVialBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
     <div class="actions">
       <button id="oneTimeInfoSaveBtn">Save</button>
       <button class="secondary" id="oneTimeInfoCancelBtn" hidden>Cancel</button>
@@ -389,6 +459,8 @@
   const LB_PER_KG = 2.20462;
   const PAGE_SIZE = 7;
   const MAX_UPCOMING_DOSES = 3;
+  const MAX_DOSE_INTERVAL_DAYS = 14; // days between doses: a whole number from 1
+  const BAC_ML_RANGE = [1, 3];       // BAC water a vial can be mixed with, as on its slider
   const MAX_ETA_WEEKS = 5200; // ~100 years; anything slower counts as a flat rate
   const BUG_REPORTS_MAX = 20;
   const DEBUG_LOG_MAX = 40;
@@ -428,6 +500,9 @@
   let unsavedChanges = false;
   let devModeOn = false;
   let entryDateDefault = ""; // the "today" the Date field was last set to
+  let dosingAsking = false;  // start-up info is showing the dosing plan & vial
+  let vialEditing = false;   // the vial calculator is open
+  let vialMode = "mix";      // "mix" (vial mg + BAC water) | "known" (mg/mL)
 
   // Folder autosave & sync (see that section below).
   const syncSupported = typeof window.showDirectoryPicker === "function";
@@ -444,6 +519,10 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.377", date: "2026-09-26", changes: [
+      "Setup now asks for your days between doses and typical dose, and shows the weekly equivalent.",
+      "Setup can hold one active vial (its mg/mL, or its mg and the BAC water it was mixed with), and upcoming doses show the units to draw on a U-100 syringe."
+    ] },
     { version: "4.277", date: "2026-09-26", changes: [
       "On phones the Add Entry date shows its full year (the fields sit two per row there), and its calendar icon is now visible in dark mode."
     ] },
@@ -584,7 +663,8 @@
   const isDate = d => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d) && msDate(dateMs(d)) === d;
   const daysBetween = (a, b) => (dateMs(b) - dateMs(a)) / DAY_MS;
   const addDays = (d, n) => msDate(dateMs(d) + n * DAY_MS);
-  const todayStr = () => { const n = new Date(); return msDate(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())); };
+  const localDate = t => msDate(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate())); // a moment's day on this device
+  const todayStr = () => localDate(new Date());
   const fmtDate = (d, opts = { year: "numeric", month: "short", day: "numeric" }) =>
     new Date(dateMs(d)).toLocaleDateString(undefined, { ...opts, timeZone: "UTC" });
   const fmtDateShort = d => fmtDate(d, { month: "short", day: "numeric" });
@@ -613,6 +693,17 @@
   const medLabel = id => (MEDICATIONS[id] ? MEDICATIONS[id].label : id);
   // Names a dose's medication only when it isn't the current one.
   const otherMedNote = e => (e.medication !== currentMedication() ? ` (${medLabel(e.medication)})` : "");
+
+  // The dosing plan and vial are each kept for one medication at a time.
+  const planFor = med => (profile.dosePlan && profile.dosePlan.medication === med ? profile.dosePlan : null);
+  const vialFor = med => (profile.vial && profile.vial.medication === med ? profile.vial : null);
+  const activeVial = () => vialFor(currentMedication());
+  const isDoseInterval = d => Number.isInteger(d) && d >= 1 && d <= MAX_DOSE_INTERVAL_DAYS;
+  // Rounded for display, without trailing zeros: 5.8333 -> "5.83", 20.0 -> "20".
+  const fmtNum = (v, places) => String(+v.toFixed(places));
+  const fmtConc = mgPerMl => `${fmtNum(mgPerMl, 2)} mg/mL`;
+  // A dose drawn from a vial, in U-100 insulin syringe units (100 units = 1 mL).
+  const fmtUnits = (mg, mgPerMl) => `${fmtNum(mg / mgPerMl * 100, 1)} units`;
 
   // ==========================================================================
   // STORAGE
@@ -699,9 +790,32 @@
       entries: [...days.values()].sort(byDate),
       goals: [...new Set(goalList.filter(isPos))].sort((a, b) => b - a),
       name: typeof raw.name === "string" ? raw.name.trim() : "",
-      medication: MEDICATIONS[raw.medication] ? raw.medication : ""
+      medication: MEDICATIONS[raw.medication] ? raw.medication : "",
+      dosePlan: cleanDosePlan(raw.dosePlan),
+      vial: cleanVial(raw.vial)
     };
   }
+
+  // A dosing plan or vial from storage or a backup, or null if it's unusable.
+  // Each keeps when it was saved: where two meet, the more recent one wins.
+  function cleanDosePlan(p) {
+    if (!p || typeof p !== "object" || !Object.hasOwn(MEDICATIONS, p.medication)) return null;
+    return {
+      medication: p.medication,
+      intervalDays: isDoseInterval(p.intervalDays) ? p.intervalDays : null,
+      doseMg: isPos(p.doseMg) ? p.doseMg : null,
+      savedAt: String(p.savedAt || "")
+    };
+  }
+  function cleanVial(v) {
+    if (!v || typeof v !== "object" || !Object.hasOwn(MEDICATIONS, v.medication)) return null;
+    // A mixed vial's concentration always comes from its mg and BAC water.
+    const mixed = isPos(v.vialMg) && isNum(v.bacMl) && v.bacMl >= BAC_ML_RANGE[0] && v.bacMl <= BAC_ML_RANGE[1];
+    const mgPerMl = mixed ? v.vialMg / v.bacMl : v.mgPerMl;
+    if (!isPos(mgPerMl)) return null;
+    return { medication: v.medication, mgPerMl, vialMg: mixed ? v.vialMg : null, bacMl: mixed ? v.bacMl : null, savedAt: String(v.savedAt || "") };
+  }
+  const latest = (a, b) => (!a || (b && b.savedAt >= a.savedAt) ? b : a); // b on a tie
 
   function loadAll() {
     const p = readJSON(KEYS.profile);
@@ -709,6 +823,8 @@
     if (typeof profile.name !== "string") profile.name = "";
     if (profile.unit !== "kg" && profile.unit !== "lb") profile.unit = ""; // not answered yet
     unit = profile.unit || "lb";
+    profile.dosePlan = cleanDosePlan(profile.dosePlan);
+    profile.vial = cleanVial(profile.vial);
     // Older versions only asked "Do you take Tirzepatide?"; carry that answer over.
     if ("usesTirzepatide" in profile) {
       if (!profile.medication) profile.medication = profile.usesTirzepatide === false ? "none" : LEGACY_MEDICATION;
@@ -939,13 +1055,16 @@
     // History's first page only shows the latest entries; if none of those has
     // a dose, show the last one taken so it's never out of sight.
     const last = past.slice(-PAGE_SIZE).some(hasDose) ? null : past.filter(hasDose).pop();
+    // The units to draw come from the active vial, for doses of its medication.
+    const vial = activeVial();
+    const units = e => (vial && e.medication === vial.medication ? ` &middot; <span>${fmtUnits(e.doseMg, vial.mgPerMl)}</span>` : "");
     $("upcomingDosesSection").hidden = !upcoming.length && !last;
     $("upcomingDosesGrid").innerHTML =
       (last ? `<div class="stat"><div class="val">${last.doseMg} mg</div><div class="lbl">Last dose taken${otherMedNote(last)} &middot; <span>${fmtDateBrief(last.date)}</span></div></div>` : "") +
       // Upcoming doses lead with the weekday, the day you dose on.
       upcoming.map(e => `<div class="stat">
         <button class="subtle-remove" data-dose-date="${e.date}" title="Remove this dose" aria-label="Remove upcoming dose">&times;</button>
-        <div class="val">${fmtWeekday(e.date)}</div><div class="lbl"><span>${fmtDateBrief(e.date)}</span> &middot; <span>${e.doseMg} mg</span>${otherMedNote(e)}</div>
+        <div class="val">${fmtWeekday(e.date)}</div><div class="lbl"><span>${fmtDateBrief(e.date)}</span> &middot; <span>${e.doseMg} mg</span>${units(e)}${otherMedNote(e)}</div>
       </div>`).join("");
   }
 
@@ -1046,7 +1165,10 @@
   // editing from Developer Mode.
   function renderOneTimeInfo(editAll) {
     const fields = ONE_TIME_FIELDS.filter(f => editAll || (f.optional ? !profile[f.key + "Asked"] : !String(profile[f.key] || "").trim()));
-    $("oneTimeInfoSection").hidden = !fields.length;
+    // The dosing plan and vial come after those: asked about once (when a
+    // medication is taken or being picked) and whenever start-up info is edited.
+    dosingAsking = !!editAll || (!profile.dosingAsked && (medicationEnabled() || fields.some(f => f.key === "medication")));
+    $("oneTimeInfoSection").hidden = !fields.length && !dosingAsking;
     $("oneTimeInfoCancelBtn").hidden = !editAll;
     $("oneTimeInfoFields").innerHTML = fields.map(f => {
       const id = "oneTimeInput_" + f.key;
@@ -1060,6 +1182,114 @@
       }</div></div>`;
     }).join("");
     fields.filter(f => f.type === "text").forEach(f => { $("oneTimeInput_" + f.key).value = profile[f.key] || ""; });
+    renderDosing();
+  }
+
+  // The medication picked in start-up info, or the current one if it isn't being asked.
+  function formMedication() {
+    const el = $("oneTimeInput_medication");
+    return el ? el.dataset.value : currentMedication();
+  }
+
+  // The dosing plan and vial in start-up info, for the medication picked there.
+  function renderDosing() {
+    const med = formMedication(), plan = planFor(med);
+    $("dosingBox").hidden = !dosingAsking || med === "none";
+    vialEditing = false;
+    if (med === "none") return;
+    $("dosingTitle").textContent = `${medLabel(med)} dosing`;
+    $("typicalDoseInput").placeholder = `e.g. ${MEDICATIONS[med].example}`;
+    $("doseIntervalInput").value = (plan && plan.intervalDays) || "";
+    $("typicalDoseInput").value = (plan && plan.doseMg) || "";
+    renderVial();
+  }
+
+  // The active vial (or none) with a button to change it, or the calculator for a new one.
+  function renderVial() {
+    const med = formMedication(), vial = vialFor(med), other = vial ? null : profile.vial;
+    const saved = vial && new Date(vial.savedAt);
+    $("vialSummary").hidden = vialEditing;
+    $("vialEditor").hidden = !vialEditing;
+    $("vialSummaryText").innerHTML = vial
+      ? `<strong>${fmtConc(vial.mgPerMl)}</strong> <span class="muted">${vial.vialMg ? `&middot; ${fmtNum(vial.vialMg, 2)} mg + ${fmtNum(vial.bacMl, 2)} mL BAC water ` : ""}${isNaN(saved) ? "" : `&middot; saved ${fmtDateBrief(localDate(saved))}`}</span>`
+      : other ? `Your active vial is for ${medLabel(other.medication)}.` : "No active vial yet.";
+    $("changeVialBtn").textContent = vial ? "Change vial" : "Add vial";
+    updateDosingNotes();
+  }
+
+  function setVialMode(mode) {
+    vialMode = mode;
+    $("vialModeToggle").querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.vialMode === mode));
+    $("vialMixWrap").hidden = mode !== "mix";
+    $("vialKnownWrap").hidden = mode !== "known";
+    updateDosingNotes();
+  }
+
+  const bacWaterMl = () => Math.round(parseFloat($("bacMlInput").value) * 10) / 10;
+
+  // Live results as the dosing is entered: the plan's weekly equivalent, the
+  // vial's concentration, and the typical dose in syringe units.
+  function updateDosingNotes() {
+    const show = (id, html) => { $(id).innerHTML = html; $(id).hidden = !html; };
+    const days = readNumber("doseIntervalInput"), dose = readNumber("typicalDoseInput");
+    show("weeklyDoseNote", isDoseInterval(days) && isPos(dose) ? `Weekly equivalent: <strong>${fmtNum(dose * 7 / days, 2)} mg</strong>` : "");
+    $("bacMlValue").textContent = `${bacWaterMl()} mL`;
+    const vial = vialEditing ? enteredVial(true) : vialFor(formMedication());
+    const notes = [];
+    if (vial && vialEditing && vialMode === "mix") notes.push(`Concentration: <strong>${fmtConc(vial.mgPerMl)}</strong>`);
+    if (vial && isPos(dose)) notes.push(`${dose} mg = <strong>${fmtUnits(dose, vial.mgPerMl)}</strong> on a U&#8209;100 syringe`); // "U-100" never splits
+    // Under the saved vial, or inside the calculator while it's open.
+    show("vialUnitsNote", notes.join(" &middot; "));
+    show("vialCalcNote", notes.join(" &middot; "));
+  }
+
+  // The dosing plan as entered, or false (after saying why) if it isn't valid.
+  function enteredPlan() {
+    const intervalDays = readNumber("doseIntervalInput"), doseMg = readNumber("typicalDoseInput");
+    if (intervalDays !== null && !isDoseInterval(intervalDays)) {
+      alert(`Days between doses must be a whole number from 1 to ${MAX_DOSE_INTERVAL_DAYS}.`);
+      return false;
+    }
+    if (doseMg !== null && !isPos(doseMg)) {
+      alert("Please enter a valid positive typical dose, or leave it blank.");
+      return false;
+    }
+    return { intervalDays, doseMg };
+  }
+
+  // The vial in the calculator: null while nothing's entered, false if it isn't
+  // valid (saying why, unless quiet).
+  function enteredVial(quiet) {
+    const invalid = message => { if (!quiet) alert(message); return false; };
+    if (vialMode === "known") {
+      const mgPerMl = readNumber("vialConcInput");
+      if (mgPerMl === null) return null;
+      return Number.isInteger(mgPerMl) && mgPerMl > 0 ? { mgPerMl, vialMg: null, bacMl: null }
+        : invalid("Enter the concentration as a whole number of mg per mL.");
+    }
+    const vialMg = readNumber("vialMgInput"), bacMl = bacWaterMl();
+    if (vialMg === null) return null;
+    return isPos(vialMg) ? { mgPerMl: vialMg / bacMl, vialMg, bacMl } : invalid("Please enter the vial's total mg as a positive number.");
+  }
+
+  // Only one vial is active, and upcoming doses' syringe units come from it, so
+  // opening the calculator over a saved vial warns first.
+  function openVialEditor() {
+    const med = formMedication(), old = profile.vial, same = !!vialFor(med);
+    if (old && !confirm(same
+      ? `Change your active ${medLabel(med)} vial (${fmtConc(old.mgPerMl)})? Upcoming doses work out their syringe units from it, so only change it when you start a new vial.`
+      : `Only one vial can be active. Saving a ${medLabel(med)} vial will replace your ${medLabel(old.medication)} vial (${fmtConc(old.mgPerMl)}). Continue?`)) return;
+    vialEditing = true;
+    $("vialMgInput").value = same && old.vialMg ? old.vialMg : "";
+    $("bacMlInput").value = same && old.bacMl ? old.bacMl : $("bacMlInput").defaultValue;
+    $("vialConcInput").value = same && !old.vialMg ? old.mgPerMl : "";
+    setVialMode(same && !old.vialMg ? "known" : "mix");
+    renderVial();
+  }
+
+  function storeVial(vial, med) {
+    profile.vial = { medication: med, ...vial, savedAt: new Date().toISOString() };
+    vialEditing = false;
   }
 
   // ==========================================================================
@@ -1273,6 +1503,7 @@
       "## App State",
       `- Unit: ${unit}`,
       `- GLP-1 medication: ${currentMedication()}`,
+      `- Dosing plan / active vial saved: ${planFor(currentMedication()) ? "yes" : "no"} / ${activeVial() ? "yes" : "no"}`,
       `- Entry count: ${entries.length}`,
       `- Goal count: ${goals.length}`,
       `- Rate mode: ${rateMode}`,
@@ -1378,6 +1609,8 @@
       unit,
       name: profile.name,
       medication: currentMedication(),
+      dosePlan: profile.dosePlan,
+      vial: profile.vial,
       entries,
       goals,
       cumulativeDoseMgByMedication: cumulativeDoseMg() // derived totals for reference; not read on import
@@ -1396,6 +1629,10 @@
     entries = clean.entries;
     goals = clean.goals;
     if (clean.name) profile.name = clean.name; // older backups have no name; keep ours
+    // The most recently saved dosing plan and vial are kept, so an older backup
+    // never brings back an old vial's concentration.
+    profile.dosePlan = latest(profile.dosePlan, clean.dosePlan);
+    profile.vial = latest(profile.vial, clean.vial);
     // Dose entries prove a medication is in use, so that start-up question is
     // answered (with the backup's own answer, else its latest dose's medication).
     const lastDose = entries.filter(hasDose).pop();
@@ -1493,10 +1730,12 @@
     return {
       entries: [...days.values()].sort(byDate),
       goals: [...new Set(older.goals.concat(newer.goals))].sort((x, y) => y - x),
-      name: newer.name || older.name
+      name: newer.name || older.name,
+      dosePlan: latest(older.dosePlan, newer.dosePlan),
+      vial: latest(older.vial, newer.vial)
     };
   }
-  const dataKey = d => JSON.stringify([d.entries, d.goals, d.name]);
+  const dataKey = d => JSON.stringify([d.entries, d.goals, d.name, d.dosePlan, d.vial]);
 
   // Brings in a save found in the folder; returns what happened, or "" if nothing.
   function incorporate(raw) {
@@ -1511,9 +1750,11 @@
     const backupUnit = replace && !profile.unit && (raw.unit === "kg" || raw.unit === "lb") ? raw.unit : "";
     const theirs = normalizeBackup(raw, backupUnit || unit);
     if (!clock && !theirs.entries.length) return "";
-    const next = replace ? theirs : mergeVersions(
-      { entries, goals, name: profile.name, savedAt: syncMeta.changedAt, device: syncMeta.device },
-      { ...theirs, savedAt: String(raw.savedAt || ""), device: String(raw.sync.device || "") });
+    const ours = { entries, goals, name: profile.name, dosePlan: profile.dosePlan, vial: profile.vial };
+    const next = replace
+      ? { ...theirs, dosePlan: latest(ours.dosePlan, theirs.dosePlan), vial: latest(ours.vial, theirs.vial) } // as on import
+      : mergeVersions({ ...ours, savedAt: syncMeta.changedAt, device: syncMeta.device },
+        { ...theirs, savedAt: String(raw.savedAt || ""), device: String(raw.sync.device || "") });
     if (clock) syncMeta.clock = maxClocks(syncMeta.clock, clock);
     if (!clock || dataKey(next) !== dataKey(theirs)) {
       markLocalChange(); // a version the folder doesn't have yet, so it gets saved there
@@ -1521,7 +1762,7 @@
       syncMeta.changedAt = String(raw.savedAt || syncMeta.changedAt);
       storeSyncMeta();
     }
-    if (!backupUnit && dataKey({ ...next, name: next.name || profile.name }) === dataKey({ entries, goals, name: profile.name })) return ""; // nothing new here
+    if (!backupUnit && dataKey({ ...next, name: next.name || profile.name }) === dataKey(ours)) return ""; // nothing new here
     applyBackup(next, backupUnit);
     return replace ? "Loaded" : "Combined changes with";
   }
@@ -1796,7 +2037,23 @@
     $("customRateWrap").hidden = value !== "custom";
     renderAll();
   });
-  onToggle($("oneTimeInfoFields"), "data-value", (value, btn) => { btn.parentElement.dataset.value = value; });
+  onToggle($("oneTimeInfoFields"), "data-value", (value, btn) => {
+    btn.parentElement.dataset.value = value;
+    if (btn.parentElement.id === "oneTimeInput_medication") renderDosing(); // dosing is per medication
+  });
+  $("dosingBox").addEventListener("input", updateDosingNotes);
+  onButton($("vialModeToggle"), "button[data-vial-mode]", btn => setVialMode(btn.dataset.vialMode));
+  $("changeVialBtn").addEventListener("click", openVialEditor);
+  $("cancelVialBtn").addEventListener("click", () => { vialEditing = false; renderVial(); });
+  $("saveVialBtn").addEventListener("click", () => {
+    const vial = enteredVial();
+    if (vial === false) return;
+    if (!vial) return alert(vialMode === "known" ? "Enter the vial's concentration first." : "Enter the vial's total mg first.");
+    storeVial(vial, formMedication());
+    save();
+    renderVial();
+    renderAll();
+  });
 
   onButton($("historyBody"), "button[data-date]", btn => {
     entries = entries.filter(e => e.date !== btn.dataset.date);
@@ -1819,6 +2076,13 @@
   });
 
   $("oneTimeInfoSaveBtn").addEventListener("click", () => {
+    // The dosing plan and an open vial calculator are checked first, so a bad
+    // entry there changes nothing.
+    const med = formMedication(), dosing = dosingAsking && med !== "none";
+    const plan = dosing ? enteredPlan() : null;
+    if (plan === false) return;
+    const vial = dosing && vialEditing ? enteredVial() : null;
+    if (vial === false) return;
     const prevUnit = unit;
     ONE_TIME_FIELDS.forEach(f => {
       const el = $("oneTimeInput_" + f.key);
@@ -1826,6 +2090,12 @@
       profile[f.key] = f.type === "text" ? el.value.trim() : f.type === "boolean" ? el.dataset.value === "true" : el.dataset.value;
       if (f.optional) profile[f.key + "Asked"] = true;
     });
+    if (dosingAsking) profile.dosingAsked = true;
+    const oldPlan = planFor(med) || { intervalDays: null, doseMg: null };
+    if (plan && (plan.intervalDays !== oldPlan.intervalDays || plan.doseMg !== oldPlan.doseMg)) {
+      profile.dosePlan = { medication: med, ...plan, savedAt: new Date().toISOString() };
+    }
+    if (vial) storeVial(vial, med); // its warning came when the calculator was opened
     unit = profile.unit || "lb";
     if (unit !== prevUnit) {
       // Changing units converts every stored weight, so nothing is ever mixed.
