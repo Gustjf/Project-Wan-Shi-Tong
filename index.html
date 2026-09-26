@@ -35,6 +35,8 @@
   .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
   .row > div { flex: 1; min-width: 100px; }
   .row > .btn-cell { flex: 0 0 auto; align-self: flex-end; }
+  .row > .date-cell { min-width: 140px; } /* room for the whole date beside its calendar icon */
+  @media (max-width: 600px) { #entryRow > div:not(.btn-cell) { flex-basis: 40%; } } /* phones: two fields per row, so none gets squeezed */
   .actions { margin-top: 10px; }
   .toolbar { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
   .empty-msg { color: var(--muted); font-size: .9em; padding: 8px 0; }
@@ -51,6 +53,7 @@
   /* --- Inputs --- */
   input[type=date], input[type=number], input[type=text], textarea { width: 100%; padding: 7px 8px; border: 1px solid var(--border); border-radius: 5px; font-size: .95em; background: var(--panel); color: var(--text); transition: border-color .2s, box-shadow .2s; }
   input[type=date]:focus, input[type=number]:focus, input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
+  [data-theme="dark"] input[type=date] { color-scheme: dark; } /* light calendar icon and picker */
   input[type=number] { -moz-appearance: textfield; appearance: textfield; }
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   textarea { padding: 8px; font-family: inherit; font-size: .9em; resize: vertical; min-height: 90px; }
@@ -206,8 +209,8 @@
 
   <section>
     <h2>Add Entry</h2>
-    <div class="row">
-      <div>
+    <div class="row" id="entryRow">
+      <div class="date-cell">
         <label for="dateInput">Date</label>
         <input type="date" id="dateInput">
       </div>
@@ -441,6 +444,9 @@
   // Newest first; APP_VERSION is the top entry. Version X.YYY, bump one tier per
   // change: +0.001 bug fix, +0.010 tiny tweak, +0.100 small feature, +1 large feature.
   const CHANGELOG = [
+    { version: "4.277", date: "2026-09-26", changes: [
+      "On phones the Add Entry date shows its full year (the fields sit two per row there), and its calendar icon is now visible in dark mode."
+    ] },
     { version: "4.276", date: "2026-09-26", changes: [
       "Added a bear-face tab icon (from Lucide) so Bosco is easy to spot among browser tabs."
     ] },
