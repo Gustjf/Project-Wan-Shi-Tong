@@ -1,4 +1,5 @@
-# Project Context: Single-File Vanilla HTML/JS Weight Tracker App
+# Project Context: Bosco — Single-File Vanilla HTML/JS Weight Tracker App
+The app is called **Bosco** (the GitHub repo is named Project-Wan-Shi-Tong).
 
 ## Tech Stack & Architecture
 - **Stack:** Pure HTML5, CSS3, and Vanilla JavaScript (ES6+) contained entirely within a single html file. 
@@ -27,3 +28,6 @@
 
 ## Git Workflow
 - Make a new branch with the feature and then give me instructions on how to test and accept the changes. 
+
+## Linked Repositories
+- When other GitHub repositories are linked to the session (e.g. Momo), they are **read-only** references. Never edit, commit to, or push to them. Only edit the repository the change is for.
